@@ -1,0 +1,69 @@
+{
+    "report_name": "Milestone 1 Sentiment Validation Report",
+    "total_samples": 5,
+    "correct_predictions": 5,
+    "incorrect_predictions": 0,
+    "accuracy": 1.0,
+    "results": [
+        {
+            "sample_number": 1,
+            "input_text": "I love my job and I am very happy with my team.",
+            "processed_text": "love job happy team",
+            "expected_sentiment": "positive",
+            "predicted_sentiment": "positive",
+            "compound": 0.836,
+            "positive": 0.798,
+            "negative": 0.0,
+            "neutral": 0.202,
+            "correct": true
+        },
+        {
+            "sample_number": 2,
+            "input_text": "I am extremely stressed and unhappy with my workload.",
+            "processed_text": "extremely stressed unhappy workload",
+            "expected_sentiment": "negative",
+            "predicted_sentiment": "negative",
+            "compound": -0.6976,
+            "positive": 0.0,
+            "negative": 0.743,
+            "neutral": 0.257,
+            "correct": true
+        },
+        {
+            "sample_number": 3,
+            "input_text": "My workday was normal and nothing unusual happened.",
+            "processed_text": "workday normal nothing unusual happened",
+            "expected_sentiment": "neutral",
+            "predicted_sentiment": "neutral",
+            "compound": 0.0,
+            "positive": 0.0,
+            "negative": 0.0,
+            "neutral": 1.0,
+            "correct": true
+        },
+        {
+            "sample_number": 4,
+            "input_text": "I really enjoy working with my manager.",
+            "processed_text": "really enjoy working manager",
+            "expected_sentiment": "positive",
+            "predicted_sentiment": "positive",
+            "compound": 0.5413,
+            "positive": 0.538,
+            "negative": 0.0,
+            "neutral": 0.462,
+            "correct": true
+        },
+        {
+            "sample_number": 5,
+            "input_text": "I feel tired, frustrated and overwhelmed by work.",
+            "processed_text": "feel tired frustrated overwhelmed work",
+            "expected_sentiment": "negative",
+            "predicted_sentiment": "negative",
+            "compound": -0.7269,
+            "positive": 0.126,
+            "negative": 0.663,
+            "neutral": 0.211,
+            "correct": true
+        }
+    ]
+}
