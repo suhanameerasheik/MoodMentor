@@ -1,91 +1,96 @@
 import { useState } from "react";
 import "./App.css";
 
+type AnalysisResult = {
+  sentiment?: {
+    sentiment?: string;
+    positive?: number;
+    negative?: number;
+    neutral?: number;
+    compound?: number;
+  };
+
+  emotion?: {
+    emotion?: string;
+    confidence?: number;
+  };
+
+  multilabel_emotion?: {
+    primary_emotion?: string;
+    detected_emotions?: string[];
+    emotion_scores?: {
+      joy?: number;
+      sadness?: number;
+      anger?: number;
+      fear?: number;
+      surprise?: number;
+      disgust?: number;
+    };
+  };
+
+  wellness?: {
+    risk_level?: string;
+    insight?: string;
+  };
+
+  original_text?: string;
+  preprocessed_text?: string;
+};
+
 function App() {
-
   const [text, setText] = useState("");
-
-  const [result, setResult] =
-    useState<any>(null);
-
-  const [message, setMessage] =
-    useState("");
-
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [message, setMessage] = useState("");
 
   // ==========================================================
   // ANALYZE TEXT
   // ==========================================================
 
   async function handleAnalyze() {
-
     if (text.trim() === "") {
-
-      setMessage(
-        "Please enter some workplace feedback."
-      );
-
+      setMessage("Please enter some workplace feedback.");
       setResult(null);
-
       return;
     }
 
-
     setMessage("");
 
-
     try {
-
       const response = await fetch(
         "http://127.0.0.1:8000/analyze",
         {
-
           method: "POST",
-
           headers: {
-
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
-
             text: text,
-
           }),
-
         }
       );
 
+      const data = await response.json();
 
-      const data =
-        await response.json();
-
+      console.log("Backend response:", data);
 
       if (!response.ok) {
-
-        setMessage(
-          data.detail ||
-          "Analysis failed."
-        );
-
+        setMessage(data.detail || "Analysis failed.");
         setResult(null);
-
         return;
       }
 
-
       setResult(data);
-
+      setMessage("✓ Analysis completed successfully.");
     } catch (error) {
+      console.error(error);
 
       setMessage(
-        "Could not connect to the backend."
+        "Could not connect to the backend. Make sure FastAPI is running."
       );
 
       setResult(null);
     }
   }
-
 
   // ==========================================================
   // FILE UPLOAD
@@ -94,219 +99,137 @@ function App() {
   function handleFileUpload(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-
-    const file =
-      event.target.files?.[0];
-
+    const file = event.target.files?.[0];
 
     if (!file) return;
 
-
-    const allowedTypes = [
-      ".txt",
-      ".csv"
-    ];
-
-
-    const fileName =
-      file.name.toLowerCase();
-
+    const allowedTypes = [".txt", ".csv"];
+    const fileName = file.name.toLowerCase();
 
     if (
-      !allowedTypes.some(
-        (type) =>
-          fileName.endsWith(type)
+      !allowedTypes.some((type) =>
+        fileName.endsWith(type)
       )
     ) {
-
-      setMessage(
-        "Please upload a .txt or .csv file."
-      );
-
+      setMessage("Please upload a .txt or .csv file.");
       setResult(null);
-
       return;
     }
 
-
-    const reader =
-      new FileReader();
-
+    const reader = new FileReader();
 
     reader.onload = (event) => {
+      const fileContent = event.target?.result;
 
-      const fileContent =
-        event.target?.result;
-
-
-      if (
-        typeof fileContent !==
-        "string"
-      ) {
-
-        setMessage(
-          "Could not read the file."
-        );
-
-        return;
-      }
-
-
-      if (
-        fileContent.trim() === ""
-      ) {
-
-        setMessage(
-          "The uploaded file is empty."
-        );
-
+      if (typeof fileContent !== "string") {
+        setMessage("Could not read the file.");
         setResult(null);
-
         return;
       }
 
+      if (fileContent.trim() === "") {
+        setMessage("The uploaded file is empty.");
+        setResult(null);
+        return;
+      }
 
       // ------------------------------------------------------
       // TXT FILE
       // ------------------------------------------------------
 
-      if (
-        fileName.endsWith(".txt")
-      ) {
-
+      if (fileName.endsWith(".txt")) {
         setText(fileContent);
-
-        setMessage(
-          "✓ TXT file loaded successfully."
-        );
-
+        setMessage("✓ TXT file loaded successfully.");
         setResult(null);
-
         return;
       }
-
 
       // ------------------------------------------------------
       // CSV FILE
       // ------------------------------------------------------
 
-      if (
-        fileName.endsWith(".csv")
-      ) {
-
-        const lines =
-          fileContent
-            .split(/\r?\n/)
-            .map(
-              (line) =>
-                line.trim()
-            )
-            .filter(
-              (line) =>
-                line !== ""
-            );
-
+      if (fileName.endsWith(".csv")) {
+        const lines = fileContent
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line !== "");
 
         if (lines.length < 2) {
-
           setMessage(
             "CSV file must contain a header and at least one row."
           );
-
           setResult(null);
-
           return;
         }
 
+        const header = lines[0]
+          .split(",")[0]
+          .trim()
+          .toLowerCase();
 
-        // Backend expects "feedback"
-        const header =
-          lines[0]
-            .split(",")[0]
-            .trim()
-            .toLowerCase();
-
-
-        if (
-          header !== "feedback"
-        ) {
-
+        if (header !== "feedback") {
           setMessage(
             "CSV must contain a 'feedback' column."
           );
-
           setResult(null);
-
           return;
         }
 
+        const csvTexts = lines
+          .slice(1)
+          .map((line) =>
+            line.split(",")[0].trim()
+          )
+          .filter((line) => line !== "");
 
-        const csvTexts =
-          lines
-            .slice(1)
-            .map(
-              (line) =>
-                line
-                  .split(",")[0]
-                  .trim()
-            )
-            .filter(
-              (line) =>
-                line !== ""
-            );
-
-
-        if (
-          csvTexts.length === 0
-        ) {
-
+        if (csvTexts.length === 0) {
           setMessage(
             "CSV does not contain valid text."
           );
-
           setResult(null);
-
           return;
         }
 
-
-        setText(
-          csvTexts.join("\n")
-        );
-
-
-        setMessage(
-          "✓ CSV file loaded successfully."
-        );
-
-
+        setText(csvTexts.join("\n"));
+        setMessage("✓ CSV file loaded successfully.");
         setResult(null);
       }
     };
 
-
     reader.onerror = () => {
-
-      setMessage(
-        "Error while reading the file."
-      );
-
+      setMessage("Error while reading the file.");
       setResult(null);
     };
-
 
     reader.readAsText(file);
   }
 
+  // ==========================================================
+  // HELPER FUNCTIONS
+  // ==========================================================
+
+  function percentage(value?: number) {
+    if (value === undefined || value === null) {
+      return "0.00%";
+    }
+
+    return `${(value * 100).toFixed(2)}%`;
+  }
+
+  function number(value?: number) {
+    if (value === undefined || value === null) {
+      return "0.0000";
+    }
+
+    return value.toFixed(4);
+  }
 
   // ==========================================================
   // UI
   // ==========================================================
 
   return (
-
     <div className="app">
-
 
       {/* =====================================================
           HEADER
@@ -320,30 +243,16 @@ function App() {
             🧠
           </div>
 
-
           <div>
+            <h1><p className="eyebrow">
+            EMPLOYEE WELLNESS PLATFORM
+          </p></h1>
 
-            <h1>
-              WellMind AI
-            </h1>
-
-            <p>
-              Employee Wellness Intelligence
-            </p>
-
+            
           </div>
 
         </div>
 
-
-        <div className="status">
-
-          <span className="status-dot">
-          </span>
-
-          AI System Online
-
-        </div>
 
       </header>
 
@@ -356,31 +265,20 @@ function App() {
 
         <div>
 
-          <p className="eyebrow">
-            EMPLOYEE WELLNESS PLATFORM
-          </p>
-
+          
 
           <h2>
-
             Understand how your
-
-            <span>
-              workplace feels.
-            </span>
-
+            <span> workplace feels.</span>
           </h2>
 
-
           <p className="hero-text">
-
             Share employee feedback and let our AI analyze
-            workplace sentiment, emotions, and wellness risk instantly.
-
+            workplace sentiment, emotions, and wellness risk
+            instantly.
           </p>
 
         </div>
-
 
         <div className="hero-icon">
           💬
@@ -395,13 +293,11 @@ function App() {
 
       <main className="dashboard">
 
-
         {/* ===================================================
             INPUT CARD
            =================================================== */}
 
         <section className="card input-card">
-
 
           <div className="card-header">
 
@@ -417,7 +313,6 @@ function App() {
 
             </div>
 
-
             <span className="badge">
               AI Analysis
             </span>
@@ -426,71 +321,44 @@ function App() {
 
 
           <textarea
-
             placeholder="Example: I really enjoy working with my team, but the workload has been stressful recently..."
-
             value={text}
-
             onChange={(event) =>
               setText(event.target.value)
             }
-
           />
 
 
           <div className="input-footer">
 
-
             <label className="upload-button">
 
               📁 Upload TXT / CSV
 
-
               <input
-
                 type="file"
-
                 accept=".txt,.csv"
-
-                onChange={
-                  handleFileUpload
-                }
-
+                onChange={handleFileUpload}
               />
 
             </label>
 
 
             <button
-
               className="analyze-button"
-
-              onClick={
-                handleAnalyze
-              }
-
+              onClick={handleAnalyze}
             >
-
               Analyze Feedback
-
-              <span>
-                →
-              </span>
-
+              <span>→</span>
             </button>
-
 
           </div>
 
 
           {message && (
-
             <div className="message">
-
               {message}
-
             </div>
-
           )}
 
         </section>
@@ -502,7 +370,6 @@ function App() {
 
         <section className="card results-card">
 
-
           <div className="card-header">
 
             <div>
@@ -512,11 +379,11 @@ function App() {
               </h3>
 
               <p>
-                Sentiment, emotion, and wellness insights from feedback.
+                Sentiment, emotion, and wellness insights
+                from feedback.
               </p>
 
             </div>
-
 
             <span className="live-badge">
               ● LIVE
@@ -533,20 +400,15 @@ function App() {
                 ✨
               </div>
 
-
               <h4>
                 Waiting for feedback
               </h4>
 
-
               <p>
-
-                Enter employee feedback above and click
-
+                Enter employee feedback above and click{" "}
                 <strong>
                   Analyze Feedback
                 </strong>.
-
               </p>
 
             </div>
@@ -554,7 +416,6 @@ function App() {
           ) : (
 
             <div className="results">
-
 
               {/* ==========================================
                   SENTIMENT RESULT
@@ -564,16 +425,12 @@ function App() {
 
                 <div className="sentiment-circle">
 
-                  {result.sentiment.sentiment ===
-                    "positive"
-
+                  {result.sentiment?.sentiment ===
+                  "positive"
                     ? "😊"
-
-                    : result.sentiment.sentiment ===
+                    : result.sentiment?.sentiment ===
                       "negative"
-
                     ? "😟"
-
                     : "😐"}
 
                 </div>
@@ -585,10 +442,12 @@ function App() {
                     DETECTED SENTIMENT
                   </p>
 
-
                   <h4 className="sentiment-title">
 
-                    {result.sentiment.sentiment.toUpperCase()}
+                    {(
+                      result.sentiment?.sentiment ||
+                      "unknown"
+                    ).toUpperCase()}
 
                   </h4>
 
@@ -603,7 +462,6 @@ function App() {
 
               <div className="score-grid">
 
-
                 <div className="score positive">
 
                   <span>
@@ -611,7 +469,9 @@ function App() {
                   </span>
 
                   <strong>
-                    {result.sentiment.positive}
+                    {number(
+                      result.sentiment?.positive
+                    )}
                   </strong>
 
                 </div>
@@ -624,7 +484,9 @@ function App() {
                   </span>
 
                   <strong>
-                    {result.sentiment.negative}
+                    {number(
+                      result.sentiment?.negative
+                    )}
                   </strong>
 
                 </div>
@@ -637,7 +499,9 @@ function App() {
                   </span>
 
                   <strong>
-                    {result.sentiment.neutral}
+                    {number(
+                      result.sentiment?.neutral
+                    )}
                   </strong>
 
                 </div>
@@ -650,11 +514,12 @@ function App() {
                   </span>
 
                   <strong>
-                    {result.sentiment.compound}
+                    {number(
+                      result.sentiment?.compound
+                    )}
                   </strong>
 
                 </div>
-
 
               </div>
 
@@ -665,11 +530,9 @@ function App() {
 
               <div className="emotion-result">
 
-
                 <div className="emotion-icon">
                   🧠
                 </div>
-
 
                 <div className="emotion-info">
 
@@ -677,24 +540,22 @@ function App() {
                     DETECTED EMOTION
                   </p>
 
-
                   <h4 className="emotion-title">
 
-                    {result.emotion.emotion.toUpperCase()}
+                    {(
+                      result.emotion?.emotion ||
+                      "unknown"
+                    ).toUpperCase()}
 
                   </h4>
-
 
                   <p className="emotion-confidence">
 
                     Confidence:{" "}
 
-                    {(
-                      result.emotion.confidence *
-                      100
-                    ).toFixed(2)}
-
-                    %
+                    {percentage(
+                      result.emotion?.confidence
+                    )}
 
                   </p>
 
@@ -704,276 +565,231 @@ function App() {
 
 
               {/* ==========================================
-                  MULTI-LABEL EMOTION RESULT
+                  MULTI-LABEL EMOTION
                  ========================================== */}
 
-              <div className="emotion-result">
+              {result.multilabel_emotion && (
 
+                <>
 
-                <div className="emotion-icon">
-                  🎭
-                </div>
+                  <div className="emotion-result">
 
+                    <div className="emotion-icon">
+                      🎭
+                    </div>
 
-                <div className="emotion-info">
+                    <div className="emotion-info">
 
-                  <p className="small-label">
-                    MULTI-LABEL EMOTIONS
-                  </p>
+                      <p className="small-label">
+                        MULTI-LABEL EMOTIONS
+                      </p>
 
+                      <h4 className="emotion-title">
 
-                  <h4 className="emotion-title">
-
-                    {
-                      result
-                        .multilabel_emotion
-                        .primary_emotion
-                        .toUpperCase()
-                    }
-
-                  </h4>
-
-
-                  <p className="emotion-confidence">
-
-                    Detected:{" "}
-
-                    {
-                      result
-                        .multilabel_emotion
-                        .detected_emotions
-                        .length > 0
-
-                        ? result
+                        {(
+                          result
                             .multilabel_emotion
-                            .detected_emotions
-                            .join(", ")
+                            .primary_emotion ||
+                          "unknown"
+                        ).toUpperCase()}
 
-                        : "No emotion above threshold"
-                    }
+                      </h4>
 
-                  </p>
+                      <p className="emotion-confidence">
 
-                </div>
+                        Detected:{" "}
 
-              </div>
+                        {result
+                          .multilabel_emotion
+                          .detected_emotions
+                          ?.join(", ") ||
+                          "No emotion above threshold"}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+
+                  {/* ====================================
+                      MULTI-LABEL SCORES
+                     ==================================== */}
+
+                  <div className="score-grid">
+
+                    <div className="score">
+
+                      <span>
+                        Joy
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.joy
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="score">
+
+                      <span>
+                        Sadness
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.sadness
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="score">
+
+                      <span>
+                        Anger
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.anger
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="score">
+
+                      <span>
+                        Fear
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.fear
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="score">
+
+                      <span>
+                        Surprise
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.surprise
+                        )}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="score">
+
+                      <span>
+                        Disgust
+                      </span>
+
+                      <strong>
+                        {percentage(
+                          result
+                            .multilabel_emotion
+                            .emotion_scores
+                            ?.disgust
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+                </>
+
+              )}
 
 
               {/* ==========================================
-                  MULTI-LABEL EMOTION SCORES
+                  WELLNESS RISK
                  ========================================== */}
 
-              <div className="score-grid">
+              {result.wellness && (
 
+                <div
+                  className={`wellness-result ${
+                    result.wellness.risk_level ||
+                    "low"
+                  }`}
+                >
 
-                <div className="score">
+                  <div className="wellness-icon">
 
-                  <span>
-                    Joy
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .joy
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div className="score">
-
-                  <span>
-                    Sadness
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .sadness
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div className="score">
-
-                  <span>
-                    Anger
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .anger
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div className="score">
-
-                  <span>
-                    Fear
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .fear
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div className="score">
-
-                  <span>
-                    Surprise
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .surprise
-                    }
-                  </strong>
-
-                </div>
-
-
-                <div className="score">
-
-                  <span>
-                    Disgust
-                  </span>
-
-                  <strong>
-                    {
-                      result
-                        .multilabel_emotion
-                        .emotion_scores
-                        .disgust
-                    }
-                  </strong>
-
-                </div>
-
-
-              </div>
-
-
-              {/* ==========================================
-                  WELLNESS RISK RESULT
-                 ========================================== */}
-
-              <div
-                className={`wellness-result ${result.wellness.risk_level}`}
-              >
-
-                <div className="wellness-icon">
-
-                  {result.wellness.risk_level ===
+                    {result.wellness.risk_level ===
                     "high"
+                      ? "⚠️"
+                      : result.wellness.risk_level ===
+                        "medium"
+                      ? "🟠"
+                      : "🟢"}
 
-                    ? "⚠️"
-
-                    : result.wellness.risk_level ===
-                      "medium"
-
-                    ? "🟠"
-
-                    : "🟢"}
-
-                </div>
+                  </div>
 
 
-                <div className="wellness-info">
+                  <div className="wellness-info">
 
-                  <p className="small-label">
-                    WELLNESS RISK LEVEL
-                  </p>
+                    <p className="small-label">
+                      WELLNESS RISK LEVEL
+                    </p>
 
+                    <h4 className="wellness-title">
 
-                  <h4 className="wellness-title">
+                      {(
+                        result.wellness.risk_level ||
+                        "low"
+                      ).toUpperCase()}
 
-                    {result.wellness.risk_level.toUpperCase()}
+                    </h4>
 
-                  </h4>
+                    <p className="wellness-insight">
 
+                      {result.wellness.insight ||
+                        "No wellness insight available."}
 
-                  <p className="wellness-insight">
+                    </p>
 
-                    {result.wellness.insight}
-
-                  </p>
-
-                </div>
-
-              </div>
-
-
-              {/* ==========================================
-                  PREPROCESSED TEXT
-                 ========================================== */}
-
-              <div className="processed">
-
-                <div className="processed-title">
-
-                  <span>
-                    ⚙
-                  </span>
-
-                  Preprocessed Text
+                  </div>
 
                 </div>
 
-
-                <p>
-                  {result.preprocessed_text}
-                </p>
-
-              </div>
+              )}
 
 
-              {/* ==========================================
-                  ORIGINAL FEEDBACK
-                 ========================================== */}
+              
 
-              <div className="original">
-
-                <div className="processed-title">
-
-                  <span>
-                    📝
-                  </span>
-
-                  Original Feedback
-
-                </div>
-
-
-                <p>
-                  {result.original_text}
-                </p>
-
-              </div>
-
+              
 
             </div>
 
@@ -988,34 +804,18 @@ function App() {
           FOOTER
          ===================================================== */}
 
-      <footer>
+     <footer>
+   <span>
+     •
+  </span>
 
-        <span>
-          WellMind AI
-        </span>
-
-        <span>
-          •
-        </span>
-
-        <span>
-          VADER Sentiment + BERT Emotion + Multi-label Emotion
-        </span>
-
-        <span>
-          •
-        </span>
-
-        <span>
-          Wellness Intelligence
-        </span>
-
-      </footer>
-
-
+  <span>
+    Wellness Intelligence
+  </span>
+    
+    </footer>
     </div>
   );
 }
-
 
 export default App;
