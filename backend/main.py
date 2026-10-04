@@ -31,6 +31,10 @@ from ml.multilabel_emotion import (
     analyze_multilabel_emotion
 )
 
+from ml.emotion_intensity import (
+    analyze_emotional_state
+)
+
 from ml.wellness import (
     generate_wellness_insight
 )
@@ -83,7 +87,7 @@ def home():
 def analyze(data: dict):
 
     # --------------------------------------------------------
-    # Get text from request
+    # Get text
     # --------------------------------------------------------
 
     text = data.get(
@@ -108,7 +112,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 1: Preprocess text
+    # Step 1: Preprocess
     # --------------------------------------------------------
 
     cleaned_text = preprocess_text(
@@ -117,7 +121,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 2: Sentiment analysis using VADER
+    # Step 2: Sentiment
     # --------------------------------------------------------
 
     sentiment_result = analyze_sentiment(
@@ -126,7 +130,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 3: Single-label emotion using trained BERT
+    # Step 3: BERT emotion
     # --------------------------------------------------------
 
     emotion_result = analyze_emotion(
@@ -135,7 +139,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 4: Multi-label emotion analysis
+    # Step 4: Multi-label emotion
     # --------------------------------------------------------
 
     multilabel_emotion_result = (
@@ -146,13 +150,24 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 5: Wellness risk analysis
+    # Step 5: Emotional state and intensity
+    # --------------------------------------------------------
+
+    emotional_state_result = (
+        analyze_emotional_state(
+            multilabel_emotion_result[
+                "emotion_scores"
+            ]
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # Step 6: Wellness analysis
     # --------------------------------------------------------
 
     wellness_result = generate_wellness_insight(
-
         sentiment_result,
-
         emotion_result
     )
 
@@ -171,7 +186,8 @@ def analyze(data: dict):
                 "Text successfully passed through "
                 "preprocessing, sentiment analysis, "
                 "emotion analysis, multi-label emotion "
-                "analysis and wellness analysis"
+                "analysis, emotional intensity analysis "
+                "and wellness analysis"
             ),
 
         "original_text":
@@ -188,6 +204,9 @@ def analyze(data: dict):
 
         "multilabel_emotion":
             multilabel_emotion_result,
+
+        "emotional_state":
+            emotional_state_result,
 
         "wellness":
             wellness_result
@@ -221,11 +240,8 @@ async def analyze_file(
     ):
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=
-                "Only .txt and .csv files are supported"
+            detail="Only .txt and .csv files are supported"
         )
 
 
@@ -237,7 +253,7 @@ async def analyze_file(
 
 
     # --------------------------------------------------------
-    # Convert bytes to text
+    # Decode file
     # --------------------------------------------------------
 
     try:
@@ -249,11 +265,8 @@ async def analyze_file(
     except UnicodeDecodeError:
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=
-                "The uploaded file must use UTF-8 text encoding"
+            detail="The uploaded file must use UTF-8 text encoding"
         )
 
 
@@ -268,10 +281,6 @@ async def analyze_file(
 
         try:
 
-            # ------------------------------------------------
-            # Read CSV
-            # ------------------------------------------------
-
             reader = csv.DictReader(
                 text.splitlines()
             )
@@ -284,11 +293,8 @@ async def analyze_file(
             if not reader.fieldnames:
 
                 raise HTTPException(
-
                     status_code=400,
-
-                    detail=
-                        "CSV file must contain a header row"
+                    detail="CSV file must contain a header row"
                 )
 
 
@@ -299,11 +305,8 @@ async def analyze_file(
             if "feedback" not in reader.fieldnames:
 
                 raise HTTPException(
-
                     status_code=400,
-
-                    detail=
-                        "CSV must contain a 'feedback' column"
+                    detail="CSV must contain a 'feedback' column"
                 )
 
 
@@ -338,11 +341,8 @@ async def analyze_file(
         except Exception:
 
             raise HTTPException(
-
                 status_code=400,
-
-                detail=
-                    "Invalid CSV format"
+                detail="Invalid CSV format"
             )
 
 
@@ -362,11 +362,8 @@ async def analyze_file(
     if text.strip() == "":
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=
-                "Uploaded file contains no valid text"
+            detail="Uploaded file contains no valid text"
         )
 
 
@@ -380,7 +377,7 @@ async def analyze_file(
 
 
     # ========================================================
-    # SENTIMENT ANALYSIS
+    # SENTIMENT
     # ========================================================
 
     sentiment_result = analyze_sentiment(
@@ -389,7 +386,7 @@ async def analyze_file(
 
 
     # ========================================================
-    # SINGLE-LABEL EMOTION ANALYSIS
+    # BERT EMOTION
     # ========================================================
 
     emotion_result = analyze_emotion(
@@ -398,7 +395,7 @@ async def analyze_file(
 
 
     # ========================================================
-    # MULTI-LABEL EMOTION ANALYSIS
+    # MULTI-LABEL EMOTION
     # ========================================================
 
     multilabel_emotion_result = (
@@ -409,13 +406,24 @@ async def analyze_file(
 
 
     # ========================================================
-    # WELLNESS ANALYSIS
+    # EMOTIONAL STATE
+    # ========================================================
+
+    emotional_state_result = (
+        analyze_emotional_state(
+            multilabel_emotion_result[
+                "emotion_scores"
+            ]
+        )
+    )
+
+
+    # ========================================================
+    # WELLNESS
     # ========================================================
 
     wellness_result = generate_wellness_insight(
-
         sentiment_result,
-
         emotion_result
     )
 
@@ -446,6 +454,9 @@ async def analyze_file(
 
         "multilabel_emotion":
             multilabel_emotion_result,
+
+        "emotional_state":
+            emotional_state_result,
 
         "wellness":
             wellness_result

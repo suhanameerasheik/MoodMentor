@@ -1,17 +1,30 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification
+)
+
 import torch
 
 
-# Path of our trained BERT model
-MODEL_PATH = "./ml/models/emotion_bert/final"
+# ============================================================
+# EMOTION MODEL
+# ============================================================
 
+MODEL_NAME = "j-hartmann/emotion-english-distilroberta-base"
+
+
+# ============================================================
+# LOAD MODEL
+# ============================================================
 
 print("Loading emotion model...")
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+tokenizer = AutoTokenizer.from_pretrained(
+    MODEL_NAME
+)
 
 model = AutoModelForSequenceClassification.from_pretrained(
-    MODEL_PATH
+    MODEL_NAME
 )
 
 model.eval()
@@ -19,9 +32,16 @@ model.eval()
 print("Emotion model loaded successfully.")
 
 
+# ============================================================
+# ANALYZE EMOTION
+# ============================================================
+
 def analyze_emotion(text):
 
-    # Convert text into BERT input
+    # --------------------------------------------------------
+    # Convert text into model input
+    # --------------------------------------------------------
+
     inputs = tokenizer(
         text,
         return_tensors="pt",
@@ -30,30 +50,63 @@ def analyze_emotion(text):
         max_length=128
     )
 
-    # Disable gradient calculation because we are only predicting
+
+    # --------------------------------------------------------
+    # Generate prediction
+    # --------------------------------------------------------
+
     with torch.no_grad():
 
         outputs = model(**inputs)
 
-    # Convert model output into probabilities
+
+    # --------------------------------------------------------
+    # Convert logits to probabilities
+    # --------------------------------------------------------
+
     probabilities = torch.softmax(
         outputs.logits,
         dim=1
     )
 
-    # Find the emotion with highest probability
+
+    # --------------------------------------------------------
+    # Find highest probability
+    # --------------------------------------------------------
+
     predicted_id = torch.argmax(
         probabilities,
         dim=1
     ).item()
 
-    # Get emotion name
-    emotion = model.config.id2label[predicted_id]
 
+    # --------------------------------------------------------
+    # Get emotion name
+    # --------------------------------------------------------
+
+    emotion = model.config.id2label[
+        predicted_id
+    ]
+
+
+    # --------------------------------------------------------
     # Get confidence
-    confidence = probabilities[0][predicted_id].item()
+    # --------------------------------------------------------
+
+    confidence = probabilities[
+        0,
+        predicted_id
+    ].item()
+
+
+    # --------------------------------------------------------
+    # Return result
+    # --------------------------------------------------------
 
     return {
-        "emotion": emotion,
-        "confidence": round(confidence, 4)
+        "emotion": emotion.lower(),
+        "confidence": round(
+            confidence,
+            4
+        )
     }
