@@ -223,7 +223,6 @@ def emotion_match(
     score = 0.0
 
     for emotion in content_emotions:
-
         score = max(
             score,
             float(
@@ -473,10 +472,6 @@ def calculate_hybrid_score(
         )
     )
 
-    # --------------------------------------------------------
-    # M3-T5 SEMANTIC HYBRID SCORE
-    # --------------------------------------------------------
-
     hybrid_score = (
         (rule_score * 0.25)
         +
@@ -570,6 +565,183 @@ def generate_ranking_reason(
 
 
 # ============================================================
+# M3-T8 RECOMMENDATION EXPLAINABILITY
+# ============================================================
+
+def generate_explanation(
+    recommendation: Dict[str, Any],
+    emotional_state: Dict[str, Any],
+    preferences: List[str]
+) -> Dict[str, Any]:
+
+    reasons = []
+
+    dominant_emotion = emotional_state.get(
+        "dominant_emotion",
+        "unknown"
+    )
+
+    intensity = float(
+        emotional_state.get(
+            "intensity",
+            0.0
+        )
+    )
+
+    polarity = emotional_state.get(
+        "polarity",
+        "neutral"
+    )
+
+    # --------------------------------------------------------
+    # Emotional state explanation
+    # --------------------------------------------------------
+
+    if recommendation["rule_score"] >= 0.70:
+        reasons.append(
+            f"Strong match for your current {dominant_emotion} emotional state"
+        )
+
+    elif recommendation["rule_score"] >= 0.50:
+        reasons.append(
+            f"Good match for your current {dominant_emotion} emotional state"
+        )
+
+    # --------------------------------------------------------
+    # Intensity explanation
+    # --------------------------------------------------------
+
+    if recommendation["rule_score"] >= 0.50:
+        if intensity >= 0.80:
+            reasons.append(
+                "Suitable for your high emotional intensity"
+            )
+
+        elif intensity >= 0.50:
+            reasons.append(
+                "Suitable for your moderate emotional intensity"
+            )
+
+        else:
+            reasons.append(
+                "Suitable for your current low emotional intensity"
+            )
+
+    # --------------------------------------------------------
+    # Emotion score explanation
+    # --------------------------------------------------------
+
+    if recommendation["content_score"] >= 0.50:
+        reasons.append(
+            "Strong similarity with your detected emotions"
+        )
+
+    elif recommendation["content_score"] >= 0.20:
+        reasons.append(
+            "Moderate similarity with your detected emotions"
+        )
+
+    # --------------------------------------------------------
+    # Semantic explanation
+    # --------------------------------------------------------
+
+    if recommendation["semantic_score"] >= 0.60:
+        reasons.append(
+            "Strong semantic match with your current concern"
+        )
+
+    elif recommendation["semantic_score"] >= 0.40:
+        reasons.append(
+            "Moderate semantic match with your current concern"
+        )
+
+    # --------------------------------------------------------
+    # Preference explanation
+    # --------------------------------------------------------
+
+    if preferences and recommendation["personalization_score"] >= 0.70:
+        reasons.append(
+            "Strong match with your preferred wellness activities"
+        )
+
+    elif preferences and recommendation["personalization_score"] >= 0.50:
+        reasons.append(
+            "Matches some of your preferred wellness activities"
+        )
+
+    # --------------------------------------------------------
+    # Polarity explanation
+    # --------------------------------------------------------
+
+    if polarity != "neutral":
+        reasons.append(
+            f"Aligned with your current {polarity} emotional state"
+        )
+
+    # --------------------------------------------------------
+    # Fallback
+    # --------------------------------------------------------
+
+    if not reasons:
+        reasons.append(
+            "Selected because it provides general wellness relevance"
+        )
+
+    # Remove duplicate explanations
+    unique_reasons = list(
+        dict.fromkeys(reasons)
+    )
+
+    # --------------------------------------------------------
+    # Human-readable summary
+    # --------------------------------------------------------
+
+    if len(unique_reasons) >= 2:
+        summary = (
+            "Recommended because it matches your current "
+            "emotional state and wellness needs."
+        )
+    else:
+        summary = (
+            "Recommended because it provides relevant "
+            "wellness support."
+        )
+
+    # --------------------------------------------------------
+    # Score breakdown
+    # --------------------------------------------------------
+
+    factors = {
+        "emotional_match": round(
+            recommendation["rule_score"],
+            4
+        ),
+        "emotion_similarity": round(
+            recommendation["content_score"],
+            4
+        ),
+        "personalization": round(
+            recommendation["personalization_score"],
+            4
+        ),
+        "semantic_similarity": round(
+            recommendation["semantic_score"],
+            4
+        ),
+        "final_score": round(
+            recommendation["score"],
+            4
+        )
+    }
+
+    return {
+        "summary": summary,
+        "reasons": unique_reasons,
+        "factors": factors
+    }
+
+
+# ============================================================
 # DUPLICATE FILTER
 # ============================================================
 
@@ -620,7 +792,9 @@ def filter_low_relevance(
 
 def rank_recommendations(
     recommendations: List[Dict[str, Any]],
-    top_k: int = 5
+    top_k: int = 5,
+    emotional_state: Dict[str, Any] = None,
+    preferences: List[str] = None
 ) -> Dict[str, Any]:
 
     top_k = max(
@@ -630,6 +804,9 @@ def rank_recommendations(
             10
         )
     )
+
+    emotional_state = emotional_state or {}
+    preferences = preferences or []
 
     unique_recommendations = (
         remove_duplicate_recommendations(
@@ -677,6 +854,18 @@ def rank_recommendations(
         recommendation["ranking_reason"] = (
             generate_ranking_reason(
                 recommendation
+            )
+        )
+
+        # ----------------------------------------------------
+        # M3-T8 Explainability
+        # ----------------------------------------------------
+
+        recommendation["explanation"] = (
+            generate_explanation(
+                recommendation=recommendation,
+                emotional_state=emotional_state,
+                preferences=preferences
             )
         )
 
@@ -789,12 +978,14 @@ def generate_hybrid_recommendations(
         )
 
     # --------------------------------------------------------
-    # M3-T4 + M3-T5 RANKING
+    # M3-T4 + M3-T5 + M3-T8
     # --------------------------------------------------------
 
     ranking_result = rank_recommendations(
         recommendations=scored_recommendations,
-        top_k=top_k
+        top_k=top_k,
+        emotional_state=emotional_state,
+        preferences=preferences
     )
 
     ranking_result.update(
@@ -809,7 +1000,8 @@ def generate_hybrid_recommendations(
                 "semantic_similarity",
                 "dynamic_ranking",
                 "duplicate_filtering",
-                "low_relevance_filtering"
+                "low_relevance_filtering",
+                "recommendation_explainability"
             ],
 
             "personalization": {
