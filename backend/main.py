@@ -43,6 +43,11 @@ from ml.recommendation import (
     generate_personalized_recommendations
 )
 
+from ml.trend_tracking import (
+    save_emotional_state,
+    get_emotional_trend
+)
+
 
 # ============================================================
 # CREATE FASTAPI APPLICATION
@@ -141,6 +146,32 @@ def run_analysis(text):
 
 
 # ============================================================
+# SAVE ANALYSIS HISTORY
+# ============================================================
+
+def save_analysis_history(
+    analysis_result
+):
+
+    return save_emotional_state(
+        emotional_state=
+            analysis_result[
+                "emotional_state"
+            ],
+
+        sentiment=
+            analysis_result[
+                "sentiment"
+            ],
+
+        wellness=
+            analysis_result[
+                "wellness"
+            ]
+    )
+
+
+# ============================================================
 # ANALYZE DIRECT TEXT
 # ============================================================
 
@@ -165,6 +196,10 @@ def analyze(data: dict):
             "message": "Text cannot be empty"
         }
 
+    record_id = save_analysis_history(
+        analysis_result
+    )
+
     return {
 
         "status": "success",
@@ -177,6 +212,9 @@ def analyze(data: dict):
                 "analysis, emotional intensity analysis "
                 "and wellness analysis"
             ),
+
+        "history_record_id":
+            record_id,
 
         **analysis_result
     }
@@ -249,6 +287,14 @@ def recommend(data: dict):
 
         raise error
 
+    # --------------------------------------------------------
+    # Save emotional state
+    # --------------------------------------------------------
+
+    record_id = save_analysis_history(
+        analysis_result
+    )
+
     emotional_state = (
         analysis_result[
             "emotional_state"
@@ -256,7 +302,7 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------------
-    # Generate semantic + hybrid recommendations
+    # Generate recommendations
     # --------------------------------------------------------
 
     recommendation_result = (
@@ -277,10 +323,54 @@ def recommend(data: dict):
         "message":
             "Personalized recommendations generated successfully",
 
-        "analysis": analysis_result,
+        "history_record_id":
+            record_id,
+
+        "analysis":
+            analysis_result,
 
         "recommendations":
             recommendation_result
+    }
+
+
+# ============================================================
+# EMOTIONAL TREND ENDPOINT
+# ============================================================
+
+@app.get("/emotional-trend")
+def emotional_trend(
+    limit: int = 20
+):
+
+    try:
+
+        limit = int(limit)
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        limit = 20
+
+    limit = max(
+        1,
+        min(limit, 100)
+    )
+
+    trend_result = get_emotional_trend(
+        limit
+    )
+
+    return {
+
+        "status": "success",
+
+        "message":
+            "Emotional trend retrieved successfully",
+
+        **trend_result
     }
 
 
@@ -388,6 +478,10 @@ async def analyze_file(
         text
     )
 
+    record_id = save_analysis_history(
+        analysis_result
+    )
+
     return {
 
         "status":
@@ -395,6 +489,9 @@ async def analyze_file(
 
         "filename":
             file.filename,
+
+        "history_record_id":
+            record_id,
 
         **analysis_result
     }
