@@ -5,79 +5,51 @@ import csv
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-
-# ============================================================
-# ADD PROJECT ROOT TO PYTHON PATH
-# ============================================================
-
 sys.path.append(
     str(
         Path(__file__).resolve().parent.parent
     )
 )
 
-
-# ============================================================
-# IMPORT ML MODULES
-# ============================================================
-
 from ml.preprocessing import preprocess_text
-
 from ml.sentiment import analyze_sentiment
-
 from ml.emotion import analyze_emotion
-
 from ml.multilabel_emotion import (
     analyze_multilabel_emotion
 )
-
 from ml.emotion_intensity import (
     analyze_emotional_state
 )
-
 from ml.wellness import (
     generate_wellness_insight
 )
-
 from ml.recommendation import (
     generate_personalized_recommendations
 )
-
 from ml.trend_tracking import (
     save_emotional_state,
     get_emotional_trend
 )
+from ml.feedback_learning import (
+    save_recommendation_feedback,
+    get_feedback_statistics,
+    apply_feedback_learning
+)
 
-
-# ============================================================
-# CREATE FASTAPI APPLICATION
-# ============================================================
 
 app = FastAPI()
 
 
-# ============================================================
-# CORS CONFIGURATION
-# ============================================================
-
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=[
         "http://localhost:5173"
     ],
-
     allow_credentials=True,
-
     allow_methods=["*"],
-
     allow_headers=["*"],
 )
 
-
-# ============================================================
-# HOME ENDPOINT
-# ============================================================
 
 @app.get("/")
 def home():
@@ -87,10 +59,6 @@ def home():
             "Employee Wellness Backend is running"
     }
 
-
-# ============================================================
-# COMMON ANALYSIS FUNCTION
-# ============================================================
 
 def run_analysis(text):
 
@@ -141,13 +109,10 @@ def run_analysis(text):
             multilabel_emotion_result,
         "emotional_state":
             emotional_state_result,
-        "wellness": wellness_result
+        "wellness":
+            wellness_result
     }
 
-
-# ============================================================
-# SAVE ANALYSIS HISTORY
-# ============================================================
 
 def save_analysis_history(
     analysis_result
@@ -158,22 +123,16 @@ def save_analysis_history(
             analysis_result[
                 "emotional_state"
             ],
-
         sentiment=
             analysis_result[
                 "sentiment"
             ],
-
         wellness=
             analysis_result[
                 "wellness"
             ]
     )
 
-
-# ============================================================
-# ANALYZE DIRECT TEXT
-# ============================================================
 
 @app.post("/analyze")
 def analyze(data: dict):
@@ -201,28 +160,14 @@ def analyze(data: dict):
     )
 
     return {
-
         "status": "success",
-
         "message":
-            (
-                "Text successfully passed through "
-                "preprocessing, sentiment analysis, "
-                "emotion analysis, multi-label emotion "
-                "analysis, emotional intensity analysis "
-                "and wellness analysis"
-            ),
-
+            "Text successfully analyzed",
         "history_record_id":
             record_id,
-
         **analysis_result
     }
 
-
-# ============================================================
-# PERSONALIZED RECOMMENDATIONS
-# ============================================================
 
 @app.post("/recommend")
 def recommend(data: dict):
@@ -251,25 +196,20 @@ def recommend(data: dict):
         preferences,
         list
     ):
-
         preferences = []
 
     if not isinstance(
         recommendation_history,
         list
     ):
-
         recommendation_history = []
 
     try:
-
         top_k = int(top_k)
-
     except (
         ValueError,
         TypeError
     ):
-
         top_k = 5
 
     top_k = max(
@@ -277,19 +217,9 @@ def recommend(data: dict):
         min(top_k, 10)
     )
 
-    try:
-
-        analysis_result = run_analysis(
-            text
-        )
-
-    except HTTPException as error:
-
-        raise error
-
-    # --------------------------------------------------------
-    # Save emotional state
-    # --------------------------------------------------------
+    analysis_result = run_analysis(
+        text
+    )
 
     record_id = save_analysis_history(
         analysis_result
@@ -300,10 +230,6 @@ def recommend(data: dict):
             "emotional_state"
         ]
     )
-
-    # --------------------------------------------------------
-    # Generate recommendations
-    # --------------------------------------------------------
 
     recommendation_result = (
         generate_personalized_recommendations(
@@ -316,47 +242,146 @@ def recommend(data: dict):
         )
     )
 
+    recommendations = (
+        recommendation_result[
+            "recommendations"
+        ]
+    )
+
+    recommendations = (
+        apply_feedback_learning(
+            recommendations
+        )
+    )
+
+    recommendation_result[
+        "recommendations"
+    ] = recommendations
+
+    recommendation_result[
+        "top_recommendation"
+    ] = (
+        recommendations[0]
+        if recommendations
+        else None
+    )
+
+    recommendation_result[
+        "ranking_order"
+    ] = [
+        item["id"]
+        for item in recommendations
+    ]
+
+    recommendation_result[
+        "method"
+    ] = "hybrid_semantic_feedback"
+
+    recommendation_result[
+        "components"
+    ].append(
+        "feedback_learning"
+    )
+
     return {
-
         "status": "success",
-
         "message":
             "Personalized recommendations generated successfully",
-
         "history_record_id":
             record_id,
-
         "analysis":
             analysis_result,
-
         "recommendations":
             recommendation_result
     }
 
 
-# ============================================================
-# EMOTIONAL TREND ENDPOINT
-# ============================================================
+@app.post("/recommendation-feedback")
+def recommendation_feedback(
+    data: dict
+):
+
+    recommendation_id = data.get(
+        "recommendation_id",
+        ""
+    )
+
+    feedback = data.get(
+        "feedback",
+        ""
+    )
+
+    emotional_state = data.get(
+        "emotional_state",
+        {}
+    )
+
+    if not recommendation_id:
+
+        raise HTTPException(
+            status_code=400,
+            detail="recommendation_id is required"
+        )
+
+    try:
+
+        feedback_id = (
+            save_recommendation_feedback(
+                recommendation_id=
+                    recommendation_id,
+                feedback=feedback,
+                emotional_state=
+                    emotional_state
+            )
+        )
+
+    except ValueError as error:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )
+
+    return {
+        "status": "success",
+        "message":
+            "Recommendation feedback saved successfully",
+        "feedback_id":
+            feedback_id,
+        "recommendation_id":
+            recommendation_id,
+        "feedback":
+            feedback
+    }
+
+
+@app.get("/recommendation-feedback")
+def recommendation_feedback_stats():
+
+    statistics = (
+        get_feedback_statistics()
+    )
+
+    return {
+        "status": "success",
+        "message":
+            "Recommendation feedback statistics retrieved successfully",
+        "statistics":
+            statistics
+    }
+
 
 @app.get("/emotional-trend")
 def emotional_trend(
     limit: int = 20
 ):
 
-    try:
-
-        limit = int(limit)
-
-    except (
-        ValueError,
-        TypeError
-    ):
-
-        limit = 20
-
     limit = max(
         1,
-        min(limit, 100)
+        min(
+            int(limit),
+            100
+        )
     )
 
     trend_result = get_emotional_trend(
@@ -364,19 +389,12 @@ def emotional_trend(
     )
 
     return {
-
         "status": "success",
-
         "message":
             "Emotional trend retrieved successfully",
-
         **trend_result
     }
 
-
-# ============================================================
-# ANALYZE UPLOADED TXT / CSV FILE
-# ============================================================
 
 @app.post("/analyze-file")
 async def analyze_file(
@@ -387,8 +405,7 @@ async def analyze_file(
 
     if not (
         filename.endswith(".txt")
-        or
-        filename.endswith(".csv")
+        or filename.endswith(".csv")
     ):
 
         raise HTTPException(
@@ -444,8 +461,7 @@ async def analyze_file(
 
                 if (
                     feedback
-                    and
-                    feedback.strip()
+                    and feedback.strip()
                 ):
 
                     lines.append(
@@ -453,7 +469,6 @@ async def analyze_file(
                     )
 
         except HTTPException:
-
             raise
 
         except Exception:
@@ -467,7 +482,7 @@ async def analyze_file(
             lines
         )
 
-    if text.strip() == "":
+    if not text.strip():
 
         raise HTTPException(
             status_code=400,
@@ -483,15 +498,10 @@ async def analyze_file(
     )
 
     return {
-
-        "status":
-            "success",
-
+        "status": "success",
         "filename":
             file.filename,
-
         "history_record_id":
             record_id,
-
         **analysis_result
     }
