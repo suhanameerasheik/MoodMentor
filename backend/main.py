@@ -89,10 +89,6 @@ def home():
 
 def run_analysis(text):
 
-    # --------------------------------------------------------
-    # Validate text
-    # --------------------------------------------------------
-
     if not text or not text.strip():
 
         raise HTTPException(
@@ -100,48 +96,23 @@ def run_analysis(text):
             detail="Text cannot be empty"
         )
 
-
-    # --------------------------------------------------------
-    # Step 1: Preprocess
-    # --------------------------------------------------------
-
     cleaned_text = preprocess_text(
         text
     )
-
-
-    # --------------------------------------------------------
-    # Step 2: Sentiment
-    # --------------------------------------------------------
 
     sentiment_result = analyze_sentiment(
         cleaned_text
     )
 
-
-    # --------------------------------------------------------
-    # Step 3: BERT emotion
-    # --------------------------------------------------------
-
     emotion_result = analyze_emotion(
         text
     )
-
-
-    # --------------------------------------------------------
-    # Step 4: Multi-label emotion
-    # --------------------------------------------------------
 
     multilabel_emotion_result = (
         analyze_multilabel_emotion(
             text
         )
     )
-
-
-    # --------------------------------------------------------
-    # Step 5: Emotional state
-    # --------------------------------------------------------
 
     emotional_state_result = (
         analyze_emotional_state(
@@ -151,16 +122,10 @@ def run_analysis(text):
         )
     )
 
-
-    # --------------------------------------------------------
-    # Step 6: Wellness
-    # --------------------------------------------------------
-
     wellness_result = generate_wellness_insight(
         sentiment_result,
         emotion_result
     )
-
 
     return {
         "original_text": text,
@@ -199,7 +164,6 @@ def analyze(data: dict):
             "status": "error",
             "message": "Text cannot be empty"
         }
-
 
     return {
 
@@ -245,11 +209,6 @@ def recommend(data: dict):
         5
     )
 
-
-    # --------------------------------------------------------
-    # Validate preferences
-    # --------------------------------------------------------
-
     if not isinstance(
         preferences,
         list
@@ -257,22 +216,12 @@ def recommend(data: dict):
 
         preferences = []
 
-
-    # --------------------------------------------------------
-    # Validate history
-    # --------------------------------------------------------
-
     if not isinstance(
         recommendation_history,
         list
     ):
 
         recommendation_history = []
-
-
-    # --------------------------------------------------------
-    # Validate top_k
-    # --------------------------------------------------------
 
     try:
 
@@ -285,16 +234,10 @@ def recommend(data: dict):
 
         top_k = 5
 
-
     top_k = max(
         1,
         min(top_k, 10)
     )
-
-
-    # --------------------------------------------------------
-    # Run ML analysis
-    # --------------------------------------------------------
 
     try:
 
@@ -306,16 +249,14 @@ def recommend(data: dict):
 
         raise error
 
-
     emotional_state = (
         analysis_result[
             "emotional_state"
         ]
     )
 
-
     # --------------------------------------------------------
-    # Generate personalized recommendations
+    # Generate semantic + hybrid recommendations
     # --------------------------------------------------------
 
     recommendation_result = (
@@ -324,14 +265,10 @@ def recommend(data: dict):
             preferences=preferences,
             recommendation_history=
                 recommendation_history,
-            top_k=top_k
+            top_k=top_k,
+            text=text
         )
     )
-
-
-    # --------------------------------------------------------
-    # Return recommendation result
-    # --------------------------------------------------------
 
     return {
 
@@ -358,11 +295,6 @@ async def analyze_file(
 
     filename = file.filename.lower()
 
-
-    # --------------------------------------------------------
-    # Validate file type
-    # --------------------------------------------------------
-
     if not (
         filename.endswith(".txt")
         or
@@ -374,17 +306,7 @@ async def analyze_file(
             detail="Only .txt and .csv files are supported"
         )
 
-
-    # --------------------------------------------------------
-    # Read uploaded file
-    # --------------------------------------------------------
-
     content = await file.read()
-
-
-    # --------------------------------------------------------
-    # Decode file
-    # --------------------------------------------------------
 
     try:
 
@@ -399,11 +321,6 @@ async def analyze_file(
             detail="The uploaded file must use UTF-8 text encoding"
         )
 
-
-    # ========================================================
-    # CSV PROCESSING
-    # ========================================================
-
     if filename.endswith(".csv"):
 
         lines = []
@@ -414,7 +331,6 @@ async def analyze_file(
                 text.splitlines()
             )
 
-
             if not reader.fieldnames:
 
                 raise HTTPException(
@@ -422,14 +338,12 @@ async def analyze_file(
                     detail="CSV file must contain a header row"
                 )
 
-
             if "feedback" not in reader.fieldnames:
 
                 raise HTTPException(
                     status_code=400,
                     detail="CSV must contain a 'feedback' column"
                 )
-
 
             for row in reader:
 
@@ -448,11 +362,9 @@ async def analyze_file(
                         feedback.strip()
                     )
 
-
         except HTTPException:
 
             raise
-
 
         except Exception:
 
@@ -461,15 +373,9 @@ async def analyze_file(
                 detail="Invalid CSV format"
             )
 
-
         text = " ".join(
             lines
         )
-
-
-    # ========================================================
-    # CHECK EMPTY FILE
-    # ========================================================
 
     if text.strip() == "":
 
@@ -478,19 +384,9 @@ async def analyze_file(
             detail="Uploaded file contains no valid text"
         )
 
-
-    # ========================================================
-    # RUN ANALYSIS
-    # ========================================================
-
     analysis_result = run_analysis(
         text
     )
-
-
-    # ========================================================
-    # RETURN COMPLETE RESULT
-    # ========================================================
 
     return {
 

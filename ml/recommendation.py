@@ -1,5 +1,27 @@
 from typing import Dict, List, Any
 
+from sentence_transformers import (
+    SentenceTransformer,
+    util
+)
+
+
+# ============================================================
+# SEMANTIC MODEL
+# ============================================================
+
+SEMANTIC_MODEL_NAME = (
+    "sentence-transformers/all-MiniLM-L6-v2"
+)
+
+print("Loading semantic wellness model...")
+
+semantic_model = SentenceTransformer(
+    SEMANTIC_MODEL_NAME
+)
+
+print("Semantic wellness model loaded successfully.")
+
 
 # ============================================================
 # WELLNESS CONTENT CATALOG
@@ -130,6 +152,27 @@ WELLNESS_CONTENT = [
 
 
 # ============================================================
+# PRECOMPUTE WELLNESS CONTENT EMBEDDINGS
+# ============================================================
+
+WELLNESS_TEXTS = [
+    (
+        content["title"]
+        + ". "
+        + content["description"]
+        + ". "
+        + " ".join(content["tags"])
+    )
+    for content in WELLNESS_CONTENT
+]
+
+WELLNESS_EMBEDDINGS = semantic_model.encode(
+    WELLNESS_TEXTS,
+    convert_to_tensor=True
+)
+
+
+# ============================================================
 # INTENSITY MATCHING
 # ============================================================
 
@@ -253,7 +296,7 @@ def history_score(
 
 
 # ============================================================
-# RULE-BASED RECOMMENDATION SCORE
+# RULE-BASED SCORE
 # ============================================================
 
 def calculate_rule_score(
@@ -285,7 +328,7 @@ def calculate_rule_score(
 
 
 # ============================================================
-# CONTENT-BASED SCORE
+# CONTENT-BASED EMOTION SCORE
 # ============================================================
 
 def calculate_content_score(
@@ -341,6 +384,42 @@ def calculate_personalization_score(
 
 
 # ============================================================
+# SEMANTIC CONTENT MATCHING
+# ============================================================
+
+def calculate_semantic_scores(
+    text: str
+) -> List[float]:
+
+    if not text or not text.strip():
+        return [
+            0.0
+            for _ in WELLNESS_CONTENT
+        ]
+
+    text_embedding = semantic_model.encode(
+        text,
+        convert_to_tensor=True
+    )
+
+    similarities = util.cos_sim(
+        text_embedding,
+        WELLNESS_EMBEDDINGS
+    )[0]
+
+    return [
+        round(
+            max(
+                0.0,
+                float(score)
+            ),
+            4
+        )
+        for score in similarities
+    ]
+
+
+# ============================================================
 # HYBRID RECOMMENDATION SCORE
 # ============================================================
 
@@ -348,7 +427,8 @@ def calculate_hybrid_score(
     content: Dict[str, Any],
     emotional_state: Dict[str, Any],
     preferences: List[str],
-    recommendation_history: List[str]
+    recommendation_history: List[str],
+    semantic_score: float = 0.0
 ) -> Dict[str, float]:
 
     emotion_scores = emotional_state.get(
@@ -393,12 +473,18 @@ def calculate_hybrid_score(
         )
     )
 
+    # --------------------------------------------------------
+    # M3-T5 SEMANTIC HYBRID SCORE
+    # --------------------------------------------------------
+
     hybrid_score = (
-        (rule_score * 0.35)
+        (rule_score * 0.25)
         +
-        (content_score * 0.35)
+        (content_score * 0.25)
         +
-        (personalization_score * 0.30)
+        (personalization_score * 0.20)
+        +
+        (semantic_score * 0.30)
     )
 
     return {
@@ -412,6 +498,10 @@ def calculate_hybrid_score(
         ),
         "personalization_score": round(
             personalization_score,
+            4
+        ),
+        "semantic_score": round(
+            semantic_score,
             4
         ),
         "hybrid_score": round(
@@ -449,6 +539,16 @@ def generate_ranking_reason(
     elif recommendation["content_score"] >= 0.20:
         reasons.append(
             "moderate emotion-score similarity"
+        )
+
+    if recommendation["semantic_score"] >= 0.60:
+        reasons.append(
+            "strong semantic similarity"
+        )
+
+    elif recommendation["semantic_score"] >= 0.40:
+        reasons.append(
+            "moderate semantic similarity"
         )
 
     if recommendation["personalization_score"] >= 0.70:
@@ -531,7 +631,6 @@ def rank_recommendations(
         )
     )
 
-    # Remove duplicate content
     unique_recommendations = (
         remove_duplicate_recommendations(
             recommendations
@@ -543,7 +642,6 @@ def rank_recommendations(
         - len(unique_recommendations)
     )
 
-    # Remove very low-scoring recommendations
     relevant_recommendations = (
         filter_low_relevance(
             unique_recommendations
@@ -555,10 +653,10 @@ def rank_recommendations(
         - len(relevant_recommendations)
     )
 
-    # Sort using final hybrid score
     relevant_recommendations.sort(
         key=lambda item: (
             item["score"],
+            item["semantic_score"],
             item["content_score"],
             item["personalization_score"]
         ),
@@ -569,7 +667,6 @@ def rank_recommendations(
         :top_k
     ]
 
-    # Assign rank and ranking explanation
     for index, recommendation in enumerate(
         selected,
         start=1
@@ -623,7 +720,8 @@ def generate_hybrid_recommendations(
     emotional_state: Dict[str, Any],
     preferences: List[str] = None,
     recommendation_history: List[str] = None,
-    top_k: int = 5
+    top_k: int = 5,
+    text: str = ""
 ) -> Dict[str, Any]:
 
     preferences = preferences or []
@@ -640,10 +738,19 @@ def generate_hybrid_recommendations(
         )
     )
 
+    # --------------------------------------------------------
+    # Calculate semantic similarity for all content
+    # --------------------------------------------------------
+
+    semantic_scores = calculate_semantic_scores(
+        text
+    )
+
     scored_recommendations = []
 
-    # Score every wellness item
-    for content in WELLNESS_CONTENT:
+    for index, content in enumerate(
+        WELLNESS_CONTENT
+    ):
 
         score_details = (
             calculate_hybrid_score(
@@ -651,7 +758,9 @@ def generate_hybrid_recommendations(
                 emotional_state=emotional_state,
                 preferences=preferences,
                 recommendation_history=
-                    recommendation_history
+                    recommendation_history,
+                semantic_score=
+                    semantic_scores[index]
             )
         )
 
@@ -670,13 +779,17 @@ def generate_hybrid_recommendations(
                     score_details[
                         "personalization_score"
                     ],
+                "semantic_score":
+                    score_details[
+                        "semantic_score"
+                    ],
                 "score":
                     score_details["hybrid_score"]
             }
         )
 
     # --------------------------------------------------------
-    # M3-T4 RANKING
+    # M3-T4 + M3-T5 RANKING
     # --------------------------------------------------------
 
     ranking_result = rank_recommendations(
@@ -684,16 +797,16 @@ def generate_hybrid_recommendations(
         top_k=top_k
     )
 
-    # Add ranking metadata
     ranking_result.update(
         {
-            "method": "hybrid",
+            "method": "hybrid_semantic",
 
             "components": [
                 "rule_based",
                 "content_based",
                 "preference_matching",
                 "history_based",
+                "semantic_similarity",
                 "dynamic_ranking",
                 "duplicate_filtering",
                 "low_relevance_filtering"
@@ -738,7 +851,8 @@ def generate_personalized_recommendations(
     emotional_state: Dict[str, Any],
     preferences: List[str] = None,
     recommendation_history: List[str] = None,
-    top_k: int = 5
+    top_k: int = 5,
+    text: str = ""
 ) -> Dict[str, Any]:
 
     return generate_hybrid_recommendations(
@@ -746,5 +860,6 @@ def generate_personalized_recommendations(
         preferences=preferences,
         recommendation_history=
             recommendation_history,
-        top_k=top_k
+        top_k=top_k,
+        text=text
     )
