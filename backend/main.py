@@ -39,6 +39,10 @@ from ml.wellness import (
     generate_wellness_insight
 )
 
+from ml.recommendation import (
+    generate_personalized_recommendations
+)
+
 
 # ============================================================
 # CREATE FASTAPI APPLICATION
@@ -80,35 +84,21 @@ def home():
 
 
 # ============================================================
-# ANALYZE DIRECT TEXT
+# COMMON ANALYSIS FUNCTION
 # ============================================================
 
-@app.post("/analyze")
-def analyze(data: dict):
+def run_analysis(text):
 
     # --------------------------------------------------------
-    # Get text
+    # Validate text
     # --------------------------------------------------------
 
-    text = data.get(
-        "text",
-        ""
-    )
+    if not text or not text.strip():
 
-
-    # --------------------------------------------------------
-    # Validate empty text
-    # --------------------------------------------------------
-
-    if not text.strip():
-
-        return {
-
-            "status": "error",
-
-            "message":
-                "Text cannot be empty"
-        }
+        raise HTTPException(
+            status_code=400,
+            detail="Text cannot be empty"
+        )
 
 
     # --------------------------------------------------------
@@ -150,7 +140,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 5: Emotional state and intensity
+    # Step 5: Emotional state
     # --------------------------------------------------------
 
     emotional_state_result = (
@@ -163,7 +153,7 @@ def analyze(data: dict):
 
 
     # --------------------------------------------------------
-    # Step 6: Wellness analysis
+    # Step 6: Wellness
     # --------------------------------------------------------
 
     wellness_result = generate_wellness_insight(
@@ -172,14 +162,48 @@ def analyze(data: dict):
     )
 
 
-    # --------------------------------------------------------
-    # Return complete analysis
-    # --------------------------------------------------------
+    return {
+        "original_text": text,
+        "preprocessed_text": cleaned_text,
+        "sentiment": sentiment_result,
+        "emotion": emotion_result,
+        "multilabel_emotion":
+            multilabel_emotion_result,
+        "emotional_state":
+            emotional_state_result,
+        "wellness": wellness_result
+    }
+
+
+# ============================================================
+# ANALYZE DIRECT TEXT
+# ============================================================
+
+@app.post("/analyze")
+def analyze(data: dict):
+
+    text = data.get(
+        "text",
+        ""
+    )
+
+    try:
+
+        analysis_result = run_analysis(
+            text
+        )
+
+    except HTTPException:
+
+        return {
+            "status": "error",
+            "message": "Text cannot be empty"
+        }
+
 
     return {
 
-        "status":
-            "success",
+        "status": "success",
 
         "message":
             (
@@ -190,26 +214,136 @@ def analyze(data: dict):
                 "and wellness analysis"
             ),
 
-        "original_text":
-            text,
+        **analysis_result
+    }
 
-        "preprocessed_text":
-            cleaned_text,
 
-        "sentiment":
-            sentiment_result,
+# ============================================================
+# PERSONALIZED RECOMMENDATIONS
+# ============================================================
 
-        "emotion":
-            emotion_result,
+@app.post("/recommend")
+def recommend(data: dict):
 
-        "multilabel_emotion":
-            multilabel_emotion_result,
+    text = data.get(
+        "text",
+        ""
+    )
 
-        "emotional_state":
-            emotional_state_result,
+    preferences = data.get(
+        "preferences",
+        []
+    )
 
-        "wellness":
-            wellness_result
+    recommendation_history = data.get(
+        "recommendation_history",
+        []
+    )
+
+    top_k = data.get(
+        "top_k",
+        5
+    )
+
+
+    # --------------------------------------------------------
+    # Validate preferences
+    # --------------------------------------------------------
+
+    if not isinstance(
+        preferences,
+        list
+    ):
+
+        preferences = []
+
+
+    # --------------------------------------------------------
+    # Validate history
+    # --------------------------------------------------------
+
+    if not isinstance(
+        recommendation_history,
+        list
+    ):
+
+        recommendation_history = []
+
+
+    # --------------------------------------------------------
+    # Validate top_k
+    # --------------------------------------------------------
+
+    try:
+
+        top_k = int(top_k)
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        top_k = 5
+
+
+    top_k = max(
+        1,
+        min(top_k, 10)
+    )
+
+
+    # --------------------------------------------------------
+    # Run ML analysis
+    # --------------------------------------------------------
+
+    try:
+
+        analysis_result = run_analysis(
+            text
+        )
+
+    except HTTPException as error:
+
+        raise error
+
+
+    emotional_state = (
+        analysis_result[
+            "emotional_state"
+        ]
+    )
+
+
+    # --------------------------------------------------------
+    # Generate personalized recommendations
+    # --------------------------------------------------------
+
+    recommendation_result = (
+        generate_personalized_recommendations(
+            emotional_state=emotional_state,
+            preferences=preferences,
+            recommendation_history=
+                recommendation_history,
+            top_k=top_k
+        )
+    )
+
+
+    # --------------------------------------------------------
+    # Return recommendation result
+    # --------------------------------------------------------
+
+    return {
+
+        "status": "success",
+
+        "message":
+            "Personalized recommendations generated successfully",
+
+        "analysis": analysis_result,
+
+        "recommendations":
+            recommendation_result
     }
 
 
@@ -221,10 +355,6 @@ def analyze(data: dict):
 async def analyze_file(
     file: UploadFile = File(...)
 ):
-
-    # --------------------------------------------------------
-    # Get filename
-    # --------------------------------------------------------
 
     filename = file.filename.lower()
 
@@ -278,17 +408,12 @@ async def analyze_file(
 
         lines = []
 
-
         try:
 
             reader = csv.DictReader(
                 text.splitlines()
             )
 
-
-            # ------------------------------------------------
-            # Check header
-            # ------------------------------------------------
 
             if not reader.fieldnames:
 
@@ -298,10 +423,6 @@ async def analyze_file(
                 )
 
 
-            # ------------------------------------------------
-            # Check feedback column
-            # ------------------------------------------------
-
             if "feedback" not in reader.fieldnames:
 
                 raise HTTPException(
@@ -310,17 +431,12 @@ async def analyze_file(
                 )
 
 
-            # ------------------------------------------------
-            # Read feedback rows
-            # ------------------------------------------------
-
             for row in reader:
 
                 feedback = row.get(
                     "feedback",
                     ""
                 )
-
 
                 if (
                     feedback
@@ -346,10 +462,6 @@ async def analyze_file(
             )
 
 
-        # ----------------------------------------------------
-        # Combine all feedback
-        # ----------------------------------------------------
-
         text = " ".join(
             lines
         )
@@ -368,63 +480,11 @@ async def analyze_file(
 
 
     # ========================================================
-    # PREPROCESSING
+    # RUN ANALYSIS
     # ========================================================
 
-    cleaned_text = preprocess_text(
+    analysis_result = run_analysis(
         text
-    )
-
-
-    # ========================================================
-    # SENTIMENT
-    # ========================================================
-
-    sentiment_result = analyze_sentiment(
-        cleaned_text
-    )
-
-
-    # ========================================================
-    # BERT EMOTION
-    # ========================================================
-
-    emotion_result = analyze_emotion(
-        text
-    )
-
-
-    # ========================================================
-    # MULTI-LABEL EMOTION
-    # ========================================================
-
-    multilabel_emotion_result = (
-        analyze_multilabel_emotion(
-            text
-        )
-    )
-
-
-    # ========================================================
-    # EMOTIONAL STATE
-    # ========================================================
-
-    emotional_state_result = (
-        analyze_emotional_state(
-            multilabel_emotion_result[
-                "emotion_scores"
-            ]
-        )
-    )
-
-
-    # ========================================================
-    # WELLNESS
-    # ========================================================
-
-    wellness_result = generate_wellness_insight(
-        sentiment_result,
-        emotion_result
     )
 
 
@@ -440,24 +500,5 @@ async def analyze_file(
         "filename":
             file.filename,
 
-        "original_text":
-            text,
-
-        "preprocessed_text":
-            cleaned_text,
-
-        "sentiment":
-            sentiment_result,
-
-        "emotion":
-            emotion_result,
-
-        "multilabel_emotion":
-            multilabel_emotion_result,
-
-        "emotional_state":
-            emotional_state_result,
-
-        "wellness":
-            wellness_result
+        **analysis_result
     }
