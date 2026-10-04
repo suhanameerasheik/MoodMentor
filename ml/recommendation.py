@@ -174,14 +174,20 @@ def emotion_match(
     content_emotions: List[str]
 ) -> float:
 
+    if not emotion_scores:
+        return 0.0
+
     score = 0.0
 
     for emotion in content_emotions:
+
         score = max(
             score,
-            emotion_scores.get(
-                emotion,
-                0.0
+            float(
+                emotion_scores.get(
+                    emotion,
+                    0.0
+                )
             )
         )
 
@@ -201,7 +207,7 @@ def preference_match(
         return 0.0
 
     user_preferences = {
-        preference.lower()
+        str(preference).lower()
         for preference in preferences
     }
 
@@ -215,13 +221,14 @@ def preference_match(
         return 0.0
 
     return min(
-        len(matching_tags) / len(user_preferences),
+        len(matching_tags)
+        / len(user_preferences),
         1.0
     )
 
 
 # ============================================================
-# HISTORY MATCHING
+# HISTORY SCORE
 # ============================================================
 
 def history_score(
@@ -232,92 +239,135 @@ def history_score(
     if not recommendation_history:
         return 0.0
 
-    times_seen = recommendation_history.count(
-        content_id
+    times_seen = (
+        recommendation_history.count(
+            content_id
+        )
     )
 
+    # Never recommended before
     if times_seen == 0:
         return 0.20
 
+    # Seen once - small neutral effect
     if times_seen == 1:
         return 0.0
 
+    # Repeatedly shown - reduce score
     return -0.15
 
 
 # ============================================================
-# PERSONALIZED SCORE
+# RULE-BASED RECOMMENDATION SCORE
 # ============================================================
 
-def calculate_recommendation_score(
+def calculate_rule_score(
     content: Dict[str, Any],
-    emotion_scores: Dict[str, float],
+    dominant_emotion: str,
     intensity: float,
-    polarity: str,
+    polarity: str
+) -> float:
+
+    score = 0.0
+
+    # Emotion rule
+    if dominant_emotion in content["emotions"]:
+        score += 0.50
+
+    # Intensity rule
+    score += (
+        intensity_match(
+            intensity,
+            content["intensity"]
+        ) * 0.30
+    )
+
+    # Polarity rule
+    if content["polarity"] == polarity:
+        score += 0.20
+
+    return round(
+        score,
+        4
+    )
+
+
+# ============================================================
+# CONTENT-BASED SCORE
+# ============================================================
+
+def calculate_content_score(
+    content: Dict[str, Any],
+    emotion_scores: Dict[str, float]
+) -> float:
+
+    return round(
+        emotion_match(
+            emotion_scores,
+            content["emotions"]
+        ),
+        4
+    )
+
+
+# ============================================================
+# PERSONALIZATION SCORE
+# ============================================================
+
+def calculate_personalization_score(
+    content: Dict[str, Any],
     preferences: List[str],
     recommendation_history: List[str]
 ) -> float:
-
-    emotion_score = emotion_match(
-        emotion_scores,
-        content["emotions"]
-    )
-
-    intensity_score = intensity_match(
-        intensity,
-        content["intensity"]
-    )
 
     preference_score = preference_match(
         preferences,
         content["tags"]
     )
 
-    polarity_score = (
-        1.0
-        if content["polarity"] == polarity
-        else 0.0
-    )
-
-    history_score_value = history_score(
+    history_value = history_score(
         recommendation_history,
         content["id"]
     )
 
-    final_score = (
-        (emotion_score * 0.45)
-        + (intensity_score * 0.20)
-        + (preference_score * 0.20)
-        + (polarity_score * 0.10)
-        + history_score_value
+    # Keep history adjustment inside 0-1 range
+    history_adjustment = max(
+        0.0,
+        min(
+            1.0,
+            0.5 + history_value
+        )
     )
 
     return round(
-        max(final_score, 0.0),
+        (
+            (preference_score * 0.70)
+            +
+            (history_adjustment * 0.30)
+        ),
         4
     )
 
 
 # ============================================================
-# GENERATE PERSONALIZED RECOMMENDATIONS
+# HYBRID RECOMMENDATION SCORE
 # ============================================================
 
-def generate_personalized_recommendations(
+def calculate_hybrid_score(
+    content: Dict[str, Any],
     emotional_state: Dict[str, Any],
-    preferences: List[str] = None,
-    recommendation_history: List[str] = None,
-    top_k: int = 5
-) -> Dict[str, Any]:
-
-    preferences = preferences or []
-
-    recommendation_history = (
-        recommendation_history or []
-    )
+    preferences: List[str],
+    recommendation_history: List[str]
+) -> Dict[str, float]:
 
     emotion_scores = emotional_state.get(
         "emotion_scores",
         {}
+    )
+
+    dominant_emotion = emotional_state.get(
+        "dominant_emotion",
+        "unknown"
     )
 
     intensity = float(
@@ -332,17 +382,111 @@ def generate_personalized_recommendations(
         "neutral"
     )
 
+    # --------------------------------------------------------
+    # Rule-based component
+    # --------------------------------------------------------
+
+    rule_score = calculate_rule_score(
+        content,
+        dominant_emotion,
+        intensity,
+        polarity
+    )
+
+    # --------------------------------------------------------
+    # Content-based component
+    # --------------------------------------------------------
+
+    content_score = calculate_content_score(
+        content,
+        emotion_scores
+    )
+
+    # --------------------------------------------------------
+    # Personalization component
+    # --------------------------------------------------------
+
+    personalization_score = (
+        calculate_personalization_score(
+            content,
+            preferences,
+            recommendation_history
+        )
+    )
+
+    # --------------------------------------------------------
+    # Hybrid weighted score
+    # --------------------------------------------------------
+
+    hybrid_score = (
+        (rule_score * 0.35)
+        +
+        (content_score * 0.35)
+        +
+        (personalization_score * 0.30)
+    )
+
+    return {
+        "rule_score": round(
+            rule_score,
+            4
+        ),
+        "content_score": round(
+            content_score,
+            4
+        ),
+        "personalization_score": round(
+            personalization_score,
+            4
+        ),
+        "hybrid_score": round(
+            hybrid_score,
+            4
+        )
+    }
+
+
+# ============================================================
+# GENERATE HYBRID RECOMMENDATIONS
+# ============================================================
+
+def generate_hybrid_recommendations(
+    emotional_state: Dict[str, Any],
+    preferences: List[str] = None,
+    recommendation_history: List[str] = None,
+    top_k: int = 5
+) -> Dict[str, Any]:
+
+    preferences = preferences or []
+
+    recommendation_history = (
+        recommendation_history or []
+    )
+
+    top_k = max(
+        1,
+        min(
+            int(top_k),
+            10
+        )
+    )
+
     scored_recommendations = []
+
+    # --------------------------------------------------------
+    # Score every wellness item
+    # --------------------------------------------------------
 
     for content in WELLNESS_CONTENT:
 
-        score = calculate_recommendation_score(
-            content=content,
-            emotion_scores=emotion_scores,
-            intensity=intensity,
-            polarity=polarity,
-            preferences=preferences,
-            recommendation_history=recommendation_history
+        score_details = (
+            calculate_hybrid_score(
+                content=content,
+                emotional_state=emotional_state,
+                preferences=preferences,
+                recommendation_history=
+                    recommendation_history
+            )
         )
 
         scored_recommendations.append(
@@ -352,9 +496,22 @@ def generate_personalized_recommendations(
                 "type": content["type"],
                 "description": content["description"],
                 "tags": content["tags"],
-                "score": score
+                "rule_score":
+                    score_details["rule_score"],
+                "content_score":
+                    score_details["content_score"],
+                "personalization_score":
+                    score_details[
+                        "personalization_score"
+                    ],
+                "score":
+                    score_details["hybrid_score"]
             }
         )
+
+    # --------------------------------------------------------
+    # Dynamic ranking
+    # --------------------------------------------------------
 
     scored_recommendations.sort(
         key=lambda item: item["score"],
@@ -362,29 +519,80 @@ def generate_personalized_recommendations(
     )
 
     selected = scored_recommendations[
-        :max(1, min(top_k, 10))
+        :top_k
     ]
+
+    # --------------------------------------------------------
+    # Assign ranking
+    # --------------------------------------------------------
 
     for index, recommendation in enumerate(
         selected,
         start=1
     ):
+
         recommendation["rank"] = index
 
+    # --------------------------------------------------------
+    # Return hybrid result
+    # --------------------------------------------------------
+
     return {
-        "recommendations": selected,
-        "count": len(selected),
+        "recommendations":
+            selected,
+
+        "count":
+            len(selected),
+
+        "method":
+            "hybrid",
+
+        "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "history_based"
+        ],
+
         "personalization": {
             "dominant_emotion":
                 emotional_state.get(
                     "dominant_emotion",
                     "unknown"
                 ),
-            "intensity": intensity,
-            "polarity": polarity,
-            "preferences": preferences,
-            "history_used": len(
-                recommendation_history
-            )
+            "intensity":
+                emotional_state.get(
+                    "intensity",
+                    0.0
+                ),
+            "polarity":
+                emotional_state.get(
+                    "polarity",
+                    "neutral"
+                ),
+            "preferences":
+                preferences,
+            "history_used":
+                len(recommendation_history)
         }
     }
+
+
+# ============================================================
+# M3-T2 COMPATIBILITY FUNCTION
+# ============================================================
+
+def generate_personalized_recommendations(
+    emotional_state: Dict[str, Any],
+    preferences: List[str] = None,
+    recommendation_history: List[str] = None,
+    top_k: int = 5
+) -> Dict[str, Any]:
+
+    return generate_hybrid_recommendations(
+        emotional_state=emotional_state,
+        preferences=preferences,
+        recommendation_history=
+            recommendation_history,
+        top_k=top_k
+    )
