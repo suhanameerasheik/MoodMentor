@@ -239,21 +239,16 @@ def history_score(
     if not recommendation_history:
         return 0.0
 
-    times_seen = (
-        recommendation_history.count(
-            content_id
-        )
+    times_seen = recommendation_history.count(
+        content_id
     )
 
-    # Never recommended before
     if times_seen == 0:
         return 0.20
 
-    # Seen once - small neutral effect
     if times_seen == 1:
         return 0.0
 
-    # Repeatedly shown - reduce score
     return -0.15
 
 
@@ -270,11 +265,9 @@ def calculate_rule_score(
 
     score = 0.0
 
-    # Emotion rule
     if dominant_emotion in content["emotions"]:
         score += 0.50
 
-    # Intensity rule
     score += (
         intensity_match(
             intensity,
@@ -282,7 +275,6 @@ def calculate_rule_score(
         ) * 0.30
     )
 
-    # Polarity rule
     if content["polarity"] == polarity:
         score += 0.20
 
@@ -330,7 +322,6 @@ def calculate_personalization_score(
         content["id"]
     )
 
-    # Keep history adjustment inside 0-1 range
     history_adjustment = max(
         0.0,
         min(
@@ -382,10 +373,6 @@ def calculate_hybrid_score(
         "neutral"
     )
 
-    # --------------------------------------------------------
-    # Rule-based component
-    # --------------------------------------------------------
-
     rule_score = calculate_rule_score(
         content,
         dominant_emotion,
@@ -393,18 +380,10 @@ def calculate_hybrid_score(
         polarity
     )
 
-    # --------------------------------------------------------
-    # Content-based component
-    # --------------------------------------------------------
-
     content_score = calculate_content_score(
         content,
         emotion_scores
     )
-
-    # --------------------------------------------------------
-    # Personalization component
-    # --------------------------------------------------------
 
     personalization_score = (
         calculate_personalization_score(
@@ -413,10 +392,6 @@ def calculate_hybrid_score(
             recommendation_history
         )
     )
-
-    # --------------------------------------------------------
-    # Hybrid weighted score
-    # --------------------------------------------------------
 
     hybrid_score = (
         (rule_score * 0.35)
@@ -447,6 +422,200 @@ def calculate_hybrid_score(
 
 
 # ============================================================
+# RANKING REASON
+# ============================================================
+
+def generate_ranking_reason(
+    recommendation: Dict[str, Any]
+) -> List[str]:
+
+    reasons = []
+
+    if recommendation["rule_score"] >= 0.70:
+        reasons.append(
+            "strong emotional and intensity match"
+        )
+
+    elif recommendation["rule_score"] >= 0.50:
+        reasons.append(
+            "good emotional and intensity match"
+        )
+
+    if recommendation["content_score"] >= 0.50:
+        reasons.append(
+            "strong emotion-score similarity"
+        )
+
+    elif recommendation["content_score"] >= 0.20:
+        reasons.append(
+            "moderate emotion-score similarity"
+        )
+
+    if recommendation["personalization_score"] >= 0.70:
+        reasons.append(
+            "strong personalization match"
+        )
+
+    elif recommendation["personalization_score"] >= 0.50:
+        reasons.append(
+            "good personalization match"
+        )
+
+    if not reasons:
+        reasons.append(
+            "general wellness relevance"
+        )
+
+    return reasons
+
+
+# ============================================================
+# DUPLICATE FILTER
+# ============================================================
+
+def remove_duplicate_recommendations(
+    recommendations: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
+
+    unique_recommendations = []
+    seen_ids = set()
+
+    for recommendation in recommendations:
+
+        recommendation_id = recommendation["id"]
+
+        if recommendation_id in seen_ids:
+            continue
+
+        seen_ids.add(
+            recommendation_id
+        )
+
+        unique_recommendations.append(
+            recommendation
+        )
+
+    return unique_recommendations
+
+
+# ============================================================
+# LOW-RELEVANCE FILTER
+# ============================================================
+
+def filter_low_relevance(
+    recommendations: List[Dict[str, Any]],
+    minimum_score: float = 0.15
+) -> List[Dict[str, Any]]:
+
+    return [
+        recommendation
+        for recommendation in recommendations
+        if recommendation["score"] >= minimum_score
+    ]
+
+
+# ============================================================
+# RECOMMENDATION RANKING MODEL
+# ============================================================
+
+def rank_recommendations(
+    recommendations: List[Dict[str, Any]],
+    top_k: int = 5
+) -> Dict[str, Any]:
+
+    top_k = max(
+        1,
+        min(
+            int(top_k),
+            10
+        )
+    )
+
+    # Remove duplicate content
+    unique_recommendations = (
+        remove_duplicate_recommendations(
+            recommendations
+        )
+    )
+
+    duplicate_filtered = (
+        len(recommendations)
+        - len(unique_recommendations)
+    )
+
+    # Remove very low-scoring recommendations
+    relevant_recommendations = (
+        filter_low_relevance(
+            unique_recommendations
+        )
+    )
+
+    low_relevance_filtered = (
+        len(unique_recommendations)
+        - len(relevant_recommendations)
+    )
+
+    # Sort using final hybrid score
+    relevant_recommendations.sort(
+        key=lambda item: (
+            item["score"],
+            item["content_score"],
+            item["personalization_score"]
+        ),
+        reverse=True
+    )
+
+    selected = relevant_recommendations[
+        :top_k
+    ]
+
+    # Assign rank and ranking explanation
+    for index, recommendation in enumerate(
+        selected,
+        start=1
+    ):
+
+        recommendation["rank"] = index
+
+        recommendation["ranking_reason"] = (
+            generate_ranking_reason(
+                recommendation
+            )
+        )
+
+    ranking_order = [
+        recommendation["id"]
+        for recommendation in selected
+    ]
+
+    top_recommendation = (
+        selected[0]
+        if selected
+        else None
+    )
+
+    return {
+        "recommendations":
+            selected,
+
+        "count":
+            len(selected),
+
+        "top_recommendation":
+            top_recommendation,
+
+        "ranking_order":
+            ranking_order,
+
+        "duplicate_filtered":
+            duplicate_filtered,
+
+        "low_relevance_filtered":
+            low_relevance_filtered
+    }
+
+
+# ============================================================
 # GENERATE HYBRID RECOMMENDATIONS
 # ============================================================
 
@@ -473,10 +642,7 @@ def generate_hybrid_recommendations(
 
     scored_recommendations = []
 
-    # --------------------------------------------------------
     # Score every wellness item
-    # --------------------------------------------------------
-
     for content in WELLNESS_CONTENT:
 
         score_details = (
@@ -510,76 +676,62 @@ def generate_hybrid_recommendations(
         )
 
     # --------------------------------------------------------
-    # Dynamic ranking
+    # M3-T4 RANKING
     # --------------------------------------------------------
 
-    scored_recommendations.sort(
-        key=lambda item: item["score"],
-        reverse=True
+    ranking_result = rank_recommendations(
+        recommendations=scored_recommendations,
+        top_k=top_k
     )
 
-    selected = scored_recommendations[
-        :top_k
-    ]
+    # Add ranking metadata
+    ranking_result.update(
+        {
+            "method": "hybrid",
 
-    # --------------------------------------------------------
-    # Assign ranking
-    # --------------------------------------------------------
+            "components": [
+                "rule_based",
+                "content_based",
+                "preference_matching",
+                "history_based",
+                "dynamic_ranking",
+                "duplicate_filtering",
+                "low_relevance_filtering"
+            ],
 
-    for index, recommendation in enumerate(
-        selected,
-        start=1
-    ):
+            "personalization": {
+                "dominant_emotion":
+                    emotional_state.get(
+                        "dominant_emotion",
+                        "unknown"
+                    ),
 
-        recommendation["rank"] = index
+                "intensity":
+                    emotional_state.get(
+                        "intensity",
+                        0.0
+                    ),
 
-    # --------------------------------------------------------
-    # Return hybrid result
-    # --------------------------------------------------------
+                "polarity":
+                    emotional_state.get(
+                        "polarity",
+                        "neutral"
+                    ),
 
-    return {
-        "recommendations":
-            selected,
+                "preferences":
+                    preferences,
 
-        "count":
-            len(selected),
-
-        "method":
-            "hybrid",
-
-        "components": [
-            "rule_based",
-            "content_based",
-            "preference_matching",
-            "history_based"
-        ],
-
-        "personalization": {
-            "dominant_emotion":
-                emotional_state.get(
-                    "dominant_emotion",
-                    "unknown"
-                ),
-            "intensity":
-                emotional_state.get(
-                    "intensity",
-                    0.0
-                ),
-            "polarity":
-                emotional_state.get(
-                    "polarity",
-                    "neutral"
-                ),
-            "preferences":
-                preferences,
-            "history_used":
-                len(recommendation_history)
+                "history_used":
+                    len(recommendation_history)
+            }
         }
-    }
+    )
+
+    return ranking_result
 
 
 # ============================================================
-# M3-T2 COMPATIBILITY FUNCTION
+# COMPATIBILITY FUNCTION
 # ============================================================
 
 def generate_personalized_recommendations(
