@@ -1,0 +1,1441 @@
+{
+    "report_name": "M3 Advanced ML Validation Report",
+    "milestone": "M3-T9",
+    "total_tests": 5,
+    "passed_tests": 5,
+    "failed_tests": 0,
+    "validation_rate": 1.0,
+    "performance": {
+        "average_processing_time_seconds": 0.0774,
+        "maximum_processing_time_seconds": 0.1212,
+        "tests_measured": 5
+    },
+    "results": [
+        {
+            "test_name": "High Stress",
+            "input_text": "I am extremely stressed and overwhelmed by my workload.",
+            "processed_text": "extremely stressed overwhelmed workload",
+            "sentiment": {
+                "sentiment": "negative",
+                "compound": -0.2992,
+                "positive": 0.24,
+                "negative": 0.436,
+                "neutral": 0.324
+            },
+            "emotion": {
+                "emotion": "fear",
+                "confidence": 0.6198
+            },
+            "multilabel_emotion": {
+                "detected_emotions": [],
+                "primary_emotion": "sadness",
+                "emotion_scores": {
+                    "joy": 0.0166,
+                    "sadness": 0.3152,
+                    "anger": 0.0045,
+                    "fear": 0.0214,
+                    "surprise": 0.0024,
+                    "disgust": 0.0026
+                }
+            },
+            "emotional_state": {
+                "dominant_emotion": "sadness",
+                "intensity": 0.3152,
+                "polarity": "negative",
+                "mixed_emotion": false,
+                "severity": "low",
+                "emotion_scores": {
+                    "joy": 0.0166,
+                    "sadness": 0.3152,
+                    "anger": 0.0045,
+                    "fear": 0.0214,
+                    "surprise": 0.0024,
+                    "disgust": 0.0026
+                }
+            },
+            "recommendation_count": 5,
+            "top_recommendation": {
+                "id": "walk_01",
+                "title": "Take a Short Walk",
+                "type": "physical_activity",
+                "description": "Take a short walk away from your workspace to refresh your mind.",
+                "tags": [
+                    "walking",
+                    "exercise",
+                    "stress"
+                ],
+                "rule_score": 0.85,
+                "content_score": 0.3152,
+                "personalization_score": 0.3833,
+                "semantic_score": 0.5986,
+                "score": 0.5475,
+                "rank": 1,
+                "ranking_reason": [
+                    "strong emotional and intensity match",
+                    "moderate emotion-score similarity",
+                    "moderate semantic similarity"
+                ],
+                "explanation": {
+                    "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                    "reasons": [
+                        "Strong match for your current sadness emotional state",
+                        "Suitable for your current low emotional intensity",
+                        "Moderate similarity with your detected emotions",
+                        "Moderate semantic match with your current concern",
+                        "Aligned with your current negative emotional state"
+                    ],
+                    "factors": {
+                        "emotional_match": 0.85,
+                        "emotion_similarity": 0.3152,
+                        "personalization": 0.3833,
+                        "semantic_similarity": 0.5986,
+                        "final_score": 0.5475
+                    }
+                }
+            },
+            "recommendations": [
+                {
+                    "id": "walk_01",
+                    "title": "Take a Short Walk",
+                    "type": "physical_activity",
+                    "description": "Take a short walk away from your workspace to refresh your mind.",
+                    "tags": [
+                        "walking",
+                        "exercise",
+                        "stress"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.3152,
+                    "personalization_score": 0.3833,
+                    "semantic_score": 0.5986,
+                    "score": 0.5475,
+                    "rank": 1,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "moderate semantic similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Moderate semantic match with your current concern",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.3152,
+                            "personalization": 0.3833,
+                            "semantic_similarity": 0.5986,
+                            "final_score": 0.5475
+                        }
+                    }
+                },
+                {
+                    "id": "breathing_01",
+                    "title": "5-Minute Deep Breathing",
+                    "type": "breathing",
+                    "description": "A short breathing exercise to reduce immediate stress and tension.",
+                    "tags": [
+                        "breathing",
+                        "stress",
+                        "calm"
+                    ],
+                    "rule_score": 0.76,
+                    "content_score": 0.3152,
+                    "personalization_score": 0.6167,
+                    "semantic_score": 0.4511,
+                    "score": 0.5275,
+                    "rank": 2,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "moderate semantic similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Moderate semantic match with your current concern",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.76,
+                            "emotion_similarity": 0.3152,
+                            "personalization": 0.6167,
+                            "semantic_similarity": 0.4511,
+                            "final_score": 0.5275
+                        }
+                    }
+                },
+                {
+                    "id": "relax_01",
+                    "title": "Guided Relaxation",
+                    "type": "relaxation",
+                    "description": "Follow a short guided relaxation exercise to release tension.",
+                    "tags": [
+                        "relaxation",
+                        "stress",
+                        "calm"
+                    ],
+                    "rule_score": 0.76,
+                    "content_score": 0.3152,
+                    "personalization_score": 0.6167,
+                    "semantic_score": 0.3945,
+                    "score": 0.5105,
+                    "rank": 3,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.76,
+                            "emotion_similarity": 0.3152,
+                            "personalization": 0.6167,
+                            "semantic_similarity": 0.3945,
+                            "final_score": 0.5105
+                        }
+                    }
+                },
+                {
+                    "id": "music_01",
+                    "title": "Listen to Calming Music",
+                    "type": "music",
+                    "description": "Listen to calming music to create a more relaxed environment.",
+                    "tags": [
+                        "music",
+                        "relaxation",
+                        "calm"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.3152,
+                    "personalization_score": 0.3833,
+                    "semantic_score": 0.3623,
+                    "score": 0.4767,
+                    "rank": 4,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.3152,
+                            "personalization": 0.3833,
+                            "semantic_similarity": 0.3623,
+                            "final_score": 0.4767
+                        }
+                    }
+                },
+                {
+                    "id": "mindfulness_01",
+                    "title": "Mindfulness Reset",
+                    "type": "mindfulness",
+                    "description": "A simple mindfulness activity to help regain emotional balance.",
+                    "tags": [
+                        "mindfulness",
+                        "relaxation",
+                        "focus"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.3152,
+                    "personalization_score": 0.3833,
+                    "semantic_score": 0.3384,
+                    "score": 0.4695,
+                    "rank": 5,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.3152,
+                            "personalization": 0.3833,
+                            "semantic_similarity": 0.3384,
+                            "final_score": 0.4695
+                        }
+                    }
+                }
+            ],
+            "checks": {
+                "preprocessing_success": true,
+                "sentiment_success": true,
+                "emotion_success": true,
+                "multilabel_success": true,
+                "emotional_state_success": true,
+                "recommendation_success": true,
+                "ranking_success": true,
+                "explainability_success": true,
+                "semantic_matching_success": true
+            },
+            "passed_checks": 9,
+            "total_checks": 9,
+            "all_checks_passed": true,
+            "processing_time_seconds": 3.059
+        },
+        {
+            "test_name": "Low Stress",
+            "input_text": "I feel calm and my work is manageable today.",
+            "processed_text": "feel calm work manageable today",
+            "sentiment": {
+                "sentiment": "positive",
+                "compound": 0.3182,
+                "positive": 0.365,
+                "negative": 0.0,
+                "neutral": 0.635
+            },
+            "emotion": {
+                "emotion": "joy",
+                "confidence": 0.9722
+            },
+            "multilabel_emotion": {
+                "detected_emotions": [],
+                "primary_emotion": "joy",
+                "emotion_scores": {
+                    "joy": 0.3547,
+                    "sadness": 0.0044,
+                    "anger": 0.0011,
+                    "fear": 0.0028,
+                    "surprise": 0.0016,
+                    "disgust": 0.001
+                }
+            },
+            "emotional_state": {
+                "dominant_emotion": "joy",
+                "intensity": 0.3547,
+                "polarity": "positive",
+                "mixed_emotion": false,
+                "severity": "low_positive",
+                "emotion_scores": {
+                    "joy": 0.3547,
+                    "sadness": 0.0044,
+                    "anger": 0.0011,
+                    "fear": 0.0028,
+                    "surprise": 0.0016,
+                    "disgust": 0.001
+                }
+            },
+            "recommendation_count": 5,
+            "top_recommendation": {
+                "id": "gratitude_01",
+                "title": "Gratitude Reflection",
+                "type": "reflection",
+                "description": "Spend a few minutes identifying things that went well today.",
+                "tags": [
+                    "gratitude",
+                    "positive",
+                    "reflection"
+                ],
+                "rule_score": 1.0,
+                "content_score": 0.3547,
+                "personalization_score": 0.15,
+                "semantic_score": 0.3584,
+                "score": 0.4762,
+                "rank": 1,
+                "ranking_reason": [
+                    "strong emotional and intensity match",
+                    "moderate emotion-score similarity"
+                ],
+                "explanation": {
+                    "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                    "reasons": [
+                        "Strong match for your current joy emotional state",
+                        "Suitable for your current low emotional intensity",
+                        "Moderate similarity with your detected emotions",
+                        "Aligned with your current positive emotional state"
+                    ],
+                    "factors": {
+                        "emotional_match": 1.0,
+                        "emotion_similarity": 0.3547,
+                        "personalization": 0.15,
+                        "semantic_similarity": 0.3584,
+                        "final_score": 0.4762
+                    }
+                }
+            },
+            "recommendations": [
+                {
+                    "id": "gratitude_01",
+                    "title": "Gratitude Reflection",
+                    "type": "reflection",
+                    "description": "Spend a few minutes identifying things that went well today.",
+                    "tags": [
+                        "gratitude",
+                        "positive",
+                        "reflection"
+                    ],
+                    "rule_score": 1.0,
+                    "content_score": 0.3547,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.3584,
+                    "score": 0.4762,
+                    "rank": 1,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 1.0,
+                            "emotion_similarity": 0.3547,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.3584,
+                            "final_score": 0.4762
+                        }
+                    }
+                },
+                {
+                    "id": "celebrate_01",
+                    "title": "Celebrate a Small Win",
+                    "type": "positive_activity",
+                    "description": "Recognize one achievement from your day and build on that positive feeling.",
+                    "tags": [
+                        "joy",
+                        "motivation",
+                        "positive"
+                    ],
+                    "rule_score": 0.76,
+                    "content_score": 0.3547,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.3871,
+                    "score": 0.4248,
+                    "rank": 2,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.76,
+                            "emotion_similarity": 0.3547,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.3871,
+                            "final_score": 0.4248
+                        }
+                    }
+                },
+                {
+                    "id": "music_01",
+                    "title": "Listen to Calming Music",
+                    "type": "music",
+                    "description": "Listen to calming music to create a more relaxed environment.",
+                    "tags": [
+                        "music",
+                        "relaxation",
+                        "calm"
+                    ],
+                    "rule_score": 0.15,
+                    "content_score": 0.0044,
+                    "personalization_score": 0.85,
+                    "semantic_score": 0.4973,
+                    "score": 0.3578,
+                    "rank": 3,
+                    "ranking_reason": [
+                        "moderate semantic similarity",
+                        "strong personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Moderate semantic match with your current concern",
+                            "Strong match with your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.15,
+                            "emotion_similarity": 0.0044,
+                            "personalization": 0.85,
+                            "semantic_similarity": 0.4973,
+                            "final_score": 0.3578
+                        }
+                    }
+                },
+                {
+                    "id": "relax_01",
+                    "title": "Guided Relaxation",
+                    "type": "relaxation",
+                    "description": "Follow a short guided relaxation exercise to release tension.",
+                    "tags": [
+                        "relaxation",
+                        "stress",
+                        "calm"
+                    ],
+                    "rule_score": 0.06,
+                    "content_score": 0.0044,
+                    "personalization_score": 0.85,
+                    "semantic_score": 0.3936,
+                    "score": 0.3042,
+                    "rank": 4,
+                    "ranking_reason": [
+                        "strong personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match with your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.06,
+                            "emotion_similarity": 0.0044,
+                            "personalization": 0.85,
+                            "semantic_similarity": 0.3936,
+                            "final_score": 0.3042
+                        }
+                    }
+                },
+                {
+                    "id": "mindfulness_01",
+                    "title": "Mindfulness Reset",
+                    "type": "mindfulness",
+                    "description": "A simple mindfulness activity to help regain emotional balance.",
+                    "tags": [
+                        "mindfulness",
+                        "relaxation",
+                        "focus"
+                    ],
+                    "rule_score": 0.15,
+                    "content_score": 0.0044,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.4469,
+                    "score": 0.2727,
+                    "rank": 5,
+                    "ranking_reason": [
+                        "moderate semantic similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Moderate semantic match with your current concern",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.15,
+                            "emotion_similarity": 0.0044,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.4469,
+                            "final_score": 0.2727
+                        }
+                    }
+                }
+            ],
+            "checks": {
+                "preprocessing_success": true,
+                "sentiment_success": true,
+                "emotion_success": true,
+                "multilabel_success": true,
+                "emotional_state_success": true,
+                "recommendation_success": true,
+                "ranking_success": true,
+                "explainability_success": true,
+                "semantic_matching_success": true
+            },
+            "passed_checks": 9,
+            "total_checks": 9,
+            "all_checks_passed": true,
+            "processing_time_seconds": 0.0737
+        },
+        {
+            "test_name": "Work Concentration",
+            "input_text": "I have too much work and cannot concentrate properly.",
+            "processed_text": "much work not concentrate properly",
+            "sentiment": {
+                "sentiment": "neutral",
+                "compound": 0.0,
+                "positive": 0.0,
+                "negative": 0.0,
+                "neutral": 1.0
+            },
+            "emotion": {
+                "emotion": "sadness",
+                "confidence": 0.9705
+            },
+            "multilabel_emotion": {
+                "detected_emotions": [],
+                "primary_emotion": "sadness",
+                "emotion_scores": {
+                    "joy": 0.0027,
+                    "sadness": 0.2034,
+                    "anger": 0.0083,
+                    "fear": 0.0018,
+                    "surprise": 0.002,
+                    "disgust": 0.0065
+                }
+            },
+            "emotional_state": {
+                "dominant_emotion": "sadness",
+                "intensity": 0.2034,
+                "polarity": "negative",
+                "mixed_emotion": false,
+                "severity": "low",
+                "emotion_scores": {
+                    "joy": 0.0027,
+                    "sadness": 0.2034,
+                    "anger": 0.0083,
+                    "fear": 0.0018,
+                    "surprise": 0.002,
+                    "disgust": 0.0065
+                }
+            },
+            "recommendation_count": 5,
+            "top_recommendation": {
+                "id": "walk_01",
+                "title": "Take a Short Walk",
+                "type": "physical_activity",
+                "description": "Take a short walk away from your workspace to refresh your mind.",
+                "tags": [
+                    "walking",
+                    "exercise",
+                    "stress"
+                ],
+                "rule_score": 0.85,
+                "content_score": 0.2034,
+                "personalization_score": 0.15,
+                "semantic_score": 0.6171,
+                "score": 0.4785,
+                "rank": 1,
+                "ranking_reason": [
+                    "strong emotional and intensity match",
+                    "moderate emotion-score similarity",
+                    "strong semantic similarity"
+                ],
+                "explanation": {
+                    "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                    "reasons": [
+                        "Strong match for your current sadness emotional state",
+                        "Suitable for your current low emotional intensity",
+                        "Moderate similarity with your detected emotions",
+                        "Strong semantic match with your current concern",
+                        "Aligned with your current negative emotional state"
+                    ],
+                    "factors": {
+                        "emotional_match": 0.85,
+                        "emotion_similarity": 0.2034,
+                        "personalization": 0.15,
+                        "semantic_similarity": 0.6171,
+                        "final_score": 0.4785
+                    }
+                }
+            },
+            "recommendations": [
+                {
+                    "id": "walk_01",
+                    "title": "Take a Short Walk",
+                    "type": "physical_activity",
+                    "description": "Take a short walk away from your workspace to refresh your mind.",
+                    "tags": [
+                        "walking",
+                        "exercise",
+                        "stress"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.2034,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.6171,
+                    "score": 0.4785,
+                    "rank": 1,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "strong semantic similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Strong semantic match with your current concern",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.2034,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.6171,
+                            "final_score": 0.4785
+                        }
+                    }
+                },
+                {
+                    "id": "mindfulness_01",
+                    "title": "Mindfulness Reset",
+                    "type": "mindfulness",
+                    "description": "A simple mindfulness activity to help regain emotional balance.",
+                    "tags": [
+                        "mindfulness",
+                        "relaxation",
+                        "focus"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.2034,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.3286,
+                    "score": 0.4619,
+                    "rank": 2,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.2034,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.3286,
+                            "final_score": 0.4619
+                        }
+                    }
+                },
+                {
+                    "id": "planning_01",
+                    "title": "Workload Planning Reset",
+                    "type": "productivity",
+                    "description": "List your tasks and prioritize the most important items first.",
+                    "tags": [
+                        "planning",
+                        "workload",
+                        "productivity"
+                    ],
+                    "rule_score": 0.76,
+                    "content_score": 0.2034,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.3993,
+                    "score": 0.4606,
+                    "rank": 3,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.76,
+                            "emotion_similarity": 0.2034,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.3993,
+                            "final_score": 0.4606
+                        }
+                    }
+                },
+                {
+                    "id": "focus_01",
+                    "title": "Focus Reset Exercise",
+                    "type": "productivity",
+                    "description": "Break your workload into one small achievable task at a time.",
+                    "tags": [
+                        "focus",
+                        "productivity",
+                        "work"
+                    ],
+                    "rule_score": 0.35,
+                    "content_score": 0.0083,
+                    "personalization_score": 0.85,
+                    "semantic_score": 0.6673,
+                    "score": 0.4598,
+                    "rank": 4,
+                    "ranking_reason": [
+                        "strong semantic similarity",
+                        "strong personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong semantic match with your current concern",
+                            "Strong match with your preferred wellness activities",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.35,
+                            "emotion_similarity": 0.0083,
+                            "personalization": 0.85,
+                            "semantic_similarity": 0.6673,
+                            "final_score": 0.4598
+                        }
+                    }
+                },
+                {
+                    "id": "break_01",
+                    "title": "Take a Screen Break",
+                    "type": "break",
+                    "description": "Step away from the screen for a few minutes and reset.",
+                    "tags": [
+                        "break",
+                        "rest",
+                        "relaxation"
+                    ],
+                    "rule_score": 1.0,
+                    "content_score": 0.2034,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.4041,
+                    "score": 0.4521,
+                    "rank": 5,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "moderate emotion-score similarity",
+                        "moderate semantic similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current sadness emotional state",
+                            "Suitable for your current low emotional intensity",
+                            "Moderate similarity with your detected emotions",
+                            "Moderate semantic match with your current concern",
+                            "Aligned with your current negative emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 1.0,
+                            "emotion_similarity": 0.2034,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.4041,
+                            "final_score": 0.4521
+                        }
+                    }
+                }
+            ],
+            "checks": {
+                "preprocessing_success": true,
+                "sentiment_success": true,
+                "emotion_success": true,
+                "multilabel_success": true,
+                "emotional_state_success": true,
+                "recommendation_success": true,
+                "ranking_success": true,
+                "explainability_success": true,
+                "semantic_matching_success": true
+            },
+            "passed_checks": 9,
+            "total_checks": 9,
+            "all_checks_passed": true,
+            "processing_time_seconds": 0.0793
+        },
+        {
+            "test_name": "Positive State",
+            "input_text": "I am happy with my work and proud of what I achieved today.",
+            "processed_text": "happy work proud achieved today",
+            "sentiment": {
+                "sentiment": "positive",
+                "compound": 0.7783,
+                "positive": 0.694,
+                "negative": 0.0,
+                "neutral": 0.306
+            },
+            "emotion": {
+                "emotion": "joy",
+                "confidence": 0.9933
+            },
+            "multilabel_emotion": {
+                "detected_emotions": [
+                    "joy"
+                ],
+                "primary_emotion": "joy",
+                "emotion_scores": {
+                    "joy": 0.7236,
+                    "sadness": 0.0064,
+                    "anger": 0.0051,
+                    "fear": 0.0022,
+                    "surprise": 0.0035,
+                    "disgust": 0.0018
+                }
+            },
+            "emotional_state": {
+                "dominant_emotion": "joy",
+                "intensity": 0.7236,
+                "polarity": "positive",
+                "mixed_emotion": false,
+                "severity": "moderate_positive",
+                "emotion_scores": {
+                    "joy": 0.7236,
+                    "sadness": 0.0064,
+                    "anger": 0.0051,
+                    "fear": 0.0022,
+                    "surprise": 0.0035,
+                    "disgust": 0.0018
+                }
+            },
+            "recommendation_count": 5,
+            "top_recommendation": {
+                "id": "celebrate_01",
+                "title": "Celebrate a Small Win",
+                "type": "positive_activity",
+                "description": "Recognize one achievement from your day and build on that positive feeling.",
+                "tags": [
+                    "joy",
+                    "motivation",
+                    "positive"
+                ],
+                "rule_score": 0.88,
+                "content_score": 0.7236,
+                "personalization_score": 0.85,
+                "semantic_score": 0.545,
+                "score": 0.7344,
+                "rank": 1,
+                "ranking_reason": [
+                    "strong emotional and intensity match",
+                    "strong emotion-score similarity",
+                    "moderate semantic similarity",
+                    "strong personalization match"
+                ],
+                "explanation": {
+                    "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                    "reasons": [
+                        "Strong match for your current joy emotional state",
+                        "Suitable for your moderate emotional intensity",
+                        "Strong similarity with your detected emotions",
+                        "Moderate semantic match with your current concern",
+                        "Strong match with your preferred wellness activities",
+                        "Aligned with your current positive emotional state"
+                    ],
+                    "factors": {
+                        "emotional_match": 0.88,
+                        "emotion_similarity": 0.7236,
+                        "personalization": 0.85,
+                        "semantic_similarity": 0.545,
+                        "final_score": 0.7344
+                    }
+                }
+            },
+            "recommendations": [
+                {
+                    "id": "celebrate_01",
+                    "title": "Celebrate a Small Win",
+                    "type": "positive_activity",
+                    "description": "Recognize one achievement from your day and build on that positive feeling.",
+                    "tags": [
+                        "joy",
+                        "motivation",
+                        "positive"
+                    ],
+                    "rule_score": 0.88,
+                    "content_score": 0.7236,
+                    "personalization_score": 0.85,
+                    "semantic_score": 0.545,
+                    "score": 0.7344,
+                    "rank": 1,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "strong emotion-score similarity",
+                        "moderate semantic similarity",
+                        "strong personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your moderate emotional intensity",
+                            "Strong similarity with your detected emotions",
+                            "Moderate semantic match with your current concern",
+                            "Strong match with your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.88,
+                            "emotion_similarity": 0.7236,
+                            "personalization": 0.85,
+                            "semantic_similarity": 0.545,
+                            "final_score": 0.7344
+                        }
+                    }
+                },
+                {
+                    "id": "gratitude_01",
+                    "title": "Gratitude Reflection",
+                    "type": "reflection",
+                    "description": "Spend a few minutes identifying things that went well today.",
+                    "tags": [
+                        "gratitude",
+                        "positive",
+                        "reflection"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.7236,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.4393,
+                    "score": 0.6252,
+                    "rank": 2,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "strong emotion-score similarity",
+                        "moderate semantic similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your moderate emotional intensity",
+                            "Strong similarity with your detected emotions",
+                            "Moderate semantic match with your current concern",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.7236,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.4393,
+                            "final_score": 0.6252
+                        }
+                    }
+                },
+                {
+                    "id": "focus_01",
+                    "title": "Focus Reset Exercise",
+                    "type": "productivity",
+                    "description": "Break your workload into one small achievable task at a time.",
+                    "tags": [
+                        "focus",
+                        "productivity",
+                        "work"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.0051,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.2833,
+                    "score": 0.1913,
+                    "rank": 3,
+                    "ranking_reason": [
+                        "general wellness relevance"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it provides relevant wellness support.",
+                        "reasons": [
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.0051,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.2833,
+                            "final_score": 0.1913
+                        }
+                    }
+                },
+                {
+                    "id": "journaling_01",
+                    "title": "Write Down Your Thoughts",
+                    "type": "journaling",
+                    "description": "Write down what is bothering you and identify the main source of stress.",
+                    "tags": [
+                        "journaling",
+                        "reflection",
+                        "mental-health"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.0064,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.1882,
+                    "score": 0.1631,
+                    "rank": 4,
+                    "ranking_reason": [
+                        "general wellness relevance"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it provides relevant wellness support.",
+                        "reasons": [
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.0064,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.1882,
+                            "final_score": 0.1631
+                        }
+                    }
+                },
+                {
+                    "id": "walk_01",
+                    "title": "Take a Short Walk",
+                    "type": "physical_activity",
+                    "description": "Take a short walk away from your workspace to refresh your mind.",
+                    "tags": [
+                        "walking",
+                        "exercise",
+                        "stress"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.0064,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.1793,
+                    "score": 0.1604,
+                    "rank": 5,
+                    "ranking_reason": [
+                        "general wellness relevance"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it provides relevant wellness support.",
+                        "reasons": [
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.0064,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.1793,
+                            "final_score": 0.1604
+                        }
+                    }
+                }
+            ],
+            "checks": {
+                "preprocessing_success": true,
+                "sentiment_success": true,
+                "emotion_success": true,
+                "multilabel_success": true,
+                "emotional_state_success": true,
+                "recommendation_success": true,
+                "ranking_success": true,
+                "explainability_success": true,
+                "semantic_matching_success": true
+            },
+            "passed_checks": 9,
+            "total_checks": 9,
+            "all_checks_passed": true,
+            "processing_time_seconds": 0.0766
+        },
+        {
+            "test_name": "Mixed Emotion",
+            "input_text": "I am happy about my progress but worried about tomorrow's workload.",
+            "processed_text": "happy progress worried tomorrow workload",
+            "sentiment": {
+                "sentiment": "positive",
+                "compound": 0.6486,
+                "positive": 0.607,
+                "negative": 0.206,
+                "neutral": 0.187
+            },
+            "emotion": {
+                "emotion": "joy",
+                "confidence": 0.8353
+            },
+            "multilabel_emotion": {
+                "detected_emotions": [
+                    "joy"
+                ],
+                "primary_emotion": "joy",
+                "emotion_scores": {
+                    "joy": 0.6562,
+                    "sadness": 0.025,
+                    "anger": 0.0028,
+                    "fear": 0.0161,
+                    "surprise": 0.0019,
+                    "disgust": 0.001
+                }
+            },
+            "emotional_state": {
+                "dominant_emotion": "joy",
+                "intensity": 0.6562,
+                "polarity": "positive",
+                "mixed_emotion": false,
+                "severity": "moderate_positive",
+                "emotion_scores": {
+                    "joy": 0.6562,
+                    "sadness": 0.025,
+                    "anger": 0.0028,
+                    "fear": 0.0161,
+                    "surprise": 0.0019,
+                    "disgust": 0.001
+                }
+            },
+            "recommendation_count": 5,
+            "top_recommendation": {
+                "id": "celebrate_01",
+                "title": "Celebrate a Small Win",
+                "type": "positive_activity",
+                "description": "Recognize one achievement from your day and build on that positive feeling.",
+                "tags": [
+                    "joy",
+                    "motivation",
+                    "positive"
+                ],
+                "rule_score": 0.88,
+                "content_score": 0.6562,
+                "personalization_score": 0.15,
+                "semantic_score": 0.3279,
+                "score": 0.5124,
+                "rank": 1,
+                "ranking_reason": [
+                    "strong emotional and intensity match",
+                    "strong emotion-score similarity"
+                ],
+                "explanation": {
+                    "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                    "reasons": [
+                        "Strong match for your current joy emotional state",
+                        "Suitable for your moderate emotional intensity",
+                        "Strong similarity with your detected emotions",
+                        "Aligned with your current positive emotional state"
+                    ],
+                    "factors": {
+                        "emotional_match": 0.88,
+                        "emotion_similarity": 0.6562,
+                        "personalization": 0.15,
+                        "semantic_similarity": 0.3279,
+                        "final_score": 0.5124
+                    }
+                }
+            },
+            "recommendations": [
+                {
+                    "id": "celebrate_01",
+                    "title": "Celebrate a Small Win",
+                    "type": "positive_activity",
+                    "description": "Recognize one achievement from your day and build on that positive feeling.",
+                    "tags": [
+                        "joy",
+                        "motivation",
+                        "positive"
+                    ],
+                    "rule_score": 0.88,
+                    "content_score": 0.6562,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.3279,
+                    "score": 0.5124,
+                    "rank": 1,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "strong emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your moderate emotional intensity",
+                            "Strong similarity with your detected emotions",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.88,
+                            "emotion_similarity": 0.6562,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.3279,
+                            "final_score": 0.5124
+                        }
+                    }
+                },
+                {
+                    "id": "gratitude_01",
+                    "title": "Gratitude Reflection",
+                    "type": "reflection",
+                    "description": "Spend a few minutes identifying things that went well today.",
+                    "tags": [
+                        "gratitude",
+                        "positive",
+                        "reflection"
+                    ],
+                    "rule_score": 0.85,
+                    "content_score": 0.6562,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.251,
+                    "score": 0.4818,
+                    "rank": 2,
+                    "ranking_reason": [
+                        "strong emotional and intensity match",
+                        "strong emotion-score similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Strong match for your current joy emotional state",
+                            "Suitable for your moderate emotional intensity",
+                            "Strong similarity with your detected emotions",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.85,
+                            "emotion_similarity": 0.6562,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.251,
+                            "final_score": 0.4818
+                        }
+                    }
+                },
+                {
+                    "id": "focus_01",
+                    "title": "Focus Reset Exercise",
+                    "type": "productivity",
+                    "description": "Break your workload into one small achievable task at a time.",
+                    "tags": [
+                        "focus",
+                        "productivity",
+                        "work"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.0161,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.4802,
+                    "score": 0.3231,
+                    "rank": 3,
+                    "ranking_reason": [
+                        "moderate semantic similarity",
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Moderate semantic match with your current concern",
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.0161,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.4802,
+                            "final_score": 0.3231
+                        }
+                    }
+                },
+                {
+                    "id": "mindfulness_01",
+                    "title": "Mindfulness Reset",
+                    "type": "mindfulness",
+                    "description": "A simple mindfulness activity to help regain emotional balance.",
+                    "tags": [
+                        "mindfulness",
+                        "relaxation",
+                        "focus"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.025,
+                    "personalization_score": 0.5,
+                    "semantic_score": 0.2188,
+                    "score": 0.2469,
+                    "rank": 4,
+                    "ranking_reason": [
+                        "good personalization match"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Matches some of your preferred wellness activities",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.025,
+                            "personalization": 0.5,
+                            "semantic_similarity": 0.2188,
+                            "final_score": 0.2469
+                        }
+                    }
+                },
+                {
+                    "id": "walk_01",
+                    "title": "Take a Short Walk",
+                    "type": "physical_activity",
+                    "description": "Take a short walk away from your workspace to refresh your mind.",
+                    "tags": [
+                        "walking",
+                        "exercise",
+                        "stress"
+                    ],
+                    "rule_score": 0.3,
+                    "content_score": 0.025,
+                    "personalization_score": 0.15,
+                    "semantic_score": 0.4063,
+                    "score": 0.2331,
+                    "rank": 5,
+                    "ranking_reason": [
+                        "moderate semantic similarity"
+                    ],
+                    "explanation": {
+                        "summary": "Recommended because it matches your current emotional state and wellness needs.",
+                        "reasons": [
+                            "Moderate semantic match with your current concern",
+                            "Aligned with your current positive emotional state"
+                        ],
+                        "factors": {
+                            "emotional_match": 0.3,
+                            "emotion_similarity": 0.025,
+                            "personalization": 0.15,
+                            "semantic_similarity": 0.4063,
+                            "final_score": 0.2331
+                        }
+                    }
+                }
+            ],
+            "checks": {
+                "preprocessing_success": true,
+                "sentiment_success": true,
+                "emotion_success": true,
+                "multilabel_success": true,
+                "emotional_state_success": true,
+                "recommendation_success": true,
+                "ranking_success": true,
+                "explainability_success": true,
+                "semantic_matching_success": true
+            },
+            "passed_checks": 9,
+            "total_checks": 9,
+            "all_checks_passed": true,
+            "processing_time_seconds": 0.0813
+        }
+    ]
+}
