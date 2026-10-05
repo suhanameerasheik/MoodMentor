@@ -36,6 +36,11 @@ from ml.feedback_learning import (
     apply_feedback_learning
 )
 
+from ml.interaction_history import (
+    save_recommendation_interaction,
+    get_previous_interactions
+)
+
 
 app = FastAPI()
 
@@ -205,11 +210,14 @@ def recommend(data: dict):
         recommendation_history = []
 
     try:
+
         top_k = int(top_k)
+
     except (
         ValueError,
         TypeError
     ):
+
         top_k = 5
 
     top_k = max(
@@ -283,6 +291,21 @@ def recommend(data: dict):
         "feedback_learning"
     )
 
+    # --------------------------------------------------
+    # NEW: Save actual recommendation interaction
+    # --------------------------------------------------
+
+    save_recommendation_interaction(
+        text=text,
+        preferences=preferences,
+        emotional_state=emotional_state,
+        recommendations=recommendations,
+        top_recommendation=
+            recommendation_result[
+                "top_recommendation"
+            ]
+    )
+
     return {
         "status": "success",
         "message":
@@ -293,6 +316,48 @@ def recommend(data: dict):
             analysis_result,
         "recommendations":
             recommendation_result
+    }
+
+
+# ------------------------------------------------------
+# NEW: Previous Recommendation Interactions API
+# ------------------------------------------------------
+
+@app.get("/previous-interactions")
+def previous_interactions(
+    limit: int = 20
+):
+
+    try:
+
+        limit = int(limit)
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        limit = 20
+
+    limit = max(
+        1,
+        min(limit, 100)
+    )
+
+    interactions = (
+        get_previous_interactions(
+            limit
+        )
+    )
+
+    return {
+        "status": "success",
+        "message":
+            "Previous recommendation interactions retrieved successfully",
+        "count":
+            len(interactions),
+        "interactions":
+            interactions
     }
 
 
