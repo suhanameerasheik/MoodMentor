@@ -67,9 +67,6 @@ type Recommendation = {
   rule_score?: number;
   content_score?: number;
   personalization_score?: number;
-  collaborative_score?: number;
-  emotion_similarity_score?: number;
-  historical_behavior_score?: number;
   semantic_score?: number;
   score?: number;
 
@@ -354,7 +351,7 @@ function App() {
   }
 
   // ==========================================================
-  // HYBRID RECOMMENDATIONS
+  // PERSONALIZED RECOMMENDATIONS
   // ==========================================================
 
   async function handleRecommendations() {
@@ -480,7 +477,7 @@ function App() {
       await loadPreviousInteractionCount();
 
       setMessage(
-        "✓ Hybrid recommendations generated successfully."
+        "✓ Personalized recommendations generated successfully."
       );
     } catch (error) {
       console.error(error);
@@ -1509,29 +1506,6 @@ function App() {
 
               )}
 
-              {result.emotional_state && (
-                <div style={{ marginTop: '20px', padding: '20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e5e9f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#172033' }}>
-                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6366f1', display: 'inline-block' }}></span>
-                    Recent Emotional Trends & Intensity Tracker
-                  </h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: '600' }}>Dominant Emotion</span>
-                      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginTop: '4px' }}>
-                        {result.emotional_state.dominant_emotion || result.emotional_state.primary_emotion || 'Neutral'}
-                      </div>
-                    </div>
-                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: '600' }}>Emotional Intensity</span>
-                      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginTop: '4px' }}>
-                        {Math.round((result.emotional_state.intensity || result.emotional_state.emotional_intensity || 0.5) * 100)}%
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <section className="recommendation-card">
 
                 <div className="recommendation-header">
@@ -1539,15 +1513,18 @@ function App() {
                   <div>
 
                     <p className="small-label">
-                      HYBRID WELLNESS RECOMMENDATIONS
+                      PERSONALIZED WELLNESS
                     </p>
 
                     <h4>
-                      Intelligent Recommendations
+                      Recommendations for You
                     </h4>
 
                     <p>
-                      Generated via a multi-strategy hybrid engine combining rules, content matching, preferences, collaborative filtering, emotion similarity, and history.
+                      Recommendations are generated
+                      from your emotional state,
+                      preferences, and previous
+                      recommendation interactions.
                     </p>
 
                   </div>
@@ -1609,7 +1586,7 @@ function App() {
 
                     Select activities you prefer.
                     These preferences are sent to
-                    the hybrid engine.
+                    the recommendation model.
 
                   </p>
 
@@ -1768,7 +1745,7 @@ function App() {
                         </h5>
 
                         <p>
-                          Generate a hybrid
+                          Generate a personalized
                           recommendation and it will
                           appear here.
                         </p>
@@ -1945,7 +1922,7 @@ function App() {
                         </h5>
 
                         <p>
-                          Generate hybrid
+                          Generate personalized
                           recommendations to build your
                           recommendation history.
                         </p>
@@ -2113,8 +2090,8 @@ function App() {
                 >
 
                   {recommendationLoading
-                    ? "Generating Hybrid Recommendations..."
-                    : "Generate Hybrid Recommendations"}
+                    ? "Generating..."
+                    : "Generate Personalized Recommendations"}
 
                   {!recommendationLoading && (
 
@@ -2136,7 +2113,7 @@ function App() {
                       <div className="top-recommendation">
 
                         <div className="top-recommendation-label">
-                          TOP HYBRID MATCH
+                          TOP MATCH
                         </div>
 
                         <h5>
@@ -2159,35 +2136,11 @@ function App() {
 
                         </p>
 
-                        {/* Task 3 Hybrid Strategy Breakdown for Top Recommendation */}
-                        <div style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', fontSize: '12px' }}>
-                          <div>
-                            <span style={{ color: '#64748b', display: 'block' }}>Rule-Based</span>
-                            <strong>{percentage(recommendations.top_recommendation.rule_score)}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: '#64748b', display: 'block' }}>Content-Based</span>
-                            <strong>{percentage(recommendations.top_recommendation.content_score)}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: '#64748b', display: 'block' }}>Collaborative</span>
-                            <strong>{percentage(recommendations.top_recommendation.collaborative_score)}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: '#64748b', display: 'block' }}>Emotion Sim</span>
-                            <strong>{percentage(recommendations.top_recommendation.emotion_similarity_score)}</strong>
-                          </div>
-                          <div>
-                            <span style={{ color: '#64748b', display: 'block' }}>History Match</span>
-                            <strong>{percentage(recommendations.top_recommendation.historical_behavior_score)}</strong>
-                          </div>
-                        </div>
-
                         {recommendations
                           .top_recommendation
                           .ranking_reason && (
 
-                          <div className="ranking-reason" style={{ marginTop: '10px' }}>
+                          <div className="ranking-reason">
 
                             <strong>
                               Why this was recommended:
@@ -2307,35 +2260,11 @@ function App() {
 
                               </p>
 
-                              {/* Task 3 Hybrid Strategy Breakdown for List Item */}
-                              <div style={{ marginTop: '10px', padding: '8px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '6px', fontSize: '11px' }}>
-                                <div>
-                                  <span style={{ color: '#64748b', display: 'block' }}>Rules</span>
-                                  <strong>{percentage(recommendation.rule_score)}</strong>
-                                </div>
-                                <div>
-                                  <span style={{ color: '#64748b', display: 'block' }}>Content</span>
-                                  <strong>{percentage(recommendation.content_score)}</strong>
-                                </div>
-                                <div>
-                                  <span style={{ color: '#64748b', display: 'block' }}>Collaborative</span>
-                                  <strong>{percentage(recommendation.collaborative_score)}</strong>
-                                </div>
-                                <div>
-                                  <span style={{ color: '#64748b', display: 'block' }}>Emotion Sim</span>
-                                  <strong>{percentage(recommendation.emotion_similarity_score)}</strong>
-                                </div>
-                                <div>
-                                  <span style={{ color: '#64748b', display: 'block' }}>History</span>
-                                  <strong>{percentage(recommendation.historical_behavior_score)}</strong>
-                                </div>
-                              </div>
-
                               {recommendation.tags &&
                                 recommendation.tags
                                   .length > 0 && (
 
-                                <div className="recommendation-tags" style={{ marginTop: '8px' }}>
+                                <div className="recommendation-tags">
 
                                   {recommendation.tags.map(
                                     (
