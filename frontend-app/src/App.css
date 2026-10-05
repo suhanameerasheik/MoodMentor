@@ -20,10 +20,10 @@ body {
 
 button,
 textarea,
-input {
+input,
+select {
   font-family: inherit;
 }
-
 
 /* ==========================================================
    APP
@@ -39,7 +39,6 @@ input {
     ),
     #f4f7fb;
 }
-
 
 /* ==========================================================
    HEADER
@@ -101,7 +100,6 @@ input {
   background: #22c55e;
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
 }
-
 
 /* ==========================================================
    HERO
@@ -169,7 +167,6 @@ input {
   box-shadow: 0 15px 35px rgba(99, 102, 241, 0.12);
 }
 
-
 /* ==========================================================
    DASHBOARD
    ========================================================== */
@@ -183,7 +180,6 @@ input {
   gap: 25px;
   align-items: start;
 }
-
 
 /* ==========================================================
    CARD
@@ -201,7 +197,6 @@ input {
 .results-card {
   padding: 28px;
 }
-
 
 /* ==========================================================
    CARD HEADER
@@ -249,7 +244,6 @@ input {
   white-space: nowrap;
 }
 
-
 /* ==========================================================
    TEXTAREA
    ========================================================== */
@@ -282,7 +276,6 @@ textarea:focus {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-
 /* ==========================================================
    INPUT FOOTER
    ========================================================== */
@@ -294,7 +287,6 @@ textarea:focus {
   justify-content: space-between;
   gap: 12px;
 }
-
 
 /* ==========================================================
    UPLOAD BUTTON
@@ -324,7 +316,6 @@ textarea:focus {
 .upload-button input {
   display: none;
 }
-
 
 /* ==========================================================
    ANALYZE BUTTON
@@ -362,7 +353,6 @@ textarea:focus {
   font-size: 18px;
 }
 
-
 /* ==========================================================
    MESSAGE
    ========================================================== */
@@ -377,7 +367,6 @@ textarea:focus {
   font-size: 13px;
   line-height: 1.5;
 }
-
 
 /* ==========================================================
    EMPTY STATE
@@ -419,7 +408,6 @@ textarea:focus {
   line-height: 1.6;
 }
 
-
 /* ==========================================================
    RESULTS
    ========================================================== */
@@ -429,7 +417,6 @@ textarea:focus {
   flex-direction: column;
   gap: 18px;
 }
-
 
 /* ==========================================================
    SENTIMENT
@@ -472,7 +459,6 @@ textarea:focus {
   letter-spacing: 0.5px;
   color: #172033;
 }
-
 
 /* ==========================================================
    SCORE GRID
@@ -521,7 +507,6 @@ textarea:focus {
   border-top: 3px solid #6366f1;
 }
 
-
 /* ==========================================================
    EMOTION
    ========================================================== */
@@ -564,7 +549,6 @@ textarea:focus {
   font-size: 12px;
   line-height: 1.5;
 }
-
 
 /* ==========================================================
    EMOTIONAL STATE
@@ -617,7 +601,6 @@ textarea:focus {
   font-size: 24px;
 }
 
-
 /* ==========================================================
    STATE SUMMARY
    ========================================================== */
@@ -650,7 +633,6 @@ textarea:focus {
   font-size: 17px;
   letter-spacing: 0.3px;
 }
-
 
 /* ==========================================================
    STATE DETAILS
@@ -689,7 +671,6 @@ textarea:focus {
   color: #6366f1 !important;
 }
 
-
 /* ==========================================================
    DETECTED EMOTIONS
    ========================================================== */
@@ -723,7 +704,6 @@ textarea:focus {
   color: #8a93a3;
   font-size: 12px;
 }
-
 
 /* ==========================================================
    INTENSITY
@@ -784,7 +764,6 @@ textarea:focus {
   font-size: 9px;
 }
 
-
 /* ==========================================================
    GENERATE PERSONALIZED RECOMMENDATIONS
    ========================================================== */
@@ -836,7 +815,6 @@ textarea:focus {
   font-size: 24px;
 }
 
-
 /* ==========================================================
    PREFERENCES
    ========================================================== */
@@ -884,6 +862,80 @@ textarea:focus {
   line-height: 1.5;
 }
 
+/* ==========================================================
+   USER PROFILE DROPDOWN
+   ========================================================== */
+
+.user-selector-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 10px;
+}
+
+.user-selector {
+  width: 100%;
+  min-height: 46px;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 11px 44px 11px 14px;
+  border: 1px solid #dfe4ec;
+  border-radius: 12px;
+  outline: none;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent 50%,
+      #6366f1 50%
+    ),
+    linear-gradient(
+      135deg,
+      #6366f1 50%,
+      transparent 50%
+    );
+  background-position:
+    calc(100% - 19px) 20px,
+    calc(100% - 13px) 20px;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(30, 41, 59, 0.04);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.user-selector:hover {
+  border-color: #aeb4ff;
+  background-color: #fafaff;
+}
+
+.user-selector:focus {
+  border-color: #6366f1;
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, 0.12),
+    0 5px 14px rgba(30, 41, 59, 0.05);
+}
+
+.user-selector:active {
+  transform: translateY(1px);
+}
+
+.user-selector option {
+  background: #ffffff;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+}
 
 /* ==========================================================
    PERSONALIZATION GRID
@@ -894,10 +946,12 @@ textarea:focus {
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-top: 18px;
+  align-items: start;
 }
 
 .personalization-item {
   min-width: 0;
+  height: auto;
   padding: 14px;
   border-radius: 12px;
   background: #ffffff;
@@ -925,7 +979,6 @@ textarea:focus {
   font-size: 10px;
   line-height: 1.4;
 }
-
 
 /* ==========================================================
    CLICKABLE PERSONALIZATION
@@ -959,7 +1012,6 @@ textarea:focus {
   outline: 3px solid rgba(99, 102, 241, 0.15);
   outline-offset: 2px;
 }
-
 
 /* ==========================================================
    RECOMMEND BUTTON
@@ -1001,7 +1053,6 @@ textarea:focus {
   font-size: 18px;
 }
 
-
 /* ==========================================================
    RECOMMENDATION RESULTS
    ========================================================== */
@@ -1012,6 +1063,147 @@ textarea:focus {
   border-top: 1px solid #edf0f5;
 }
 
+/* ==========================================================
+   HYBRID RECOMMENDATION ENGINE
+   ========================================================== */
+
+.hybrid-summary {
+  margin-bottom: 14px;
+  padding: 18px;
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      135deg,
+      #f8f8ff 0%,
+      #ffffff 100%
+    );
+  border: 1px solid #dedfff;
+}
+
+.hybrid-summary-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ececff;
+}
+
+.hybrid-summary-header h5 {
+  margin: 0;
+  color: #172033;
+  font-size: 17px;
+}
+
+.hybrid-summary-header p:last-child {
+  margin: 6px 0 0;
+  color: #7b8495;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.hybrid-engine-icon {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eef2ff;
+  font-size: 21px;
+}
+
+.hybrid-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.hybrid-stat {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e8e9f5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hybrid-stat span {
+  color: #8a93a3;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.hybrid-stat strong {
+  color: #4f46e5;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================
+   HYBRID WEIGHTS
+   ========================================================== */
+
+.hybrid-weights {
+  margin-top: 16px;
+  padding: 15px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e8eaf2;
+}
+
+.hybrid-weights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hybrid-weights-header h6 {
+  margin: 0;
+  color: #172033;
+  font-size: 13px;
+}
+
+.hybrid-weights-header > span {
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f0fdf4;
+  color: #16a34a;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.weight-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.weight-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f8f9fc;
+}
+
+.weight-row span {
+  color: #697386;
+  font-size: 9px;
+}
+
+.weight-row strong {
+  color: #4f46e5;
+  font-size: 9px;
+}
 
 /* ==========================================================
    TOP RECOMMENDATION
@@ -1036,8 +1228,17 @@ textarea:focus {
   letter-spacing: 1.2px;
 }
 
-.top-recommendation h5 {
-  margin: 7px 0 0;
+.top-recommendation-heading {
+  margin-top: 7px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.top-recommendation h5,
+.top-recommendation-heading h5 {
+  margin: 0;
   font-size: 18px;
   color: #172033;
   overflow-wrap: anywhere;
@@ -1049,6 +1250,19 @@ textarea:focus {
   font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
+}
+
+.top-score {
+  display: inline-block;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #16a34a;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .ranking-reason {
@@ -1072,6 +1286,82 @@ textarea:focus {
   line-height: 1.5;
 }
 
+/* ==========================================================
+   HYBRID SCORE BREAKDOWN
+   ========================================================== */
+
+.hybrid-score-section {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f8f9fc;
+  border: 1px solid #edf0f5;
+}
+
+.hybrid-score-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.hybrid-score-heading span {
+  color: #697386;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.hybrid-score-heading strong {
+  color: #4f46e5;
+  font-size: 11px;
+}
+
+.hybrid-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.hybrid-score-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: #ffffff;
+  border: 1px solid #e8ebf2;
+}
+
+.hybrid-score-item span {
+  min-width: 0;
+  color: #7b8495;
+  font-size: 8px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.hybrid-score-item strong {
+  flex-shrink: 0;
+  color: #5558e8;
+  font-size: 8px;
+}
+
+.recommendation-ranking-detail {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #fafaff;
+  border: 1px solid #e5e7ff;
+  color: #737b89;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.recommendation-ranking-detail strong {
+  color: #5558e8;
+}
 
 /* ==========================================================
    RECOMMENDATION LIST
@@ -1152,7 +1442,6 @@ textarea:focus {
   overflow-wrap: anywhere;
 }
 
-
 /* ==========================================================
    RECOMMENDATION TAGS
    ========================================================== */
@@ -1173,7 +1462,6 @@ textarea:focus {
   overflow-wrap: anywhere;
 }
 
-
 /* ==========================================================
    RECOMMENDATION META
    ========================================================== */
@@ -1188,7 +1476,6 @@ textarea:focus {
   color: #8a93a3;
   font-size: 9px;
 }
-
 
 /* ==========================================================
    WELLNESS RESULT
@@ -1240,7 +1527,6 @@ textarea:focus {
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-
 
 /* ==========================================================
    PREVIOUS INTERACTIONS
@@ -1317,7 +1603,6 @@ textarea:focus {
   color: #6366f1;
 }
 
-
 /* ==========================================================
    HISTORY LIST
    ========================================================== */
@@ -1330,7 +1615,6 @@ textarea:focus {
   flex-direction: column;
   gap: 14px;
 }
-
 
 /* ==========================================================
    HISTORY ITEM
@@ -1384,7 +1668,6 @@ textarea:focus {
   overflow: hidden;
 }
 
-
 /* ==========================================================
    HISTORY ITEM HEADER
    ========================================================== */
@@ -1422,7 +1705,6 @@ textarea:focus {
   white-space: nowrap;
 }
 
-
 /* ==========================================================
    HISTORY DESCRIPTION
    ========================================================== */
@@ -1439,7 +1721,6 @@ textarea:focus {
   word-break: break-word;
 }
 
-
 /* ==========================================================
    HISTORY SECTION LABEL
    ========================================================== */
@@ -1453,7 +1734,6 @@ textarea:focus {
   letter-spacing: 0.7px;
   text-transform: uppercase;
 }
-
 
 /* ==========================================================
    HISTORY PREFERENCES
@@ -1483,7 +1763,6 @@ textarea:focus {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
-
 
 /* ==========================================================
    HISTORY META
@@ -1517,7 +1796,6 @@ textarea:focus {
   font-weight: 750;
 }
 
-
 /* ==========================================================
    HISTORY TOP RECOMMENDATION
    ========================================================== */
@@ -1548,7 +1826,6 @@ textarea:focus {
   font-weight: 750;
 }
 
-
 /* ==========================================================
    HISTORY EMPTY
    ========================================================== */
@@ -1576,7 +1853,6 @@ textarea:focus {
   overflow-wrap: anywhere;
 }
 
-
 /* ==========================================================
    FOOTER
    ========================================================== */
@@ -1600,7 +1876,6 @@ footer span:first-child {
   color: #6366f1;
   font-weight: 750;
 }
-
 
 /* ==========================================================
    TABLET
@@ -1630,8 +1905,11 @@ footer span:first-child {
   .state-detail-grid {
     grid-template-columns: 1fr 1fr;
   }
-}
 
+  .hybrid-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 /* ==========================================================
    MOBILE
@@ -1741,6 +2019,7 @@ footer span:first-child {
 
   .personalization-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .emotional-state-card,
@@ -1790,27 +2069,50 @@ footer span:first-child {
     align-self: flex-start;
   }
 
+  .hybrid-summary {
+    padding: 15px;
+  }
+
+  .hybrid-summary-header {
+    gap: 10px;
+  }
+
+  .hybrid-summary-header h5 {
+    font-size: 16px;
+  }
+
+  .hybrid-summary-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .weight-list {
+    grid-template-columns: 1fr;
+  }
+
+  .hybrid-score-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-recommendation-heading {
+    flex-direction: column;
+  }
+
+  .top-score {
+    align-self: flex-start;
+  }
+
+  .user-selector-wrapper {
+    max-width: 100%;
+    margin-top: 10px;
+  }
+
+  .user-selector {
+    min-height: 48px;
+    font-size: 14px;
+    padding: 12px 44px 12px 14px;
+  }
+
   footer {
     padding: 22px 5%;
   }
-  .personalization-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 18px;
-  align-items: start; /* Prevents columns from vertically stretching */
-}
-
-.personalization-item {
-  min-width: 0;
-  height: auto; /* Ensures it sizes naturally to its content */
-  padding: 16px;
-  border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #e8ebf2;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: left;
-}
 }

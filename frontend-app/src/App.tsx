@@ -66,6 +66,10 @@ type Recommendation = {
 
   rule_score?: number;
   content_score?: number;
+  preference_score?: number;
+  collaborative_score?: number;
+  emotion_similarity_score?: number;
+  historical_behavior_score?: number;
   personalization_score?: number;
   semantic_score?: number;
   score?: number;
@@ -83,12 +87,30 @@ type Recommendation = {
   learned_score?: number;
 };
 
+type HybridWeights = {
+  rule_based?: number;
+  content_based?: number;
+  preference_matching?: number;
+  collaborative_filtering?: number;
+  emotion_similarity?: number;
+  historical_behavior?: number;
+  semantic_similarity?: number;
+};
+
 type RecommendationResult = {
   recommendations?: Recommendation[];
   top_recommendation?: Recommendation | null;
   ranking_order?: string[];
   method?: string;
   components?: string[];
+
+  hybrid_weights?: HybridWeights;
+  user_id?: string;
+  collaborative_users_available?: number;
+
+  personalization?: {
+    collaborative_history_used?: boolean;
+  };
 };
 
 type PreviousInteraction = {
@@ -108,6 +130,13 @@ function App() {
     useState<AnalysisResult | null>(null);
 
   const [message, setMessage] = useState("");
+
+  // ==========================================================
+  // USER PROFILE
+  // ==========================================================
+
+  const [selectedUser, setSelectedUser] =
+    useState("user_001");
 
   // ==========================================================
   // PERSONALIZED RECOMMENDATION STATE
@@ -383,6 +412,9 @@ function App() {
             recommendation_history:
               recommendationHistory,
             top_k: 5,
+
+            // Selected frontend user
+            user_id: selectedUser,
           }),
         }
       );
@@ -774,6 +806,41 @@ function App() {
           letter.toUpperCase()
       );
   }
+
+  // ==========================================================
+  // HYBRID SCORE LABELS
+  // ==========================================================
+
+  const hybridScoreItems = [
+    {
+      label: "Rule-based",
+      key: "rule_score" as const,
+    },
+    {
+      label: "Content-based",
+      key: "content_score" as const,
+    },
+    {
+      label: "Preference matching",
+      key: "preference_score" as const,
+    },
+    {
+      label: "Collaborative filtering",
+      key: "collaborative_score" as const,
+    },
+    {
+      label: "Emotion similarity",
+      key: "emotion_similarity_score" as const,
+    },
+    {
+      label: "Historical behavior",
+      key: "historical_behavior_score" as const,
+    },
+    {
+      label: "Semantic similarity",
+      key: "semantic_score" as const,
+    },
+  ];
 
   // ==========================================================
   // UI
@@ -1523,8 +1590,8 @@ function App() {
                     <p>
                       Recommendations are generated
                       from your emotional state,
-                      preferences, and previous
-                      recommendation interactions.
+                      preferences, previous interactions,
+                      and multiple recommendation strategies.
                     </p>
 
                   </div>
@@ -1534,6 +1601,58 @@ function App() {
                   </div>
 
                 </div>
+
+                {/* ==================================================
+                    USER PROFILE
+                    ================================================== */}
+
+                <div className="preference-section">
+
+                  <p className="small-label">
+                    USER PROFILE
+                  </p>
+
+                  <div className="user-selector-wrapper">
+
+                    <select
+                      className="user-selector"
+                      value={selectedUser}
+                      onChange={(event) =>
+                        setSelectedUser(
+                          event.target.value
+                        )
+                      }
+                    >
+
+                      <option value="user_001">
+                        User 1
+                      </option>
+
+                      <option value="user_002">
+                        User 2
+                      </option>
+
+                      <option value="user_003">
+                        User 3
+                      </option>
+
+                    </select>
+
+                  </div>
+
+                  <p className="preference-note">
+
+                    Select the employee profile whose
+                    recommendation history and collaborative
+                    behavior should be used.
+
+                  </p>
+
+                </div>
+
+                {/* ==================================================
+                    USER PREFERENCES
+                    ================================================== */}
 
                 <div className="preference-section">
 
@@ -1691,6 +1810,10 @@ function App() {
 
                 </div>
 
+                {/* ==================================================
+                    PREVIOUS INTERACTIONS
+                    ================================================== */}
+
                 {showPreviousInteractions && (
 
                   <div className="history-panel">
@@ -1731,9 +1854,7 @@ function App() {
                     {previousInteractionsLoading ? (
 
                       <div className="history-empty">
-
                         Loading previous interactions...
-
                       </div>
 
                     ) : previousInteractions.length === 0 ? (
@@ -1771,10 +1892,7 @@ function App() {
                             >
 
                               <div className="history-rank">
-
-                                {previousInteractions.length -
-                                  index}
-
+                                {previousInteractions.length - index}
                               </div>
 
                               <div className="history-content">
@@ -1782,14 +1900,12 @@ function App() {
                                 <div className="history-item-header">
 
                                   <h6>
-
                                     {
                                       interaction
                                         .top_recommendation
                                         ?.title ||
                                       "Recommendation Interaction"
                                     }
-
                                   </h6>
 
                                   <div className="history-score">
@@ -1807,7 +1923,8 @@ function App() {
                                 {interaction.text && (
 
                                   <p>
-                                    <strong>Feedback:</strong> {interaction.text}
+                                    <strong>Feedback:</strong>{" "}
+                                    {interaction.text}
                                   </p>
 
                                 )}
@@ -1875,6 +1992,10 @@ function App() {
                   </div>
 
                 )}
+
+                {/* ==================================================
+                    RECOMMENDATION HISTORY
+                    ================================================== */}
 
                 {showRecommendationHistory && (
 
@@ -1991,18 +2112,16 @@ function App() {
                                     </span>
 
                                     <span>
-                                      <strong>Personalization:</strong>{" "}
+                                      <strong>Hybrid:</strong>{" "}
                                       {percentage(
-                                        recommendation
-                                          .personalization_score
+                                        recommendation.score
                                       )}
                                     </span>
 
                                     <span>
-                                      <strong>Semantic Match:</strong>{" "}
+                                      <strong>Semantic:</strong>{" "}
                                       {percentage(
-                                        recommendation
-                                          .semantic_score
+                                        recommendation.semantic_score
                                       )}
                                     </span>
 
@@ -2078,6 +2197,10 @@ function App() {
 
                 )}
 
+                {/* ==================================================
+                    GENERATE RECOMMENDATIONS
+                    ================================================== */}
+
                 <button
                   type="button"
                   className="recommend-button"
@@ -2103,12 +2226,253 @@ function App() {
 
                 </button>
 
+                {/* ==================================================
+                    RECOMMENDATION RESULTS
+                    ================================================== */}
+
                 {recommendations && (
 
                   <div className="recommendation-results">
 
-                    {recommendations
-                      .top_recommendation && (
+                    {/* ==================================================
+                        HYBRID ENGINE SUMMARY
+                        ================================================== */}
+
+                    <div className="hybrid-summary">
+
+                      <div className="hybrid-summary-header">
+
+                        <div>
+
+                          <p className="small-label">
+                            RECOMMENDATION INTELLIGENCE
+                          </p>
+
+                          <h5>
+                            Hybrid Recommendation Engine
+                          </h5>
+
+                          <p>
+                            The final ranking combines multiple
+                            recommendation strategies to personalize
+                            wellness suggestions.
+                          </p>
+
+                        </div>
+
+                        <div className="hybrid-engine-icon">
+                          ⚙️
+                        </div>
+
+                      </div>
+
+                      <div className="hybrid-summary-stats">
+
+                        <div className="hybrid-stat">
+
+                          <span>
+                            Strategy
+                          </span>
+
+                          <strong>
+                            Hybrid
+                          </strong>
+
+                        </div>
+
+                        <div className="hybrid-stat">
+
+                          <span>
+                            User
+                          </span>
+
+                          <strong>
+                            {recommendations.user_id ||
+                              selectedUser}
+                          </strong>
+
+                        </div>
+
+                        <div className="hybrid-stat">
+
+                          <span>
+                            Collaborative Users
+                          </span>
+
+                          <strong>
+                            {recommendations
+                              .collaborative_users_available ??
+                              0}
+                          </strong>
+
+                        </div>
+
+                        <div className="hybrid-stat">
+
+                          <span>
+                            Method
+                          </span>
+
+                          <strong>
+                            {recommendations.method ||
+                              "Hybrid"}
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+                      {recommendations.hybrid_weights && (
+
+                        <div className="hybrid-weights">
+
+                          <div className="hybrid-weights-header">
+
+                            <div>
+
+                              <p className="small-label">
+                                HYBRID WEIGHTS
+                              </p>
+
+                              <h6>
+                                Contribution of Each Strategy
+                              </h6>
+
+                            </div>
+
+                            <span>
+                              100%
+                            </span>
+
+                          </div>
+
+                          <div className="weight-list">
+
+                            <div className="weight-row">
+
+                              <span>
+                                Rule-based
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .rule_based
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Content-based
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .content_based
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Preference matching
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .preference_matching
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Collaborative filtering
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .collaborative_filtering
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Emotion similarity
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .emotion_similarity
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Historical behavior
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .historical_behavior
+                                )}
+                              </strong>
+
+                            </div>
+
+                            <div className="weight-row">
+
+                              <span>
+                                Semantic similarity
+                              </span>
+
+                              <strong>
+                                {percentage(
+                                  recommendations
+                                    .hybrid_weights
+                                    .semantic_similarity
+                                )}
+                              </strong>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+                    {/* ==================================================
+                        TOP RECOMMENDATION
+                        ================================================== */}
+
+                    {recommendations.top_recommendation && (
 
                       <div className="top-recommendation">
 
@@ -2116,15 +2480,32 @@ function App() {
                           TOP MATCH
                         </div>
 
-                        <h5>
+                        <div className="top-recommendation-heading">
 
-                          {
-                            recommendations
-                              .top_recommendation
-                              .title
-                          }
+                          <div>
 
-                        </h5>
+                            <h5>
+                              {
+                                recommendations
+                                  .top_recommendation
+                                  .title
+                              }
+                            </h5>
+
+                            <span className="top-score">
+
+                              Hybrid score:{" "}
+                              {percentage(
+                                recommendations
+                                  .top_recommendation
+                                  .score
+                              )}
+
+                            </span>
+
+                          </div>
+
+                        </div>
 
                         <p>
 
@@ -2185,6 +2566,10 @@ function App() {
                       </div>
 
                     )}
+
+                    {/* ==================================================
+                        RECOMMENDATION LIST
+                        ================================================== */}
 
                     <div className="recommendation-list">
 
@@ -2285,7 +2670,68 @@ function App() {
 
                               )}
 
+                              {/* ==================================================
+                                  TASK 3 HYBRID SCORE BREAKDOWN
+                                  ================================================== */}
+
+                              <div className="hybrid-score-section">
+
+                                <div className="hybrid-score-heading">
+
+                                  <span>
+                                    Hybrid score breakdown
+                                  </span>
+
+                                  <strong>
+                                    {percentage(
+                                      recommendation.score
+                                    )}
+                                  </strong>
+
+                                </div>
+
+                                <div className="hybrid-score-grid">
+
+                                  {hybridScoreItems.map(
+                                    (item) => (
+
+                                      <div
+                                        className="hybrid-score-item"
+                                        key={item.key}
+                                      >
+
+                                        <span>
+                                          {item.label}
+                                        </span>
+
+                                        <strong>
+                                          {percentage(
+                                            recommendation[
+                                              item.key
+                                            ]
+                                          )}
+                                        </strong>
+
+                                      </div>
+
+                                    )
+                                  )}
+
+                                </div>
+
+                              </div>
+
                               <div className="recommendation-meta">
+
+                                <span>
+
+                                  Hybrid score:{" "}
+
+                                  {percentage(
+                                    recommendation.score
+                                  )}
+
+                                </span>
 
                                 <span>
 
@@ -2311,6 +2757,26 @@ function App() {
 
                               </div>
 
+                              {recommendation.ranking_reason && (
+
+                                <div className="recommendation-ranking-detail">
+
+                                  <strong>
+                                    Ranking reason:
+                                  </strong>{" "}
+
+                                  {Array.isArray(
+                                    recommendation.ranking_reason
+                                  )
+                                    ? recommendation.ranking_reason.join(
+                                        ", "
+                                      )
+                                    : recommendation.ranking_reason}
+
+                                </div>
+
+                              )}
+
                             </div>
 
                           </article>
@@ -2325,6 +2791,10 @@ function App() {
                 )}
 
               </section>
+
+              {/* ==================================================
+                  WELLNESS RESULT
+                  ================================================== */}
 
               {result.wellness && (
 
