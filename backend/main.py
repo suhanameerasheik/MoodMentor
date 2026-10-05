@@ -197,6 +197,26 @@ def recommend(data: dict):
         5
     )
 
+    # --------------------------------------------------
+    # TASK 3D: User identity for collaborative filtering
+    # --------------------------------------------------
+
+    user_id = data.get(
+        "user_id",
+        "default_user"
+    )
+
+    if not isinstance(
+        user_id,
+        str
+    ) or not user_id.strip():
+
+        user_id = "default_user"
+
+    user_id = user_id.strip()
+
+    # --------------------------------------------------
+
     if not isinstance(
         preferences,
         list
@@ -246,7 +266,8 @@ def recommend(data: dict):
             recommendation_history=
                 recommendation_history,
             top_k=top_k,
-            text=text
+            text=text,
+            user_id=user_id
         )
     )
 
@@ -285,14 +306,27 @@ def recommend(data: dict):
         "method"
     ] = "hybrid_semantic_feedback"
 
-    recommendation_result[
-        "components"
-    ].append(
+    if "components" not in recommendation_result:
+
+        recommendation_result[
+            "components"
+        ] = []
+
+    if (
         "feedback_learning"
-    )
+        not in recommendation_result[
+            "components"
+        ]
+    ):
+
+        recommendation_result[
+            "components"
+        ].append(
+            "feedback_learning"
+        )
 
     # --------------------------------------------------
-    # NEW: Save actual recommendation interaction
+    # Save actual recommendation interaction
     # --------------------------------------------------
 
     save_recommendation_interaction(
@@ -312,6 +346,8 @@ def recommend(data: dict):
             "Personalized recommendations generated successfully",
         "history_record_id":
             record_id,
+        "user_id":
+            user_id,
         "analysis":
             analysis_result,
         "recommendations":
@@ -320,7 +356,7 @@ def recommend(data: dict):
 
 
 # ------------------------------------------------------
-# NEW: Previous Recommendation Interactions API
+# Previous Recommendation Interactions API
 # ------------------------------------------------------
 
 @app.get("/previous-interactions")
@@ -381,6 +417,20 @@ def recommendation_feedback(
         {}
     )
 
+    user_id = data.get(
+        "user_id",
+        "default_user"
+    )
+
+    if not isinstance(
+        user_id,
+        str
+    ) or not user_id.strip():
+
+        user_id = "default_user"
+
+    user_id = user_id.strip()
+
     if not recommendation_id:
 
         raise HTTPException(
@@ -396,7 +446,8 @@ def recommendation_feedback(
                     recommendation_id,
                 feedback=feedback,
                 emotional_state=
-                    emotional_state
+                    emotional_state,
+                user_id=user_id
             )
         )
 
@@ -416,7 +467,9 @@ def recommendation_feedback(
         "recommendation_id":
             recommendation_id,
         "feedback":
-            feedback
+            feedback,
+        "user_id":
+            user_id
     }
 
 

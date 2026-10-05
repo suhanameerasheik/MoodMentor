@@ -1,8 +1,14 @@
 from typing import Dict, List, Any
+from collections import defaultdict
+import math
 
 from sentence_transformers import (
     SentenceTransformer,
     util
+)
+
+from ml.feedback_learning import (
+    get_all_user_interactions
 )
 
 
@@ -345,6 +351,120 @@ def calculate_content_score(
 
 
 # ============================================================
+# EMOTION SIMILARITY
+# ============================================================
+
+def calculate_emotion_similarity_score(
+    content: Dict[str, Any],
+    emotion_scores: Dict[str, float]
+) -> float:
+
+    if not emotion_scores:
+        return 0.0
+
+    content_emotions = set(
+        content.get(
+            "emotions",
+            []
+        )
+    )
+
+    if not content_emotions:
+        return 0.0
+
+    user_vector = []
+    content_vector = []
+
+    for emotion, score in emotion_scores.items():
+
+        user_vector.append(
+            float(score)
+        )
+
+        content_vector.append(
+            1.0
+            if emotion in content_emotions
+            else 0.0
+        )
+
+    user_magnitude = math.sqrt(
+        sum(
+            value * value
+            for value in user_vector
+        )
+    )
+
+    content_magnitude = math.sqrt(
+        sum(
+            value * value
+            for value in content_vector
+        )
+    )
+
+    if (
+        user_magnitude == 0.0
+        or content_magnitude == 0.0
+    ):
+        return 0.0
+
+    dot_product = sum(
+        user_value * content_value
+        for user_value, content_value
+        in zip(
+            user_vector,
+            content_vector
+        )
+    )
+
+    similarity = (
+        dot_product
+        /
+        (
+            user_magnitude
+            *
+            content_magnitude
+        )
+    )
+
+    return round(
+        max(
+            0.0,
+            min(
+                1.0,
+                similarity
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
+# HISTORICAL USER BEHAVIOR
+# ============================================================
+
+def calculate_historical_behavior_score(
+    recommendation_history: List[str],
+    content_id: str
+) -> float:
+
+    history_value = history_score(
+        recommendation_history,
+        content_id
+    )
+
+    return round(
+        max(
+            0.0,
+            min(
+                1.0,
+                0.5 + history_value
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
 # PERSONALIZATION SCORE
 # ============================================================
 
@@ -419,7 +539,263 @@ def calculate_semantic_scores(
 
 
 # ============================================================
-# HYBRID RECOMMENDATION SCORE
+# TASK 3C — COLLABORATIVE FILTERING
+# ============================================================
+
+def _feedback_value(
+    feedback: str
+) -> float:
+
+    feedback = str(
+        feedback
+    ).lower().strip()
+
+    if feedback == "helpful":
+        return 1.0
+
+    if feedback == "not_helpful":
+        return -1.0
+
+    return 0.0
+
+
+def _build_user_item_matrix(
+    interactions: List[Dict[str, Any]]
+) -> Dict[str, Dict[str, float]]:
+
+    matrix = defaultdict(dict)
+
+    for interaction in interactions:
+
+        user_id = interaction.get(
+            "user_id"
+        )
+
+        recommendation_id = (
+            interaction.get(
+                "recommendation_id"
+            )
+        )
+
+        if not user_id or not recommendation_id:
+            continue
+
+        value = _feedback_value(
+            interaction.get(
+                "feedback",
+                ""
+            )
+        )
+
+        if value == 0.0:
+            continue
+
+        matrix[
+            str(user_id)
+        ][
+            str(recommendation_id)
+        ] = value
+
+    return dict(matrix)
+
+
+def _cosine_similarity(
+    first_vector: Dict[str, float],
+    second_vector: Dict[str, float]
+) -> float:
+
+    common_items = (
+        set(first_vector.keys())
+        &
+        set(second_vector.keys())
+    )
+
+    if not common_items:
+        return 0.0
+
+    first_values = [
+        first_vector[item]
+        for item in common_items
+    ]
+
+    second_values = [
+        second_vector[item]
+        for item in common_items
+    ]
+
+    dot_product = sum(
+        first_value * second_value
+        for first_value, second_value
+        in zip(
+            first_values,
+            second_values
+        )
+    )
+
+    first_magnitude = math.sqrt(
+        sum(
+            value * value
+            for value in first_values
+        )
+    )
+
+    second_magnitude = math.sqrt(
+        sum(
+            value * value
+            for value in second_values
+        )
+    )
+
+    if (
+        first_magnitude == 0.0
+        or second_magnitude == 0.0
+    ):
+        return 0.0
+
+    return (
+        dot_product
+        /
+        (
+            first_magnitude
+            *
+            second_magnitude
+        )
+    )
+
+
+def calculate_collaborative_scores(
+    user_id: str = "default_user"
+) -> Dict[str, float]:
+
+    if not user_id:
+        return {}
+
+    interactions = (
+        get_all_user_interactions()
+    )
+
+    user_item_matrix = (
+        _build_user_item_matrix(
+            interactions
+        )
+    )
+
+    target_user = str(
+        user_id
+    )
+
+    target_vector = (
+        user_item_matrix.get(
+            target_user,
+            {}
+        )
+    )
+
+    if not target_vector:
+        return {}
+
+    collaborative_totals = defaultdict(float)
+    similarity_totals = defaultdict(float)
+
+    for other_user, other_vector in (
+        user_item_matrix.items()
+    ):
+
+        if other_user == target_user:
+            continue
+
+        similarity = _cosine_similarity(
+            target_vector,
+            other_vector
+        )
+
+        if similarity <= 0.0:
+            continue
+
+        for recommendation_id, feedback_value in (
+            other_vector.items()
+        ):
+
+            if recommendation_id in target_vector:
+                continue
+
+            collaborative_totals[
+                recommendation_id
+            ] += (
+                similarity
+                *
+                feedback_value
+            )
+
+            similarity_totals[
+                recommendation_id
+            ] += similarity
+
+    collaborative_scores = {}
+
+    for recommendation_id, total in (
+        collaborative_totals.items()
+    ):
+
+        similarity_total = (
+            similarity_totals[
+                recommendation_id
+            ]
+        )
+
+        if similarity_total <= 0.0:
+            continue
+
+        raw_score = (
+            total
+            /
+            similarity_total
+        )
+
+        normalized_score = (
+            raw_score + 1.0
+        ) / 2.0
+
+        collaborative_scores[
+            recommendation_id
+        ] = round(
+            max(
+                0.0,
+                min(
+                    1.0,
+                    normalized_score
+                )
+            ),
+            4
+        )
+
+    return collaborative_scores
+
+
+def calculate_collaborative_score(
+    content_id: str,
+    user_id: str = "default_user"
+) -> float:
+
+    scores = (
+        calculate_collaborative_scores(
+            user_id
+        )
+    )
+
+    return round(
+        float(
+            scores.get(
+                content_id,
+                0.0
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
+# TASK 3D — HYBRID RECOMMENDATION SCORE
 # ============================================================
 
 def calculate_hybrid_score(
@@ -427,7 +803,8 @@ def calculate_hybrid_score(
     emotional_state: Dict[str, Any],
     preferences: List[str],
     recommendation_history: List[str],
-    semantic_score: float = 0.0
+    semantic_score: float = 0.0,
+    collaborative_score: float = 0.0
 ) -> Dict[str, float]:
 
     emotion_scores = emotional_state.get(
@@ -452,6 +829,10 @@ def calculate_hybrid_score(
         "neutral"
     )
 
+    # --------------------------------------------------------
+    # 1. Rule-based recommendation
+    # --------------------------------------------------------
+
     rule_score = calculate_rule_score(
         content,
         dominant_emotion,
@@ -459,10 +840,53 @@ def calculate_hybrid_score(
         polarity
     )
 
+    # --------------------------------------------------------
+    # 2. Content-based filtering
+    # --------------------------------------------------------
+
     content_score = calculate_content_score(
         content,
         emotion_scores
     )
+
+    # --------------------------------------------------------
+    # 3. User preference matching
+    # --------------------------------------------------------
+
+    preference_score = preference_match(
+        preferences,
+        content["tags"]
+    )
+
+    # --------------------------------------------------------
+    # 4. Historical user behavior
+    # --------------------------------------------------------
+
+    historical_behavior_score = (
+        calculate_historical_behavior_score(
+            recommendation_history,
+            content["id"]
+        )
+    )
+
+    # --------------------------------------------------------
+    # 5. Emotion similarity
+    # --------------------------------------------------------
+
+    emotion_similarity_score = (
+        calculate_emotion_similarity_score(
+            content,
+            emotion_scores
+        )
+    )
+
+    # --------------------------------------------------------
+    # 6. Existing personalization score
+    #
+    # Kept for backward compatibility and explainability.
+    # It is NOT added separately to the final score because
+    # preference + history are already individual components.
+    # --------------------------------------------------------
 
     personalization_score = (
         calculate_personalization_score(
@@ -472,14 +896,56 @@ def calculate_hybrid_score(
         )
     )
 
+    # --------------------------------------------------------
+    # 7. Collaborative filtering
+    # --------------------------------------------------------
+
+    collaborative_score = max(
+        0.0,
+        min(
+            1.0,
+            float(
+                collaborative_score
+            )
+        )
+    )
+
+    # No collaborative information means neutral influence.
+    # This prevents new users from being unfairly penalized.
+    collaborative_component = (
+        collaborative_score
+        if collaborative_score > 0.0
+        else 0.5
+    )
+
+    # --------------------------------------------------------
+    # FINAL HYBRID WEIGHTS
+    #
+    # Rule-based             = 20%
+    # Content-based          = 15%
+    # Preferences            = 15%
+    # Collaborative         = 15%
+    # Emotion similarity     = 10%
+    # Historical behavior   = 10%
+    # Semantic similarity    = 15%
+    #
+    # Total                  = 100%
+    # --------------------------------------------------------
+
     hybrid_score = (
-        (rule_score * 0.25)
+        (rule_score * 0.20)
         +
-        (content_score * 0.25)
+        (content_score * 0.15)
         +
-        (personalization_score * 0.20)
+        (preference_score * 0.15)
         +
-        (semantic_score * 0.30)
+        (collaborative_component * 0.15)
+        +
+        (emotion_similarity_score * 0.10)
+        +
+        (historical_behavior_score * 0.10)
+        +
+        (semantic_score * 0.15)
     )
 
     return {
@@ -487,18 +953,42 @@ def calculate_hybrid_score(
             rule_score,
             4
         ),
+
         "content_score": round(
             content_score,
             4
         ),
+
+        "preference_score": round(
+            preference_score,
+            4
+        ),
+
+        "collaborative_score": round(
+            collaborative_component,
+            4
+        ),
+
+        "emotion_similarity_score": round(
+            emotion_similarity_score,
+            4
+        ),
+
+        "historical_behavior_score": round(
+            historical_behavior_score,
+            4
+        ),
+
         "personalization_score": round(
             personalization_score,
             4
         ),
+
         "semantic_score": round(
             semantic_score,
             4
         ),
+
         "hybrid_score": round(
             hybrid_score,
             4
@@ -534,6 +1024,42 @@ def generate_ranking_reason(
     elif recommendation["content_score"] >= 0.20:
         reasons.append(
             "moderate emotion-score similarity"
+        )
+
+    if recommendation.get(
+        "preference_score",
+        0.0
+    ) >= 0.50:
+
+        reasons.append(
+            "matches user preferences"
+        )
+
+    if recommendation.get(
+        "collaborative_score",
+        0.0
+    ) >= 0.70:
+
+        reasons.append(
+            "supported by similar-user feedback"
+        )
+
+    if recommendation.get(
+        "emotion_similarity_score",
+        0.0
+    ) >= 0.50:
+
+        reasons.append(
+            "strong emotion-vector similarity"
+        )
+
+    if recommendation.get(
+        "historical_behavior_score",
+        0.0
+    ) >= 0.70:
+
+        reasons.append(
+            "fits the user's historical recommendation behavior"
         )
 
     if recommendation["semantic_score"] >= 0.60:
@@ -593,10 +1119,6 @@ def generate_explanation(
         "neutral"
     )
 
-    # --------------------------------------------------------
-    # Emotional state explanation
-    # --------------------------------------------------------
-
     if recommendation["rule_score"] >= 0.70:
         reasons.append(
             f"Strong match for your current {dominant_emotion} emotional state"
@@ -607,11 +1129,8 @@ def generate_explanation(
             f"Good match for your current {dominant_emotion} emotional state"
         )
 
-    # --------------------------------------------------------
-    # Intensity explanation
-    # --------------------------------------------------------
-
     if recommendation["rule_score"] >= 0.50:
+
         if intensity >= 0.80:
             reasons.append(
                 "Suitable for your high emotional intensity"
@@ -627,10 +1146,6 @@ def generate_explanation(
                 "Suitable for your current low emotional intensity"
             )
 
-    # --------------------------------------------------------
-    # Emotion score explanation
-    # --------------------------------------------------------
-
     if recommendation["content_score"] >= 0.50:
         reasons.append(
             "Strong similarity with your detected emotions"
@@ -641,9 +1156,32 @@ def generate_explanation(
             "Moderate similarity with your detected emotions"
         )
 
-    # --------------------------------------------------------
-    # Semantic explanation
-    # --------------------------------------------------------
+    if recommendation.get(
+        "emotion_similarity_score",
+        0.0
+    ) >= 0.50:
+
+        reasons.append(
+            "Strong similarity between your emotion profile and this wellness activity"
+        )
+
+    if recommendation.get(
+        "collaborative_score",
+        0.0
+    ) >= 0.70:
+
+        reasons.append(
+            "Similar users gave positive feedback for this recommendation"
+        )
+
+    if recommendation.get(
+        "historical_behavior_score",
+        0.0
+    ) >= 0.70:
+
+        reasons.append(
+            "Fits your previous recommendation interaction pattern"
+        )
 
     if recommendation["semantic_score"] >= 0.60:
         reasons.append(
@@ -655,79 +1193,100 @@ def generate_explanation(
             "Moderate semantic match with your current concern"
         )
 
-    # --------------------------------------------------------
-    # Preference explanation
-    # --------------------------------------------------------
+    if preferences and recommendation.get(
+        "preference_score",
+        0.0
+    ) >= 0.50:
 
-    if preferences and recommendation["personalization_score"] >= 0.70:
         reasons.append(
-            "Strong match with your preferred wellness activities"
+            "Matches your preferred wellness activities"
         )
 
     elif preferences and recommendation["personalization_score"] >= 0.50:
+
         reasons.append(
             "Matches some of your preferred wellness activities"
         )
-
-    # --------------------------------------------------------
-    # Polarity explanation
-    # --------------------------------------------------------
 
     if polarity != "neutral":
         reasons.append(
             f"Aligned with your current {polarity} emotional state"
         )
 
-    # --------------------------------------------------------
-    # Fallback
-    # --------------------------------------------------------
-
     if not reasons:
         reasons.append(
             "Selected because it provides general wellness relevance"
         )
 
-    # Remove duplicate explanations
     unique_reasons = list(
         dict.fromkeys(reasons)
     )
 
-    # --------------------------------------------------------
-    # Human-readable summary
-    # --------------------------------------------------------
-
     if len(unique_reasons) >= 2:
         summary = (
-            "Recommended because it matches your current "
-            "emotional state and wellness needs."
+            "Recommended using multiple signals from your "
+            "emotional state, preferences, behavior, and wellness content."
         )
+
     else:
         summary = (
             "Recommended because it provides relevant "
             "wellness support."
         )
 
-    # --------------------------------------------------------
-    # Score breakdown
-    # --------------------------------------------------------
-
     factors = {
         "emotional_match": round(
             recommendation["rule_score"],
             4
         ),
-        "emotion_similarity": round(
+
+        "content_based": round(
             recommendation["content_score"],
             4
         ),
+
+        "preference_matching": round(
+            recommendation.get(
+                "preference_score",
+                0.0
+            ),
+            4
+        ),
+
+        "collaborative_filtering": round(
+            recommendation.get(
+                "collaborative_score",
+                0.0
+            ),
+            4
+        ),
+
+        "emotion_similarity": round(
+            recommendation.get(
+                "emotion_similarity_score",
+                0.0
+            ),
+            4
+        ),
+
+        "historical_behavior": round(
+            recommendation.get(
+                "historical_behavior_score",
+                0.0
+            ),
+            4
+        ),
+
         "personalization": round(
             recommendation["personalization_score"],
             4
         ),
+
         "semantic_similarity": round(
             recommendation["semantic_score"],
             4
         ),
+
         "final_score": round(
             recommendation["score"],
             4
@@ -834,6 +1393,14 @@ def rank_recommendations(
         key=lambda item: (
             item["score"],
             item["semantic_score"],
+            item.get(
+                "collaborative_score",
+                0.0
+            ),
+            item.get(
+                "emotion_similarity_score",
+                0.0
+            ),
             item["content_score"],
             item["personalization_score"]
         ),
@@ -856,10 +1423,6 @@ def rank_recommendations(
                 recommendation
             )
         )
-
-        # ----------------------------------------------------
-        # M3-T8 Explainability
-        # ----------------------------------------------------
 
         recommendation["explanation"] = (
             generate_explanation(
@@ -910,13 +1473,20 @@ def generate_hybrid_recommendations(
     preferences: List[str] = None,
     recommendation_history: List[str] = None,
     top_k: int = 5,
-    text: str = ""
+    text: str = "",
+    user_id: str = "default_user"
 ) -> Dict[str, Any]:
 
     preferences = preferences or []
 
     recommendation_history = (
         recommendation_history or []
+    )
+
+    user_id = (
+        str(user_id).strip()
+        if user_id
+        else "default_user"
     )
 
     top_k = max(
@@ -927,12 +1497,14 @@ def generate_hybrid_recommendations(
         )
     )
 
-    # --------------------------------------------------------
-    # Calculate semantic similarity for all content
-    # --------------------------------------------------------
-
     semantic_scores = calculate_semantic_scores(
         text
+    )
+
+    collaborative_scores = (
+        calculate_collaborative_scores(
+            user_id
+        )
     )
 
     scored_recommendations = []
@@ -949,7 +1521,12 @@ def generate_hybrid_recommendations(
                 recommendation_history=
                     recommendation_history,
                 semantic_score=
-                    semantic_scores[index]
+                    semantic_scores[index],
+                collaborative_score=
+                    collaborative_scores.get(
+                        content["id"],
+                        0.0
+                    )
             )
         )
 
@@ -960,26 +1537,43 @@ def generate_hybrid_recommendations(
                 "type": content["type"],
                 "description": content["description"],
                 "tags": content["tags"],
+
                 "rule_score":
                     score_details["rule_score"],
+
                 "content_score":
                     score_details["content_score"],
+
+                "preference_score":
+                    score_details["preference_score"],
+
+                "collaborative_score":
+                    score_details["collaborative_score"],
+
+                "emotion_similarity_score":
+                    score_details[
+                        "emotion_similarity_score"
+                    ],
+
+                "historical_behavior_score":
+                    score_details[
+                        "historical_behavior_score"
+                    ],
+
                 "personalization_score":
                     score_details[
                         "personalization_score"
                     ],
+
                 "semantic_score":
                     score_details[
                         "semantic_score"
                     ],
+
                 "score":
                     score_details["hybrid_score"]
             }
         )
-
-    # --------------------------------------------------------
-    # M3-T4 + M3-T5 + M3-T8
-    # --------------------------------------------------------
 
     ranking_result = rank_recommendations(
         recommendations=scored_recommendations,
@@ -990,19 +1584,49 @@ def generate_hybrid_recommendations(
 
     ranking_result.update(
         {
-            "method": "hybrid_semantic",
+            # Kept compatible with the existing API.
+            "method": "hybrid_semantic_feedback",
 
             "components": [
                 "rule_based",
                 "content_based",
                 "preference_matching",
-                "history_based",
+                "collaborative_filtering",
+                "emotion_similarity",
+                "historical_behavior",
                 "semantic_similarity",
                 "dynamic_ranking",
                 "duplicate_filtering",
                 "low_relevance_filtering",
                 "recommendation_explainability"
             ],
+
+            "hybrid_weights": {
+                "rule_based": 0.20,
+                "content_based": 0.15,
+                "preference_matching": 0.15,
+                "collaborative_filtering": 0.15,
+                "emotion_similarity": 0.10,
+                "historical_behavior": 0.10,
+                "semantic_similarity": 0.15
+            },
+
+            "user_id":
+                user_id,
+
+            "collaborative_users_available":
+                len(
+                    set(
+                        interaction.get(
+                            "user_id"
+                        )
+                        for interaction
+                        in get_all_user_interactions()
+                        if interaction.get(
+                            "user_id"
+                        )
+                    )
+                ),
 
             "personalization": {
                 "dominant_emotion":
@@ -1027,7 +1651,12 @@ def generate_hybrid_recommendations(
                     preferences,
 
                 "history_used":
-                    len(recommendation_history)
+                    len(recommendation_history),
+
+                "collaborative_history_used":
+                    bool(
+                        collaborative_scores
+                    )
             }
         }
     )
@@ -1044,7 +1673,8 @@ def generate_personalized_recommendations(
     preferences: List[str] = None,
     recommendation_history: List[str] = None,
     top_k: int = 5,
-    text: str = ""
+    text: str = "",
+    user_id: str = "default_user"
 ) -> Dict[str, Any]:
 
     return generate_hybrid_recommendations(
@@ -1053,5 +1683,6 @@ def generate_personalized_recommendations(
         recommendation_history=
             recommendation_history,
         top_k=top_k,
-        text=text
+        text=text,
+        user_id=user_id
     )
