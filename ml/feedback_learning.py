@@ -43,10 +43,33 @@ def initialize_feedback_database():
             feedback TEXT NOT NULL,
             dominant_emotion TEXT,
             intensity REAL,
-            polarity TEXT
+            polarity TEXT,
+            user_id TEXT
         )
         """
     )
+
+    # --------------------------------------------------------
+    # Add user_id to an existing database created earlier
+    # --------------------------------------------------------
+
+    cursor.execute(
+        "PRAGMA table_info(recommendation_feedback)"
+    )
+
+    columns = [
+        row[1]
+        for row in cursor.fetchall()
+    ]
+
+    if "user_id" not in columns:
+
+        cursor.execute(
+            """
+            ALTER TABLE recommendation_feedback
+            ADD COLUMN user_id TEXT
+            """
+        )
 
     connection.commit()
     connection.close()
@@ -59,7 +82,8 @@ def initialize_feedback_database():
 def save_recommendation_feedback(
     recommendation_id: str,
     feedback: str,
-    emotional_state: Dict[str, Any]
+    emotional_state: Dict[str, Any],
+    user_id: str = "default_user"
 ) -> int:
 
     initialize_feedback_database()
@@ -76,6 +100,14 @@ def save_recommendation_feedback(
             "Feedback must be 'helpful' or 'not_helpful'"
         )
 
+    user_id = str(
+        user_id
+    ).strip()
+
+    if not user_id:
+
+        user_id = "default_user"
+
     connection = sqlite3.connect(
         DATABASE_PATH
     )
@@ -90,9 +122,10 @@ def save_recommendation_feedback(
             feedback,
             dominant_emotion,
             intensity,
-            polarity
+            polarity,
+            user_id
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
         (
             datetime.now().isoformat(),
@@ -111,7 +144,8 @@ def save_recommendation_feedback(
             emotional_state.get(
                 "polarity",
                 "neutral"
-            )
+            ),
+            user_id
         )
     )
 
@@ -191,6 +225,98 @@ def get_feedback_statistics() -> Dict[str, Any]:
         }
 
     return statistics
+
+
+# ============================================================
+# GET USER INTERACTIONS
+# ============================================================
+
+def get_user_interactions(
+    user_id: str
+) -> List[Dict[str, Any]]:
+
+    initialize_feedback_database()
+
+    connection = sqlite3.connect(
+        DATABASE_PATH
+    )
+
+    connection.row_factory = sqlite3.Row
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            timestamp,
+            recommendation_id,
+            feedback,
+            dominant_emotion,
+            intensity,
+            polarity,
+            user_id
+        FROM recommendation_feedback
+        WHERE user_id = ?
+        ORDER BY id DESC
+        """,
+        (
+            user_id,
+        )
+    )
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    return [
+        dict(row)
+        for row in rows
+    ]
+
+
+# ============================================================
+# GET ALL USER-ITEM INTERACTIONS
+# ============================================================
+
+def get_all_user_interactions() -> List[Dict[str, Any]]:
+
+    initialize_feedback_database()
+
+    connection = sqlite3.connect(
+        DATABASE_PATH
+    )
+
+    connection.row_factory = sqlite3.Row
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            timestamp,
+            recommendation_id,
+            feedback,
+            dominant_emotion,
+            intensity,
+            polarity,
+            user_id
+        FROM recommendation_feedback
+        WHERE user_id IS NOT NULL
+        AND user_id != ''
+        ORDER BY id ASC
+        """
+    )
+
+    rows = cursor.fetchall()
+
+    connection.close()
+
+    return [
+        dict(row)
+        for row in rows
+    ]
 
 
 # ============================================================
