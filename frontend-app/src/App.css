@@ -1793,4 +1793,24 @@ footer span:first-child {
   footer {
     padding: 22px 5%;
   }
+  .personalization-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+  align-items: start; /* Prevents columns from vertically stretching */
+}
+
+.personalization-item {
+  min-width: 0;
+  height: auto; /* Ensures it sizes naturally to its content */
+  padding: 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e8ebf2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
 }

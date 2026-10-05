@@ -1506,6 +1506,32 @@ function App() {
 
               )}
 
+              {/* ==========================================================
+                  RECENT EMOTIONAL TRENDS (Cleanly Placed)
+                  ========================================================== */}
+              {result.emotional_state && (
+                <div style={{ marginTop: '20px', padding: '20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e5e9f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#172033' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6366f1', display: 'inline-block' }}></span>
+                    Recent Emotional Trends & Intensity Tracker
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: '600' }}>Dominant Emotion</span>
+                      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginTop: '4px' }}>
+                        {result.emotional_state.dominant_emotion || result.emotional_state.primary_emotion || 'Neutral'}
+                      </div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: '600' }}>Emotional Intensity</span>
+                      <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', marginTop: '4px' }}>
+                        {Math.round((result.emotional_state.intensity || result.emotional_state.emotional_intensity || 0.5) * 100)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <section className="recommendation-card">
 
                 <div className="recommendation-header">
