@@ -67,6 +67,9 @@ type Recommendation = {
   rule_score?: number;
   content_score?: number;
   personalization_score?: number;
+  collaborative_score?: number;
+  emotion_similarity_score?: number;
+  historical_behavior_score?: number;
   semantic_score?: number;
   score?: number;
 
@@ -351,7 +354,7 @@ function App() {
   }
 
   // ==========================================================
-  // PERSONALIZED RECOMMENDATIONS
+  // HYBRID RECOMMENDATIONS
   // ==========================================================
 
   async function handleRecommendations() {
@@ -477,7 +480,7 @@ function App() {
       await loadPreviousInteractionCount();
 
       setMessage(
-        "✓ Personalized recommendations generated successfully."
+        "✓ Hybrid recommendations generated successfully."
       );
     } catch (error) {
       console.error(error);
@@ -1506,9 +1509,6 @@ function App() {
 
               )}
 
-              {/* ==========================================================
-                  RECENT EMOTIONAL TRENDS (Cleanly Placed)
-                  ========================================================== */}
               {result.emotional_state && (
                 <div style={{ marginTop: '20px', padding: '20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e5e9f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                   <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#172033' }}>
@@ -1539,18 +1539,15 @@ function App() {
                   <div>
 
                     <p className="small-label">
-                      PERSONALIZED WELLNESS
+                      HYBRID WELLNESS RECOMMENDATIONS
                     </p>
 
                     <h4>
-                      Recommendations for You
+                      Intelligent Recommendations
                     </h4>
 
                     <p>
-                      Recommendations are generated
-                      from your emotional state,
-                      preferences, and previous
-                      recommendation interactions.
+                      Generated via a multi-strategy hybrid engine combining rules, content matching, preferences, collaborative filtering, emotion similarity, and history.
                     </p>
 
                   </div>
@@ -1612,7 +1609,7 @@ function App() {
 
                     Select activities you prefer.
                     These preferences are sent to
-                    the recommendation model.
+                    the hybrid engine.
 
                   </p>
 
@@ -1771,7 +1768,7 @@ function App() {
                         </h5>
 
                         <p>
-                          Generate a personalized
+                          Generate a hybrid
                           recommendation and it will
                           appear here.
                         </p>
@@ -1948,7 +1945,7 @@ function App() {
                         </h5>
 
                         <p>
-                          Generate personalized
+                          Generate hybrid
                           recommendations to build your
                           recommendation history.
                         </p>
@@ -2116,8 +2113,8 @@ function App() {
                 >
 
                   {recommendationLoading
-                    ? "Generating..."
-                    : "Generate Personalized Recommendations"}
+                    ? "Generating Hybrid Recommendations..."
+                    : "Generate Hybrid Recommendations"}
 
                   {!recommendationLoading && (
 
@@ -2139,7 +2136,7 @@ function App() {
                       <div className="top-recommendation">
 
                         <div className="top-recommendation-label">
-                          TOP MATCH
+                          TOP HYBRID MATCH
                         </div>
 
                         <h5>
@@ -2162,11 +2159,35 @@ function App() {
 
                         </p>
 
+                        {/* Task 3 Hybrid Strategy Breakdown for Top Recommendation */}
+                        <div style={{ marginTop: '12px', padding: '10px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', fontSize: '12px' }}>
+                          <div>
+                            <span style={{ color: '#64748b', display: 'block' }}>Rule-Based</span>
+                            <strong>{percentage(recommendations.top_recommendation.rule_score)}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', display: 'block' }}>Content-Based</span>
+                            <strong>{percentage(recommendations.top_recommendation.content_score)}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', display: 'block' }}>Collaborative</span>
+                            <strong>{percentage(recommendations.top_recommendation.collaborative_score)}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', display: 'block' }}>Emotion Sim</span>
+                            <strong>{percentage(recommendations.top_recommendation.emotion_similarity_score)}</strong>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', display: 'block' }}>History Match</span>
+                            <strong>{percentage(recommendations.top_recommendation.historical_behavior_score)}</strong>
+                          </div>
+                        </div>
+
                         {recommendations
                           .top_recommendation
                           .ranking_reason && (
 
-                          <div className="ranking-reason">
+                          <div className="ranking-reason" style={{ marginTop: '10px' }}>
 
                             <strong>
                               Why this was recommended:
@@ -2286,11 +2307,35 @@ function App() {
 
                               </p>
 
+                              {/* Task 3 Hybrid Strategy Breakdown for List Item */}
+                              <div style={{ marginTop: '10px', padding: '8px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '6px', fontSize: '11px' }}>
+                                <div>
+                                  <span style={{ color: '#64748b', display: 'block' }}>Rules</span>
+                                  <strong>{percentage(recommendation.rule_score)}</strong>
+                                </div>
+                                <div>
+                                  <span style={{ color: '#64748b', display: 'block' }}>Content</span>
+                                  <strong>{percentage(recommendation.content_score)}</strong>
+                                </div>
+                                <div>
+                                  <span style={{ color: '#64748b', display: 'block' }}>Collaborative</span>
+                                  <strong>{percentage(recommendation.collaborative_score)}</strong>
+                                </div>
+                                <div>
+                                  <span style={{ color: '#64748b', display: 'block' }}>Emotion Sim</span>
+                                  <strong>{percentage(recommendation.emotion_similarity_score)}</strong>
+                                </div>
+                                <div>
+                                  <span style={{ color: '#64748b', display: 'block' }}>History</span>
+                                  <strong>{percentage(recommendation.historical_behavior_score)}</strong>
+                                </div>
+                              </div>
+
                               {recommendation.tags &&
                                 recommendation.tags
                                   .length > 0 && (
 
-                                <div className="recommendation-tags">
+                                <div className="recommendation-tags" style={{ marginTop: '8px' }}>
 
                                   {recommendation.tags.map(
                                     (
