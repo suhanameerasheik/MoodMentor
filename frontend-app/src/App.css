@@ -1210,15 +1210,31 @@ textarea:focus {
    ========================================================== */
 
 .top-recommendation {
-  padding: 18px;
-  border-radius: 14px;
+  padding: 20px;
+  border-radius: 16px;
   background:
     linear-gradient(
       135deg,
-      #eef2ff,
-      #f8f9ff
+      #eef2ff 0%,
+      #f8f9ff 55%,
+      #ffffff 100%
     );
-  border: 1px solid #dfe2ff;
+  border: 1px solid #d7dcff;
+  box-shadow:
+    0 10px 25px rgba(99, 102, 241, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.top-recommendation::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #6366f1;
 }
 
 .top-recommendation-label {
@@ -1229,17 +1245,17 @@ textarea:focus {
 }
 
 .top-recommendation-heading {
-  margin-top: 7px;
+  margin-top: 8px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 14px;
 }
 
 .top-recommendation h5,
 .top-recommendation-heading h5 {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
   color: #172033;
   overflow-wrap: anywhere;
 }
@@ -1253,23 +1269,224 @@ textarea:focus {
 }
 
 .top-score {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
   margin-top: 0;
-  padding: 5px 8px;
-  border-radius: 7px;
+  padding: 9px 12px;
+  border-radius: 10px;
   background: #ffffff;
-  color: #16a34a;
-  font-size: 9px;
-  font-weight: 800;
+  border: 1px solid #dce1f4;
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 850;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.06);
 }
 
+/* ==========================================================
+   M3-T4 TOP RANKING SCORE PANEL
+   ========================================================== */
+
+.top-ranking-score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.top-ranking-score-grid > div {
+  min-width: 0;
+  padding: 13px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid #e0e4f4;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  box-shadow: 0 3px 10px rgba(30, 41, 59, 0.035);
+}
+
+.top-ranking-score-grid > div span {
+  color: #7b8495;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.top-ranking-score-grid > div strong {
+  color: #374151;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.top-ranking-score-grid > div:nth-child(1) {
+  border-top: 3px solid #94a3b8;
+}
+
+.top-ranking-score-grid > div:nth-child(2) {
+  border-top: 3px solid #6366f1;
+}
+
+.top-ranking-score-grid > div:nth-child(2) strong {
+  color: #6366f1;
+}
+
+.top-ranking-score-grid > div:nth-child(3) {
+  border-top: 3px solid #22c55e;
+  background: #f7fff9;
+}
+
+.top-ranking-score-grid > div:nth-child(3) strong {
+  color: #15803d;
+}
+
+/* ==========================================================
+   RANKING VALIDATION - M3-T4
+   ========================================================== */
+
+.ranking-validation {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f8f9ff 100%
+    );
+  border: 1px solid #dfe3f2;
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.045);
+}
+
+.ranking-validation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.ranking-validation-header h6 {
+  margin: 0;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.ranking-validation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.ranking-validation-item {
+  min-width: 0;
+  min-height: 72px;
+  padding: 13px;
+  border-radius: 11px;
+  background: #ffffff;
+  border: 1px solid #e7eaf2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ranking-validation-item:hover {
+  transform: translateY(-2px);
+  border-color: #d5d9f5;
+  box-shadow: 0 7px 16px rgba(30, 41, 59, 0.06);
+}
+
+.ranking-validation-item span {
+  color: #7b8495;
+  font-size: 9px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.ranking-validation-item strong {
+  color: #172033;
+  font-size: 18px;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.ranking-validation-item:nth-child(1) {
+  border-top: 3px solid #6366f1;
+}
+
+.ranking-validation-item:nth-child(1) strong {
+  color: #4f46e5;
+}
+
+.ranking-validation-item:nth-child(2) {
+  border-top: 3px solid #94a3b8;
+}
+
+.ranking-validation-item:nth-child(2) strong {
+  color: #475569;
+}
+
+.ranking-validation-item:nth-child(3) {
+  border-top: 3px solid #22c55e;
+}
+
+.ranking-validation-item:nth-child(3) strong {
+  color: #15803d;
+}
+
+/* Ranking order is the fourth item and gets a full-width layout */
+.ranking-validation-item:nth-child(4) {
+  grid-column: 1 / -1;
+  min-height: auto;
+  padding: 15px;
+  border-top: 3px solid #6366f1;
+  background:
+    linear-gradient(
+      135deg,
+      #f8f8ff,
+      #ffffff
+    );
+}
+
+.ranking-validation-item:nth-child(4) span {
+  margin-bottom: 3px;
+}
+
+.ranking-validation-item:nth-child(4) strong {
+  color: #4f46e5;
+  font-size: 12px;
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ==========================================================
+   RANKING ORDER VISUAL
+   ========================================================== */
+
+.ranking-validation-item:nth-child(4) strong {
+  display: block;
+}
+
+/* ==========================================================
+   RANKING REASON
+   ========================================================== */
+
 .ranking-reason {
-  margin-top: 12px;
-  padding: 11px;
+  margin-top: 13px;
+  padding: 11px 12px;
   border-radius: 9px;
   background: #ffffff;
+  border: 1px solid #e5e8f2;
   color: #667085;
   font-size: 11px;
   line-height: 1.5;
@@ -1364,6 +1581,103 @@ textarea:focus {
 }
 
 /* ==========================================================
+   M3-T4 INDIVIDUAL FINAL RANKING SECTION
+   ========================================================== */
+
+.final-ranking-section {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      135deg,
+      #f8f9ff 0%,
+      #ffffff 100%
+    );
+  border: 1px solid #dfe3f5;
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.035);
+}
+
+.final-ranking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ebf3;
+}
+
+.final-ranking-header span {
+  color: #6366f1;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.final-ranking-header strong {
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.final-ranking-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.final-ranking-item {
+  min-width: 0;
+  padding: 9px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e7eaf2;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.final-ranking-item span {
+  color: #8a93a3;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.final-ranking-item strong {
+  color: #374151;
+  font-size: 11px;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.final-ranking-item:nth-child(2) strong {
+  color: #6366f1;
+}
+
+.final-ranking-item:nth-child(3) {
+  background: #f7fff9;
+  border-color: #d6f2df;
+}
+
+.final-ranking-item:nth-child(3) strong {
+  color: #15803d;
+}
+
+.final-ranking-item:nth-child(4) {
+  background: #fafaff;
+}
+
+.final-ranking-item:nth-child(4) strong {
+  color: #4f46e5;
+}
+
+/* ==========================================================
    RECOMMENDATION LIST
    ========================================================== */
 
@@ -1381,6 +1695,33 @@ textarea:focus {
   border-radius: 13px;
   background: #ffffff;
   border: 1px solid #e8ebf2;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.recommendation-item:hover {
+  transform: translateY(-1px);
+  border-color: #dce0f2;
+  box-shadow: 0 7px 18px rgba(30, 41, 59, 0.055);
+}
+
+/* ==========================================================
+   M3-T4 TOP RANKED RECOMMENDATION
+   ========================================================== */
+
+.recommendation-item:first-child {
+  border-color: #d8dcff;
+  box-shadow:
+    0 6px 18px rgba(99, 102, 241, 0.07),
+    inset 3px 0 0 #6366f1;
+}
+
+.recommendation-item:first-child .recommendation-rank {
+  background: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 5px 12px rgba(99, 102, 241, 0.25);
 }
 
 .recommendation-rank {
@@ -1909,6 +2250,19 @@ footer span:first-child {
   .hybrid-summary-stats {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* M3-T4 tablet */
+  .ranking-validation-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .top-ranking-score-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .final-ranking-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 /* ==========================================================
@@ -2110,6 +2464,79 @@ footer span:first-child {
     min-height: 48px;
     font-size: 14px;
     padding: 12px 44px 12px 14px;
+  }
+
+  /* ========================================================
+     M3-T4 MOBILE RANKING UI
+     ======================================================== */
+
+  .ranking-validation {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .ranking-validation-header {
+    padding-bottom: 12px;
+  }
+
+  .ranking-validation-header h6 {
+    font-size: 15px;
+  }
+
+  .ranking-validation-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .ranking-validation-item {
+    min-height: 66px;
+  }
+
+  .ranking-validation-item:nth-child(4) {
+    grid-column: auto;
+    min-height: auto;
+    overflow: hidden;
+  }
+
+  .ranking-validation-item:nth-child(4) strong {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  .top-ranking-score-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .top-ranking-score-grid > div {
+    padding: 11px;
+  }
+
+  .top-ranking-score-grid > div strong {
+    font-size: 14px;
+  }
+
+  .final-ranking-section {
+    padding: 12px;
+  }
+
+  .final-ranking-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .final-ranking-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+  }
+
+  .final-ranking-item {
+    padding: 8px;
+  }
+
+  .final-ranking-item strong {
+    font-size: 10px;
   }
 
   footer {

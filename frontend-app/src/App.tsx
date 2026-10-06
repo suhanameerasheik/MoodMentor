@@ -72,7 +72,11 @@ type Recommendation = {
   historical_behavior_score?: number;
   personalization_score?: number;
   semantic_score?: number;
+
+  base_score?: number;
   score?: number;
+  feedback_score?: number;
+  learned_score?: number;
 
   rank?: number;
   ranking_reason?: string | string[];
@@ -82,9 +86,6 @@ type Recommendation = {
     reasons?: string[];
     factors?: string[] | Record<string, number>;
   };
-
-  feedback_score?: number;
-  learned_score?: number;
 };
 
 type HybridWeights = {
@@ -107,6 +108,10 @@ type RecommendationResult = {
   hybrid_weights?: HybridWeights;
   user_id?: string;
   collaborative_users_available?: number;
+
+  count?: number;
+  duplicate_filtered?: number;
+  low_relevance_filtered?: number;
 
   personalization?: {
     collaborative_history_used?: boolean;
@@ -412,8 +417,6 @@ function App() {
             recommendation_history:
               recommendationHistory,
             top_k: 5,
-
-            // Selected frontend user
             user_id: selectedUser,
           }),
         }
@@ -1602,9 +1605,7 @@ function App() {
 
                 </div>
 
-                {/* ==================================================
-                    USER PROFILE
-                    ================================================== */}
+                {/* USER PROFILE */}
 
                 <div className="preference-section">
 
@@ -1650,9 +1651,7 @@ function App() {
 
                 </div>
 
-                {/* ==================================================
-                    USER PREFERENCES
-                    ================================================== */}
+                {/* USER PREFERENCES */}
 
                 <div className="preference-section">
 
@@ -1810,9 +1809,7 @@ function App() {
 
                 </div>
 
-                {/* ==================================================
-                    PREVIOUS INTERACTIONS
-                    ================================================== */}
+                {/* PREVIOUS INTERACTIONS */}
 
                 {showPreviousInteractions && (
 
@@ -1993,9 +1990,7 @@ function App() {
 
                 )}
 
-                {/* ==================================================
-                    RECOMMENDATION HISTORY
-                    ================================================== */}
+                {/* RECOMMENDATION HISTORY */}
 
                 {showRecommendationHistory && (
 
@@ -2112,7 +2107,7 @@ function App() {
                                     </span>
 
                                     <span>
-                                      <strong>Hybrid:</strong>{" "}
+                                      <strong>Final score:</strong>{" "}
                                       {percentage(
                                         recommendation.score
                                       )}
@@ -2197,9 +2192,7 @@ function App() {
 
                 )}
 
-                {/* ==================================================
-                    GENERATE RECOMMENDATIONS
-                    ================================================== */}
+                {/* GENERATE RECOMMENDATIONS */}
 
                 <button
                   type="button"
@@ -2226,17 +2219,13 @@ function App() {
 
                 </button>
 
-                {/* ==================================================
-                    RECOMMENDATION RESULTS
-                    ================================================== */}
+                {/* RECOMMENDATION RESULTS */}
 
                 {recommendations && (
 
                   <div className="recommendation-results">
 
-                    {/* ==================================================
-                        HYBRID ENGINE SUMMARY
-                        ================================================== */}
+                    {/* HYBRID ENGINE SUMMARY */}
 
                     <div className="hybrid-summary">
 
@@ -2317,6 +2306,93 @@ function App() {
                             {recommendations.method ||
                               "Hybrid"}
                           </strong>
+
+                        </div>
+
+                      </div>
+
+                      {/* M3-T4 RANKING VALIDATION */}
+
+                      <div className="ranking-validation">
+
+                        <div className="ranking-validation-header">
+
+                          <div>
+
+                            <p className="small-label">
+                              RECOMMENDATION RANKING
+                            </p>
+
+                            <h6>
+                              Dynamic Ranking Validation
+                            </h6>
+
+                          </div>
+
+                        </div>
+
+                        <div className="ranking-validation-grid">
+
+                          <div className="ranking-validation-item">
+
+                            <span>
+                              Recommendations
+                            </span>
+
+                            <strong>
+                              {recommendations.count ??
+                                recommendations.recommendations
+                                  ?.length ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="ranking-validation-item">
+
+                            <span>
+                              Duplicates filtered
+                            </span>
+
+                            <strong>
+                              {recommendations.duplicate_filtered ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="ranking-validation-item">
+
+                            <span>
+                              Low relevance filtered
+                            </span>
+
+                            <strong>
+                              {recommendations.low_relevance_filtered ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="ranking-validation-item">
+
+                            <span>
+                              Ranking order
+                            </span>
+
+                            <strong>
+                              {recommendations.ranking_order &&
+                              recommendations.ranking_order.length > 0
+                                ? recommendations.ranking_order
+                                    .map(
+                                      (id, index) =>
+                                        `#${index + 1} ${id}`
+                                    )
+                                    .join(" → ")
+                                : "Not available"}
+                            </strong>
+
+                          </div>
 
                         </div>
 
@@ -2468,9 +2544,7 @@ function App() {
 
                     </div>
 
-                    {/* ==================================================
-                        TOP RECOMMENDATION
-                        ================================================== */}
+                    {/* TOP RECOMMENDATION */}
 
                     {recommendations.top_recommendation && (
 
@@ -2494,7 +2568,7 @@ function App() {
 
                             <span className="top-score">
 
-                              Hybrid score:{" "}
+                              Final ranking score:{" "}
                               {percentage(
                                 recommendations
                                   .top_recommendation
@@ -2502,6 +2576,76 @@ function App() {
                               )}
 
                             </span>
+
+                          </div>
+
+                        </div>
+
+                        <div className="top-ranking-score-grid">
+
+                          <div>
+
+                            <span>
+                              Base hybrid score
+                            </span>
+
+                            <strong>
+                              {percentage(
+                                recommendations
+                                  .top_recommendation
+                                  .base_score ??
+                                recommendations
+                                  .top_recommendation
+                                  .score
+                              )}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Feedback adjustment
+                            </span>
+
+                            <strong>
+                              {recommendations
+                                .top_recommendation
+                                .feedback_score !==
+                              undefined
+                                ? `${
+                                    recommendations
+                                      .top_recommendation
+                                      .feedback_score >=
+                                    0
+                                      ? "+"
+                                      : ""
+                                  }${percentage(
+                                    recommendations
+                                      .top_recommendation
+                                      .feedback_score
+                                  )}`
+                                : "0.00%"}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Final learned score
+                            </span>
+
+                            <strong>
+                              {percentage(
+                                recommendations
+                                  .top_recommendation
+                                  .learned_score ??
+                                recommendations
+                                  .top_recommendation
+                                  .score
+                              )}
+                            </strong>
 
                           </div>
 
@@ -2567,9 +2711,7 @@ function App() {
 
                     )}
 
-                    {/* ==================================================
-                        RECOMMENDATION LIST
-                        ================================================== */}
+                    {/* RECOMMENDATION LIST */}
 
                     <div className="recommendation-list">
 
@@ -2670,9 +2812,103 @@ function App() {
 
                               )}
 
-                              {/* ==================================================
-                                  TASK 3 HYBRID SCORE BREAKDOWN
-                                  ================================================== */}
+                              {/* M3-T4 FINAL RANKING SCORE */}
+
+                              <div className="final-ranking-section">
+
+                                <div className="final-ranking-header">
+
+                                  <span>
+                                    Final ranking score
+                                  </span>
+
+                                  <strong>
+                                    {percentage(
+                                      recommendation.score
+                                    )}
+                                  </strong>
+
+                                </div>
+
+                                <div className="final-ranking-grid">
+
+                                  <div className="final-ranking-item">
+
+                                    <span>
+                                      Base hybrid
+                                    </span>
+
+                                    <strong>
+                                      {percentage(
+                                        recommendation
+                                          .base_score ??
+                                        recommendation
+                                          .score
+                                      )}
+                                    </strong>
+
+                                  </div>
+
+                                  <div className="final-ranking-item">
+
+                                    <span>
+                                      Feedback adjustment
+                                    </span>
+
+                                    <strong>
+                                      {recommendation
+                                        .feedback_score !==
+                                      undefined
+                                        ? `${
+                                            recommendation
+                                              .feedback_score >=
+                                            0
+                                              ? "+"
+                                              : ""
+                                          }${percentage(
+                                            recommendation
+                                              .feedback_score
+                                          )}`
+                                        : "0.00%"}
+                                    </strong>
+
+                                  </div>
+
+                                  <div className="final-ranking-item">
+
+                                    <span>
+                                      Learned score
+                                    </span>
+
+                                    <strong>
+                                      {percentage(
+                                        recommendation
+                                          .learned_score ??
+                                        recommendation
+                                          .score
+                                      )}
+                                    </strong>
+
+                                  </div>
+
+                                  <div className="final-ranking-item">
+
+                                    <span>
+                                      Rank
+                                    </span>
+
+                                    <strong>
+                                      #{recommendation.rank ||
+                                        index + 1}
+                                    </strong>
+
+                                  </div>
+
+                                </div>
+
+                              </div>
+
+                              {/* TASK 3 HYBRID SCORE BREAKDOWN */}
 
                               <div className="hybrid-score-section">
 
@@ -2684,6 +2920,8 @@ function App() {
 
                                   <strong>
                                     {percentage(
+                                      recommendation
+                                        .base_score ??
                                       recommendation.score
                                     )}
                                   </strong>
@@ -2725,7 +2963,7 @@ function App() {
 
                                 <span>
 
-                                  Hybrid score:{" "}
+                                  Final score:{" "}
 
                                   {percentage(
                                     recommendation.score
@@ -2752,6 +2990,27 @@ function App() {
                                     recommendation
                                       .semantic_score
                                   )}
+
+                                </span>
+
+                                <span>
+
+                                  Feedback:{" "}
+
+                                  {recommendation
+                                    .feedback_score !==
+                                  undefined
+                                    ? `${
+                                        recommendation
+                                          .feedback_score >=
+                                        0
+                                          ? "+"
+                                          : ""
+                                      }${percentage(
+                                        recommendation
+                                          .feedback_score
+                                      )}`
+                                    : "0.00%"}
 
                                 </span>
 
@@ -2792,9 +3051,7 @@ function App() {
 
               </section>
 
-              {/* ==================================================
-                  WELLNESS RESULT
-                  ================================================== */}
+              {/* WELLNESS RESULT */}
 
               {result.wellness && (
 
