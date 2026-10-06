@@ -28,7 +28,8 @@ from ml.recommendation import (
 )
 from ml.trend_tracking import (
     save_emotional_state,
-    get_emotional_trend
+    get_emotional_trend,
+    normalize_user_id
 )
 from ml.feedback_learning import (
     save_recommendation_feedback,
@@ -120,8 +121,13 @@ def run_analysis(text):
 
 
 def save_analysis_history(
-    analysis_result
+    analysis_result,
+    user_id="default_user"
 ):
+
+    user_id = normalize_user_id(
+        user_id
+    )
 
     return save_emotional_state(
         emotional_state=
@@ -135,7 +141,8 @@ def save_analysis_history(
         wellness=
             analysis_result[
                 "wellness"
-            ]
+            ],
+        user_id=user_id
     )
 
 
@@ -145,6 +152,13 @@ def analyze(data: dict):
     text = data.get(
         "text",
         ""
+    )
+
+    user_id = normalize_user_id(
+        data.get(
+            "user_id",
+            "default_user"
+        )
     )
 
     try:
@@ -161,7 +175,8 @@ def analyze(data: dict):
         }
 
     record_id = save_analysis_history(
-        analysis_result
+        analysis_result,
+        user_id
     )
 
     return {
@@ -170,6 +185,8 @@ def analyze(data: dict):
             "Text successfully analyzed",
         "history_record_id":
             record_id,
+        "user_id":
+            user_id,
         **analysis_result
     }
 
@@ -198,22 +215,15 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------
-    # TASK 3D: User identity for collaborative filtering
+    # TASK 3D + TASK 6: User identity
     # --------------------------------------------------
 
-    user_id = data.get(
-        "user_id",
-        "default_user"
+    user_id = normalize_user_id(
+        data.get(
+            "user_id",
+            "default_user"
+        )
     )
-
-    if not isinstance(
-        user_id,
-        str
-    ) or not user_id.strip():
-
-        user_id = "default_user"
-
-    user_id = user_id.strip()
 
     # --------------------------------------------------
 
@@ -245,12 +255,12 @@ def recommend(data: dict):
         min(top_k, 10)
     )
 
+    # --------------------------------------------------
+    # Analyze current text
+    # --------------------------------------------------
+
     analysis_result = run_analysis(
         text
-    )
-
-    record_id = save_analysis_history(
-        analysis_result
     )
 
     emotional_state = (
@@ -258,6 +268,55 @@ def recommend(data: dict):
             "emotional_state"
         ]
     )
+
+    # --------------------------------------------------
+    # TASK 6
+    #
+    # Read historical emotional state BEFORE saving
+    # the current record.
+    #
+    # This prevents the current message from influencing
+    # its own historical trend.
+    # --------------------------------------------------
+
+    historical_emotional_context = (
+        get_emotional_trend(
+            limit=20,
+            user_id=user_id
+        )
+    )
+
+    historical_history = (
+        historical_emotional_context.get(
+            "history",
+            []
+        )
+    )
+
+    historical_trend_analysis = (
+        historical_emotional_context.get(
+            "trend_analysis",
+            {}
+        )
+    )
+
+    # --------------------------------------------------
+    # Save current emotional state
+    # --------------------------------------------------
+
+    record_id = save_analysis_history(
+        analysis_result,
+        user_id
+    )
+
+    # --------------------------------------------------
+    # Generate recommendations
+    #
+    # Existing hybrid + semantic + collaborative
+    # recommendation logic is preserved.
+    #
+    # Task 6 historical emotional context is added.
+    # --------------------------------------------------
 
     recommendation_result = (
         generate_personalized_recommendations(
@@ -267,7 +326,9 @@ def recommend(data: dict):
                 recommendation_history,
             top_k=top_k,
             text=text,
-            user_id=user_id
+            user_id=user_id,
+            historical_emotional_context=
+                historical_emotional_context
         )
     )
 
@@ -278,25 +339,63 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------
-    # M3-T4 + M3-T7
+    # M3-T4 + M3-T6 + M3-T7
     #
     # Preserve the original hybrid score.
+    #
+    # Task 6 adds a small historical emotional trend
+    # adjustment BEFORE feedback learning.
+    #
     # Feedback learning then calculates learned_score.
-    # The final recommendation score becomes learned_score
-    # so that displayed score and ranking remain consistent.
     # --------------------------------------------------
 
     for recommendation in recommendations:
 
+        base_hybrid_score = float(
+            recommendation.get(
+                "score",
+                0.0
+            )
+        )
+
+        trend_adjustment = float(
+            recommendation.get(
+                "trend_adjustment",
+                0.0
+            )
+        )
+
+        trend_adjusted_score = max(
+            0.0,
+            min(
+                1.0,
+                base_hybrid_score
+                + trend_adjustment
+            )
+        )
+
+        # Preserve original pure hybrid score.
         recommendation[
             "base_score"
         ] = round(
-            float(
-                recommendation.get(
-                    "score",
-                    0.0
-                )
-            ),
+            base_hybrid_score,
+            4
+        )
+
+        # Store Task 6 adjusted score.
+        recommendation[
+            "trend_adjusted_score"
+        ] = round(
+            trend_adjusted_score,
+            4
+        )
+
+        # This score becomes the input to
+        # feedback learning.
+        recommendation[
+            "score"
+        ] = round(
+            trend_adjusted_score,
             4
         )
 
@@ -310,6 +409,7 @@ def recommend(data: dict):
     # Final ranking after feedback learning
     #
     # learned_score is now the final recommendation score.
+    #
     # This preserves feedback learning while ensuring:
     #
     # rank 1 = highest final score
@@ -326,13 +426,38 @@ def recommend(data: dict):
                 recommendation.get(
                     "learned_score",
                     recommendation.get(
-                        "base_score",
-                        0.0
+                        "trend_adjusted_score",
+                        recommendation.get(
+                            "base_score",
+                            0.0
+                        )
                     )
                 )
             ),
             4
         )
+
+        # Keep explanation's final score synchronized
+        # with the actual final recommendation score.
+        if recommendation.get(
+            "explanation"
+        ):
+
+            factors = recommendation[
+                "explanation"
+            ].get(
+                "factors",
+                {}
+            )
+
+            factors[
+                "final_score"
+            ] = round(
+                recommendation[
+                    "score"
+                ],
+                4
+            )
 
     recommendations.sort(
         key=lambda item: (
@@ -410,6 +535,63 @@ def recommend(data: dict):
         ].append(
             "feedback_learning"
         )
+
+    # --------------------------------------------------
+    # TASK 6
+    #
+    # Return the historical trend summary without
+    # dumping the complete history into every
+    # recommendation response.
+    # --------------------------------------------------
+
+    recommendation_result[
+        "historical_emotional_trend"
+    ] = historical_trend_analysis
+
+    recommendation_result[
+        "trend_influence"
+    ] = {
+
+        "enabled":
+            len(
+                historical_history
+            ) >= 2,
+
+        "records_analyzed":
+            len(
+                historical_history
+            ),
+
+        "trend":
+            historical_trend_analysis.get(
+                "trend",
+                "insufficient_data"
+            ),
+
+        "dominant_emotion":
+            historical_trend_analysis.get(
+                "dominant_emotion",
+                "unknown"
+            ),
+
+        "repeated_emotions":
+            historical_trend_analysis.get(
+                "repeated_emotions",
+                []
+            ),
+
+        "latest_emotion":
+            historical_trend_analysis.get(
+                "latest_emotion",
+                "unknown"
+            ),
+
+        "latest_polarity":
+            historical_trend_analysis.get(
+                "latest_polarity",
+                "unknown"
+            )
+    }
 
     # --------------------------------------------------
     # Save actual recommendation interaction
@@ -503,19 +685,12 @@ def recommendation_feedback(
         {}
     )
 
-    user_id = data.get(
-        "user_id",
-        "default_user"
+    user_id = normalize_user_id(
+        data.get(
+            "user_id",
+            "default_user"
+        )
     )
-
-    if not isinstance(
-        user_id,
-        str
-    ) or not user_id.strip():
-
-        user_id = "default_user"
-
-    user_id = user_id.strip()
 
     if not recommendation_id:
 
@@ -575,21 +750,39 @@ def recommendation_feedback_stats():
     }
 
 
+# ------------------------------------------------------
+# Emotional Trend & User State Tracking
+# ------------------------------------------------------
+
 @app.get("/emotional-trend")
 def emotional_trend(
-    limit: int = 20
+    limit: int = 20,
+    user_id: str = "default_user"
 ):
+
+    try:
+
+        limit = int(limit)
+
+    except (
+        ValueError,
+        TypeError
+    ):
+
+        limit = 20
 
     limit = max(
         1,
-        min(
-            int(limit),
-            100
-        )
+        min(limit, 100)
+    )
+
+    user_id = normalize_user_id(
+        user_id
     )
 
     trend_result = get_emotional_trend(
-        limit
+        limit=limit,
+        user_id=user_id
     )
 
     return {
@@ -600,10 +793,19 @@ def emotional_trend(
     }
 
 
+# ------------------------------------------------------
+# File Analysis
+# ------------------------------------------------------
+
 @app.post("/analyze-file")
 async def analyze_file(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    user_id: str = "default_user"
 ):
+
+    user_id = normalize_user_id(
+        user_id
+    )
 
     filename = file.filename.lower()
 
@@ -698,7 +900,8 @@ async def analyze_file(
     )
 
     record_id = save_analysis_history(
-        analysis_result
+        analysis_result,
+        user_id
     )
 
     return {
@@ -707,5 +910,7 @@ async def analyze_file(
             file.filename,
         "history_record_id":
             record_id,
+        "user_id":
+            user_id,
         **analysis_result
     }

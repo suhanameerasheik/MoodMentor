@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+from collections import Counter
 
 
 # ============================================================
@@ -17,6 +18,23 @@ DATABASE_PATH = (
 )
 
 
+DEFAULT_USER_ID = "default_user"
+
+
+# ============================================================
+# DATABASE CONNECTION
+# ============================================================
+
+def get_connection():
+    connection = sqlite3.connect(
+        DATABASE_PATH
+    )
+
+    connection.row_factory = sqlite3.Row
+
+    return connection
+
+
 # ============================================================
 # DATABASE INITIALIZATION
 # ============================================================
@@ -28,17 +46,22 @@ def initialize_database() -> None:
         exist_ok=True
     )
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
-    )
+    connection = get_connection()
 
     cursor = connection.cursor()
+
+    # --------------------------------------------------------
+    # Create the original table if it does not exist.
+    #
+    # user_id is included for new installations.
+    # --------------------------------------------------------
 
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS emotional_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT NOT NULL,
+            user_id TEXT NOT NULL DEFAULT 'default_user',
             dominant_emotion TEXT NOT NULL,
             intensity REAL NOT NULL,
             polarity TEXT NOT NULL,
@@ -50,8 +73,58 @@ def initialize_database() -> None:
         """
     )
 
+    # --------------------------------------------------------
+    # Migration support for existing databases.
+    #
+    # Older versions of MoodMentor did not have user_id.
+    # Add it without deleting existing records.
+    # --------------------------------------------------------
+
+    cursor.execute(
+        "PRAGMA table_info(emotional_history)"
+    )
+
+    columns = [
+        row["name"]
+        for row in cursor.fetchall()
+    ]
+
+    if "user_id" not in columns:
+
+        cursor.execute(
+            """
+            ALTER TABLE emotional_history
+            ADD COLUMN user_id TEXT
+            NOT NULL
+            DEFAULT 'default_user'
+            """
+        )
+
     connection.commit()
+
     connection.close()
+
+
+# ============================================================
+# NORMALIZE USER ID
+# ============================================================
+
+def normalize_user_id(
+    user_id: str = DEFAULT_USER_ID
+) -> str:
+
+    if not isinstance(
+        user_id,
+        str
+    ):
+        return DEFAULT_USER_ID
+
+    user_id = user_id.strip()
+
+    if not user_id:
+        return DEFAULT_USER_ID
+
+    return user_id
 
 
 # ============================================================
@@ -61,14 +134,17 @@ def initialize_database() -> None:
 def save_emotional_state(
     emotional_state: Dict[str, Any],
     sentiment: Dict[str, Any],
-    wellness: Dict[str, Any]
+    wellness: Dict[str, Any],
+    user_id: str = DEFAULT_USER_ID
 ) -> int:
 
     initialize_database()
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
+    user_id = normalize_user_id(
+        user_id
     )
+
+    connection = get_connection()
 
     cursor = connection.cursor()
 
@@ -78,6 +154,7 @@ def save_emotional_state(
         """
         INSERT INTO emotional_history (
             timestamp,
+            user_id,
             dominant_emotion,
             intensity,
             polarity,
@@ -86,38 +163,47 @@ def save_emotional_state(
             sentiment_score,
             wellness_risk
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             timestamp,
+
+            user_id,
+
             emotional_state.get(
                 "dominant_emotion",
                 "unknown"
             ),
+
             float(
                 emotional_state.get(
                     "intensity",
                     0.0
                 )
             ),
+
             emotional_state.get(
                 "polarity",
                 "neutral"
             ),
+
             emotional_state.get(
                 "severity",
                 "low"
             ),
+
             sentiment.get(
                 "sentiment",
                 "neutral"
             ),
+
             float(
                 sentiment.get(
                     "compound",
                     0.0
                 )
             ),
+
             wellness.get(
                 "risk_level",
                 "unknown"
@@ -128,6 +214,7 @@ def save_emotional_state(
     record_id = cursor.lastrowid
 
     connection.commit()
+
     connection.close()
 
     return record_id
@@ -138,7 +225,8 @@ def save_emotional_state(
 # ============================================================
 
 def get_emotional_history(
-    limit: int = 20
+    limit: int = 20,
+    user_id: str = DEFAULT_USER_ID
 ) -> List[Dict[str, Any]]:
 
     initialize_database()
@@ -151,11 +239,11 @@ def get_emotional_history(
         )
     )
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
+    user_id = normalize_user_id(
+        user_id
     )
 
-    connection.row_factory = sqlite3.Row
+    connection = get_connection()
 
     cursor = connection.cursor()
 
@@ -164,6 +252,7 @@ def get_emotional_history(
         SELECT
             id,
             timestamp,
+            user_id,
             dominant_emotion,
             intensity,
             polarity,
@@ -172,10 +261,14 @@ def get_emotional_history(
             sentiment_score,
             wellness_risk
         FROM emotional_history
+        WHERE user_id = ?
         ORDER BY id DESC
         LIMIT ?
         """,
-        (limit,)
+        (
+            user_id,
+            limit
+        )
     )
 
     rows = cursor.fetchall()
@@ -189,6 +282,155 @@ def get_emotional_history(
 
 
 # ============================================================
+# EMOTION FREQUENCY
+# ============================================================
+
+def calculate_emotion_frequency(
+    history: List[Dict[str, Any]]
+) -> Dict[str, int]:
+
+    emotions = [
+        str(
+            record.get(
+                "dominant_emotion",
+                "unknown"
+            )
+        ).lower()
+        for record in history
+    ]
+
+    return dict(
+        Counter(emotions)
+    )
+
+
+# ============================================================
+# POLARITY FREQUENCY
+# ============================================================
+
+def calculate_polarity_frequency(
+    history: List[Dict[str, Any]]
+) -> Dict[str, int]:
+
+    polarities = [
+        str(
+            record.get(
+                "polarity",
+                "neutral"
+            )
+        ).lower()
+        for record in history
+    ]
+
+    return dict(
+        Counter(polarities)
+    )
+
+
+# ============================================================
+# POSITIVE / NEGATIVE TREND
+# ============================================================
+
+def calculate_positive_negative_trend(
+    history: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+
+    if not history:
+
+        return {
+            "direction": "insufficient_data",
+            "recent_negative_ratio": 0.0,
+            "older_negative_ratio": 0.0,
+            "negative_ratio_change": 0.0
+        }
+
+    # History is newest first.
+
+    split_index = max(
+        1,
+        len(history) // 2
+    )
+
+    recent_records = history[
+        :split_index
+    ]
+
+    older_records = history[
+        split_index:
+    ]
+
+    def negative_ratio(records):
+
+        if not records:
+            return 0.0
+
+        negative_count = sum(
+            1
+            for record in records
+            if str(
+                record.get(
+                    "polarity",
+                    "neutral"
+                )
+            ).lower()
+            == "negative"
+        )
+
+        return (
+            negative_count
+            / len(records)
+        )
+
+    recent_negative_ratio = (
+        negative_ratio(
+            recent_records
+        )
+    )
+
+    older_negative_ratio = (
+        negative_ratio(
+            older_records
+        )
+    )
+
+    negative_ratio_change = (
+        recent_negative_ratio
+        - older_negative_ratio
+    )
+
+    if negative_ratio_change >= 0.20:
+
+        direction = "more_negative"
+
+    elif negative_ratio_change <= -0.20:
+
+        direction = "more_positive"
+
+    else:
+
+        direction = "stable"
+
+    return {
+        "direction": direction,
+
+        "recent_negative_ratio": round(
+            recent_negative_ratio,
+            4
+        ),
+
+        "older_negative_ratio": round(
+            older_negative_ratio,
+            4
+        ),
+
+        "negative_ratio_change": round(
+            negative_ratio_change,
+            4
+        )
+    }
+
+
+# ============================================================
 # TREND CALCULATION
 # ============================================================
 
@@ -196,19 +438,164 @@ def calculate_emotional_trend(
     history: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
 
-    if len(history) < 2:
+    records_analyzed = len(
+        history
+    )
+
+    # --------------------------------------------------------
+    # No history
+    # --------------------------------------------------------
+
+    if records_analyzed == 0:
 
         return {
             "trend": "insufficient_data",
+
             "message":
-                "At least two emotional records are required to determine a trend.",
-            "records_analyzed": len(history),
+                "No emotional history is available for this user.",
+
+            "records_analyzed": 0,
+
             "average_intensity": 0.0,
-            "intensity_change": 0.0
+
+            "intensity_change": 0.0,
+
+            "intensity_over_time": [],
+
+            "emotion_frequency": {},
+
+            "dominant_emotion": "unknown",
+
+            "repeated_emotions": [],
+
+            "polarity_frequency": {},
+
+            "positive_records": 0,
+
+            "negative_records": 0,
+
+            "neutral_records": 0,
+
+            "positive_negative_trend": {
+                "direction": "insufficient_data",
+                "recent_negative_ratio": 0.0,
+                "older_negative_ratio": 0.0,
+                "negative_ratio_change": 0.0
+            },
+
+            "recent_emotions": [],
+
+            "recent_state": {
+                "emotion": "unknown",
+                "intensity": 0.0,
+                "polarity": "neutral",
+                "severity": "low"
+            }
         }
 
-    # History is newest first.
+    # --------------------------------------------------------
+    # Basic statistics
+    # --------------------------------------------------------
+
+    emotion_frequency = (
+        calculate_emotion_frequency(
+            history
+        )
+    )
+
+    polarity_frequency = (
+        calculate_polarity_frequency(
+            history
+        )
+    )
+
+    # --------------------------------------------------------
+    # Dominant historical emotion
+    # --------------------------------------------------------
+
+    dominant_emotion = max(
+        emotion_frequency,
+        key=emotion_frequency.get
+    )
+
+    # --------------------------------------------------------
+    # Repeated emotional patterns
+    #
+    # An emotion appearing at least twice is considered
+    # a repeated historical pattern.
+    # --------------------------------------------------------
+
+    repeated_emotions = sorted(
+        [
+            emotion
+            for emotion, count
+            in emotion_frequency.items()
+            if count >= 2
+        ],
+        key=lambda emotion:
+            emotion_frequency[emotion],
+        reverse=True
+    )
+
+    # --------------------------------------------------------
+    # Intensity over time
+    #
+    # Returned oldest -> newest for easier visualization.
+    # --------------------------------------------------------
+
+    chronological_history = list(
+        reversed(history)
+    )
+
+    intensity_over_time = [
+        {
+            "timestamp":
+                record.get(
+                    "timestamp",
+                    ""
+                ),
+
+            "intensity": round(
+                float(
+                    record.get(
+                        "intensity",
+                        0.0
+                    )
+                ),
+                4
+            ),
+
+            "emotion":
+                record.get(
+                    "dominant_emotion",
+                    "unknown"
+                )
+        }
+        for record
+        in chronological_history
+    ]
+
+    # --------------------------------------------------------
+    # Intensity statistics
+    # --------------------------------------------------------
+
+    intensities = [
+        float(
+            record.get(
+                "intensity",
+                0.0
+            )
+        )
+        for record in history
+    ]
+
+    average_intensity = (
+        sum(intensities)
+        / len(intensities)
+    )
+
     newest = history[0]
+
     oldest = history[-1]
 
     newest_intensity = float(
@@ -230,26 +617,26 @@ def calculate_emotional_trend(
         - oldest_intensity
     )
 
-    average_intensity = sum(
-        float(
-            record.get(
-                "intensity",
-                0.0
-            )
+    # --------------------------------------------------------
+    # Determine intensity trend
+    # --------------------------------------------------------
+
+    if records_analyzed < 2:
+
+        trend = "insufficient_data"
+
+        message = (
+            "At least two emotional records are required "
+            "to determine a trend."
         )
-        for record in history
-    ) / len(history)
 
-    # --------------------------------------------------------
-    # Determine emotional trend
-    # --------------------------------------------------------
-
-    if intensity_change <= -0.10:
+    elif intensity_change <= -0.10:
 
         trend = "improving"
 
         message = (
-            "Emotional intensity has decreased over the tracked period."
+            "Emotional intensity has decreased over "
+            "the tracked period."
         )
 
     elif intensity_change >= 0.10:
@@ -257,7 +644,8 @@ def calculate_emotional_trend(
         trend = "worsening"
 
         message = (
-            "Emotional intensity has increased over the tracked period."
+            "Emotional intensity has increased over "
+            "the tracked period."
         )
 
     else:
@@ -268,12 +656,83 @@ def calculate_emotional_trend(
             "Emotional intensity has remained relatively stable."
         )
 
+    # --------------------------------------------------------
+    # Positive / negative records
+    # --------------------------------------------------------
+
+    positive_records = polarity_frequency.get(
+        "positive",
+        0
+    )
+
+    negative_records = polarity_frequency.get(
+        "negative",
+        0
+    )
+
+    neutral_records = polarity_frequency.get(
+        "neutral",
+        0
+    )
+
+    # --------------------------------------------------------
+    # Positive / negative trend
+    # --------------------------------------------------------
+
+    positive_negative_trend = (
+        calculate_positive_negative_trend(
+            history
+        )
+    )
+
+    # --------------------------------------------------------
+    # Recent emotions
+    # --------------------------------------------------------
+
+    recent_emotions = [
+        record.get(
+            "dominant_emotion",
+            "unknown"
+        )
+        for record in history[:5]
+    ]
+
+    # --------------------------------------------------------
+    # Recent emotional state
+    # --------------------------------------------------------
+
+    recent_state = {
+        "emotion":
+            newest.get(
+                "dominant_emotion",
+                "unknown"
+            ),
+
+        "intensity": round(
+            newest_intensity,
+            4
+        ),
+
+        "polarity":
+            newest.get(
+                "polarity",
+                "neutral"
+            ),
+
+        "severity":
+            newest.get(
+                "severity",
+                "low"
+            )
+    }
+
     return {
         "trend": trend,
 
         "message": message,
 
-        "records_analyzed": len(history),
+        "records_analyzed":
+            records_analyzed,
 
         "average_intensity": round(
             average_intensity,
@@ -284,6 +743,36 @@ def calculate_emotional_trend(
             intensity_change,
             4
         ),
+
+        "intensity_over_time":
+            intensity_over_time,
+
+        "emotion_frequency":
+            emotion_frequency,
+
+        "dominant_emotion":
+            dominant_emotion,
+
+        "repeated_emotions":
+            repeated_emotions,
+
+        "polarity_frequency":
+            polarity_frequency,
+
+        "positive_records":
+            positive_records,
+
+        "negative_records":
+            negative_records,
+
+        "neutral_records":
+            neutral_records,
+
+        "positive_negative_trend":
+            positive_negative_trend,
+
+        "recent_emotions":
+            recent_emotions,
 
         "latest_emotion":
             newest.get(
@@ -301,7 +790,10 @@ def calculate_emotional_trend(
             newest.get(
                 "severity",
                 "low"
-            )
+            ),
+
+        "recent_state":
+            recent_state
     }
 
 
@@ -310,11 +802,17 @@ def calculate_emotional_trend(
 # ============================================================
 
 def get_emotional_trend(
-    limit: int = 20
+    limit: int = 20,
+    user_id: str = DEFAULT_USER_ID
 ) -> Dict[str, Any]:
 
+    user_id = normalize_user_id(
+        user_id
+    )
+
     history = get_emotional_history(
-        limit
+        limit=limit,
+        user_id=user_id
     )
 
     trend = calculate_emotional_trend(
@@ -323,7 +821,8 @@ def get_emotional_trend(
 
     return {
         "trend_analysis": trend,
-        "history": history
+        "history": history,
+        "user_id": user_id
     }
 
 

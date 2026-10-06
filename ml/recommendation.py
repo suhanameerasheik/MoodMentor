@@ -795,6 +795,305 @@ def calculate_collaborative_score(
 
 
 # ============================================================
+# TASK 6 — HISTORICAL EMOTIONAL PATTERN SCORE
+# ============================================================
+
+def calculate_historical_emotion_score(
+    content: Dict[str, Any],
+    historical_history: List[Dict[str, Any]]
+) -> float:
+
+    """
+    Calculates how strongly the recommendation matches
+    the user's previous emotional patterns.
+
+    Recent emotional records receive higher weight than
+    older records.
+
+    Returns a value between 0.0 and 1.0.
+
+    0.5 represents neutral/no strong historical influence.
+    """
+
+    if not historical_history:
+        return 0.5
+
+    content_emotions = set(
+        content.get(
+            "emotions",
+            []
+        )
+    )
+
+    if not content_emotions:
+        return 0.5
+
+    weighted_match = 0.0
+    total_weight = 0.0
+
+    for index, record in enumerate(
+        historical_history
+    ):
+
+        dominant_emotion = str(
+            record.get(
+                "dominant_emotion",
+                "unknown"
+            )
+        ).lower().strip()
+
+        try:
+            intensity = float(
+                record.get(
+                    "intensity",
+                    0.0
+                )
+            )
+        except (
+            TypeError,
+            ValueError
+        ):
+            intensity = 0.0
+
+        intensity = max(
+            0.0,
+            min(
+                1.0,
+                intensity
+            )
+        )
+
+        # More recent records receive more influence.
+        recency_weight = (
+            0.85 ** index
+        )
+
+        # Stronger emotional records receive slightly
+        # more influence than weak emotional records.
+        intensity_factor = (
+            0.5
+            +
+            (0.5 * intensity)
+        )
+
+        emotion_match_value = (
+            1.0
+            if dominant_emotion in content_emotions
+            else 0.0
+        )
+
+        weighted_match += (
+            recency_weight
+            *
+            emotion_match_value
+            *
+            intensity_factor
+        )
+
+        total_weight += recency_weight
+
+    if total_weight == 0.0:
+        return 0.5
+
+    score = (
+        weighted_match
+        /
+        total_weight
+    )
+
+    return round(
+        max(
+            0.0,
+            min(
+                1.0,
+                score
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
+# TASK 6 — HISTORICAL TREND SCORE
+# ============================================================
+
+def calculate_historical_trend_score(
+    content: Dict[str, Any],
+    historical_emotional_context: Dict[str, Any]
+) -> float:
+
+    """
+    Combines historical emotional patterns and trend
+    information into one Task 6 score.
+
+    The existing hybrid score is NOT changed.
+
+    Returns a value between 0.0 and 1.0.
+    """
+
+    if not historical_emotional_context:
+        return 0.5
+
+    history = (
+        historical_emotional_context.get(
+            "history",
+            []
+        )
+    )
+
+    # A single record is not enough to establish
+    # an emotional pattern.
+    if len(history) < 2:
+        return 0.5
+
+    trend_analysis = (
+        historical_emotional_context.get(
+            "trend_analysis",
+            {}
+        )
+    )
+
+    historical_emotion_score = (
+        calculate_historical_emotion_score(
+            content,
+            history
+        )
+    )
+
+    trend = str(
+        trend_analysis.get(
+            "trend",
+            "insufficient_data"
+        )
+    ).lower()
+
+    latest_polarity = str(
+        trend_analysis.get(
+            "latest_polarity",
+            "neutral"
+        )
+    ).lower()
+
+    content_polarity = str(
+        content.get(
+            "polarity",
+            "neutral"
+        )
+    ).lower()
+
+    # Historical emotional pattern has the strongest
+    # influence.
+    pattern_component = (
+        historical_emotion_score * 0.60
+    )
+
+    # Trend alignment provides an additional signal.
+    #
+    # For improving/worsening/stable trends, the current
+    # emotional pattern remains the main signal. Therefore
+    # the trend component is intentionally small.
+    if trend == "worsening":
+        trend_component = 0.65
+
+    elif trend == "improving":
+        trend_component = 0.45
+
+    elif trend == "stable":
+        trend_component = 0.50
+
+    else:
+        trend_component = 0.50
+
+    trend_component *= 0.25
+
+    # Latest polarity alignment.
+    if (
+        latest_polarity != "neutral"
+        and latest_polarity == content_polarity
+    ):
+        polarity_component = 1.0
+
+    elif latest_polarity == "neutral":
+        polarity_component = 0.5
+
+    else:
+        polarity_component = 0.0
+
+    polarity_component *= 0.15
+
+    score = (
+        pattern_component
+        +
+        trend_component
+        +
+        polarity_component
+    )
+
+    return round(
+        max(
+            0.0,
+            min(
+                1.0,
+                score
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
+# TASK 6 — TREND ADJUSTMENT
+# ============================================================
+
+def calculate_trend_adjustment(
+    historical_trend_score: float
+) -> float:
+
+    """
+    Converts the Task 6 trend score into a small
+    recommendation adjustment.
+
+    Maximum influence = +/- 0.05.
+
+    This intentionally keeps Task 6 from overpowering
+    the existing recommendation engine.
+    """
+
+    try:
+        historical_trend_score = float(
+            historical_trend_score
+        )
+    except (
+        TypeError,
+        ValueError
+    ):
+        historical_trend_score = 0.5
+
+    historical_trend_score = max(
+        0.0,
+        min(
+            1.0,
+            historical_trend_score
+        )
+    )
+
+    adjustment = (
+        historical_trend_score - 0.5
+    ) * 0.10
+
+    return round(
+        max(
+            -0.05,
+            min(
+                0.05,
+                adjustment
+            )
+        ),
+        4
+    )
+
+
+# ============================================================
 # TASK 3D — HYBRID RECOMMENDATION SCORE
 # ============================================================
 
@@ -930,6 +1229,9 @@ def calculate_hybrid_score(
     # Semantic similarity    = 15%
     #
     # Total                  = 100%
+    #
+    # IMPORTANT:
+    # Task 6 does NOT modify these weights.
     # --------------------------------------------------------
 
     hybrid_score = (
@@ -1062,6 +1364,24 @@ def generate_ranking_reason(
             "fits the user's historical recommendation behavior"
         )
 
+    if recommendation.get(
+        "historical_emotion_score",
+        0.0
+    ) >= 0.60:
+
+        reasons.append(
+            "matches repeated emotional patterns from the user's history"
+        )
+
+    if recommendation.get(
+        "historical_trend_score",
+        0.0
+    ) >= 0.60:
+
+        reasons.append(
+            "aligned with the user's recent emotional trend"
+        )
+
     if recommendation["semantic_score"] >= 0.60:
         reasons.append(
             "strong semantic similarity"
@@ -1183,6 +1503,24 @@ def generate_explanation(
             "Fits your previous recommendation interaction pattern"
         )
 
+    if recommendation.get(
+        "historical_emotion_score",
+        0.0
+    ) >= 0.60:
+
+        reasons.append(
+            "Matches emotional patterns repeatedly observed in your history"
+        )
+
+    if recommendation.get(
+        "historical_trend_score",
+        0.0
+    ) >= 0.60:
+
+        reasons.append(
+            "Takes your recent emotional trend into account"
+        )
+
     if recommendation["semantic_score"] >= 0.60:
         reasons.append(
             "Strong semantic match with your current concern"
@@ -1272,6 +1610,30 @@ def generate_explanation(
         "historical_behavior": round(
             recommendation.get(
                 "historical_behavior_score",
+                0.0
+            ),
+            4
+        ),
+
+        "historical_emotion_pattern": round(
+            recommendation.get(
+                "historical_emotion_score",
+                0.5
+            ),
+            4
+        ),
+
+        "historical_trend": round(
+            recommendation.get(
+                "historical_trend_score",
+                0.5
+            ),
+            4
+        ),
+
+        "trend_adjustment": round(
+            recommendation.get(
+                "trend_adjustment",
                 0.0
             ),
             4
@@ -1474,7 +1836,8 @@ def generate_hybrid_recommendations(
     recommendation_history: List[str] = None,
     top_k: int = 5,
     text: str = "",
-    user_id: str = "default_user"
+    user_id: str = "default_user",
+    historical_emotional_context: Dict[str, Any] = None
 ) -> Dict[str, Any]:
 
     preferences = preferences or []
@@ -1494,6 +1857,17 @@ def generate_hybrid_recommendations(
         min(
             int(top_k),
             10
+        )
+    )
+
+    historical_emotional_context = (
+        historical_emotional_context or {}
+    )
+
+    historical_history = (
+        historical_emotional_context.get(
+            "history",
+            []
         )
     )
 
@@ -1527,6 +1901,34 @@ def generate_hybrid_recommendations(
                         content["id"],
                         0.0
                     )
+            )
+        )
+
+        # ----------------------------------------------------
+        # TASK 6
+        # Historical emotional pattern influence.
+        #
+        # This does NOT modify the existing hybrid score.
+        # ----------------------------------------------------
+
+        historical_emotion_score = (
+            calculate_historical_emotion_score(
+                content=content,
+                historical_history=historical_history
+            )
+        )
+
+        historical_trend_score = (
+            calculate_historical_trend_score(
+                content=content,
+                historical_emotional_context=
+                    historical_emotional_context
+            )
+        )
+
+        trend_adjustment = (
+            calculate_trend_adjustment(
+                historical_trend_score
             )
         )
 
@@ -1570,16 +1972,61 @@ def generate_hybrid_recommendations(
                         "semantic_score"
                     ],
 
+                # Existing hybrid score is preserved.
                 "score":
-                    score_details["hybrid_score"]
+                    score_details["hybrid_score"],
+
+                # Task 6 additions.
+                "base_score":
+                    score_details["hybrid_score"],
+
+                "historical_emotion_score":
+                    historical_emotion_score,
+
+                "historical_trend_score":
+                    historical_trend_score,
+
+                "trend_adjustment":
+                    trend_adjustment,
+
+                "trend_adjusted_score":
+                    round(
+                        max(
+                            0.0,
+                            min(
+                                1.0,
+                                score_details["hybrid_score"]
+                                +
+                                trend_adjustment
+                            )
+                        ),
+                        4
+                    )
             }
         )
+
+    # --------------------------------------------------------
+    # IMPORTANT:
+    #
+    # Ranking inside this module continues to use the existing
+    # hybrid score. main.py will apply the Task 6 adjustment
+    # before feedback learning and final ranking.
+    #
+    # This preserves all previous ranking behavior.
+    # --------------------------------------------------------
 
     ranking_result = rank_recommendations(
         recommendations=scored_recommendations,
         top_k=top_k,
         emotional_state=emotional_state,
         preferences=preferences
+    )
+
+    trend_analysis = (
+        historical_emotional_context.get(
+            "trend_analysis",
+            {}
+        )
     )
 
     ranking_result.update(
@@ -1595,6 +2042,8 @@ def generate_hybrid_recommendations(
                 "emotion_similarity",
                 "historical_behavior",
                 "semantic_similarity",
+                "emotional_trend_tracking",
+                "historical_emotion_patterns",
                 "dynamic_ranking",
                 "duplicate_filtering",
                 "low_relevance_filtering",
@@ -1656,6 +2105,31 @@ def generate_hybrid_recommendations(
                 "collaborative_history_used":
                     bool(
                         collaborative_scores
+                    ),
+
+                # Task 6 information.
+                "emotional_history_records":
+                    len(historical_history),
+
+                "historical_emotion_tracking":
+                    len(historical_history) >= 2,
+
+                "historical_dominant_emotion":
+                    trend_analysis.get(
+                        "dominant_emotion",
+                        "unknown"
+                    ),
+
+                "historical_repeated_emotions":
+                    trend_analysis.get(
+                        "repeated_emotions",
+                        []
+                    ),
+
+                "historical_trend":
+                    trend_analysis.get(
+                        "trend",
+                        "insufficient_data"
                     )
             }
         }
@@ -1674,7 +2148,8 @@ def generate_personalized_recommendations(
     recommendation_history: List[str] = None,
     top_k: int = 5,
     text: str = "",
-    user_id: str = "default_user"
+    user_id: str = "default_user",
+    historical_emotional_context: Dict[str, Any] = None
 ) -> Dict[str, Any]:
 
     return generate_hybrid_recommendations(
@@ -1684,5 +2159,7 @@ def generate_personalized_recommendations(
             recommendation_history,
         top_k=top_k,
         text=text,
-        user_id=user_id
+        user_id=user_id,
+        historical_emotional_context=
+            historical_emotional_context
     )
