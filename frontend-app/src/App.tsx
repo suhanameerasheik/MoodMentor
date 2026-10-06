@@ -3748,19 +3748,72 @@ function App() {
 
                         )}
 
+                        {/* TASK 8 - TOP RECOMMENDATION EXPLAINABILITY */}
+
                         {recommendations
                           .top_recommendation
-                          .explanation
-                          ?.summary && (
+                          .explanation && (
 
                           <div className="recommendation-explanation">
 
-                            {
+                            <div className="explanation-header">
+
+                              <strong>
+                                Why this was selected
+                              </strong>
+
+                            </div>
+
+                            {recommendations
+                              .top_recommendation
+                              .explanation
+                              .summary && (
+
+                              <p>
+                                {
+                                  recommendations
+                                    .top_recommendation
+                                    .explanation
+                                    .summary
+                                }
+                              </p>
+
+                            )}
+
+                            {recommendations
+                              .top_recommendation
+                              .explanation
+                              .reasons &&
                               recommendations
                                 .top_recommendation
                                 .explanation
-                                .summary
-                            }
+                                .reasons
+                                .length > 0 && (
+
+                              <ul>
+
+                                {recommendations
+                                  .top_recommendation
+                                  .explanation
+                                  .reasons
+                                  .map(
+                                    (
+                                      reason,
+                                      reasonIndex
+                                    ) => (
+
+                                      <li
+                                        key={`top-reason-${reasonIndex}`}
+                                      >
+                                        {reason}
+                                      </li>
+
+                                    )
+                                  )}
+
+                              </ul>
+
+                            )}
 
                           </div>
 
@@ -4317,6 +4370,58 @@ function App() {
                                         ", "
                                       )
                                     : recommendation.ranking_reason}
+
+                                </div>
+
+                              )}
+
+                              {/* ==================================================
+                                  TASK 8 - RECOMMENDATION EXPLAINABILITY
+                                  ================================================== */}
+
+                              {recommendation.explanation && (
+
+                                <div className="recommendation-explanation">
+
+                                  <div className="explanation-header">
+
+                                    <strong>
+                                      Why this was selected
+                                    </strong>
+
+                                  </div>
+
+                                  {recommendation.explanation.summary && (
+
+                                    <p>
+                                      {recommendation.explanation.summary}
+                                    </p>
+
+                                  )}
+
+                                  {recommendation.explanation.reasons &&
+                                    recommendation.explanation.reasons.length > 0 && (
+
+                                    <ul>
+
+                                      {recommendation.explanation.reasons.map(
+                                        (
+                                          reason,
+                                          reasonIndex
+                                        ) => (
+
+                                          <li
+                                            key={`${recommendation.id || index}-reason-${reasonIndex}`}
+                                          >
+                                            {reason}
+                                          </li>
+
+                                        )
+                                      )}
+
+                                    </ul>
+
+                                  )}
 
                                 </div>
 
