@@ -1,0 +1,103 @@
+﻿diff --git a/backend/main.py b/backend/main.py
+index 2f23a58..a03d3d4 100644
+--- a/backend/main.py
++++ b/backend/main.py
+@@ -277,12 +277,98 @@ def recommend(data: dict):
+         ]
+     )
+ 
++    # --------------------------------------------------
++    # M3-T4 + M3-T7
++    #
++    # Preserve the original hybrid score.
++    # Feedback learning then calculates learned_score.
++    # The final recommendation score becomes learned_score
++    # so that displayed score and ranking remain consistent.
++    # --------------------------------------------------
++
++    for recommendation in recommendations:
++
++        recommendation[
++            "base_score"
++        ] = round(
++            float(
++                recommendation.get(
++                    "score",
++                    0.0
++                )
++            ),
++            4
++        )
++
+     recommendations = (
+         apply_feedback_learning(
+             recommendations
+         )
+     )
+ 
++    # --------------------------------------------------
++    # Final ranking after feedback learning
++    #
++    # learned_score is now the final recommendation score.
++    # This preserves feedback learning while ensuring:
++    #
++    # rank 1 = highest final score
++    # rank 2 = second highest final score
++    # etc.
++    # --------------------------------------------------
++
++    for recommendation in recommendations:
++
++        recommendation[
++            "score"
++        ] = round(
++            float(
++                recommendation.get(
++                    "learned_score",
++                    recommendation.get(
++                        "base_score",
++                        0.0
++                    )
++                )
++            ),
++            4
++        )
++
++    recommendations.sort(
++        key=lambda item: (
++            item.get(
++                "score",
++                0.0
++            ),
++            item.get(
++                "base_score",
++                0.0
++            ),
++            item.get(
++                "semantic_score",
++                0.0
++            ),
++            item.get(
++                "collaborative_score",
++                0.0
++            ),
++            item.get(
++                "emotion_similarity_score",
++                0.0
++            )
++        ),
++        reverse=True
++    )
++
++    for index, recommendation in enumerate(
++        recommendations,
++        start=1
++    ):
++
++        recommendation[
++            "rank"
++        ] = index
++
+     recommendation_result[
+         "recommendations"
+     ] = recommendations

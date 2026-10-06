@@ -73,6 +73,11 @@ type Recommendation = {
   personalization_score?: number;
   semantic_score?: number;
 
+  historical_emotion_score?: number;
+  historical_trend_score?: number;
+  trend_adjustment?: number;
+  trend_history_records?: number;
+
   base_score?: number;
   score?: number;
   feedback_score?: number;
@@ -115,6 +120,22 @@ type RecommendationResult = {
 
   personalization?: {
     collaborative_history_used?: boolean;
+    emotional_history_records?: number;
+    historical_dominant_emotion?: string;
+    historical_trend?: string;
+    repeated_emotions?: string[];
+    trend_influence_enabled?: boolean;
+  };
+
+  historical_emotional_trend?: EmotionalTrendResponse;
+  trend_influence?: {
+    enabled?: boolean;
+    records_analyzed?: number;
+    trend?: string;
+    dominant_emotion?: string;
+    repeated_emotions?: string[];
+    latest_emotion?: string;
+    latest_polarity?: string;
   };
 };
 
@@ -126,6 +147,63 @@ type PreviousInteraction = {
   recommendations?: Recommendation[];
   top_recommendation?: Recommendation | null;
   created_at?: string;
+};
+
+type EmotionalTrendAnalysis = {
+  trend?: string;
+  message?: string;
+  records_analyzed?: number;
+  average_intensity?: number;
+  intensity_change?: number;
+  intensity_over_time?: number[];
+
+  emotion_frequency?: Record<string, number>;
+  dominant_emotion?: string;
+  repeated_emotions?: string[];
+
+  polarity_frequency?: Record<string, number>;
+  positive_records?: number;
+  negative_records?: number;
+  neutral_records?: number;
+
+  positive_negative_trend?: {
+    direction?: string;
+    recent_negative_ratio?: number;
+    older_negative_ratio?: number;
+    recent_positive_ratio?: number;
+    older_positive_ratio?: number;
+  };
+
+  recent_emotions?: string[];
+  latest_emotion?: string;
+  latest_polarity?: string;
+  latest_severity?: string;
+
+  recent_state?: {
+    emotion?: string;
+    intensity?: number;
+    polarity?: string;
+    severity?: string;
+  };
+};
+
+type EmotionalHistoryRecord = {
+  id?: number;
+  user_id?: string;
+  text?: string;
+  emotion?: string;
+  intensity?: number;
+  polarity?: string;
+  severity?: string;
+  created_at?: string;
+};
+
+type EmotionalTrendResponse = {
+  status?: string;
+  message?: string;
+  user_id?: string;
+  trend_analysis?: EmotionalTrendAnalysis;
+  history?: EmotionalHistoryRecord[];
 };
 
 function App() {
@@ -142,6 +220,16 @@ function App() {
 
   const [selectedUser, setSelectedUser] =
     useState("user_001");
+
+  // ==========================================================
+  // TASK 6 - EMOTIONAL TREND & USER STATE TRACKING
+  // ==========================================================
+
+  const [emotionalTrend, setEmotionalTrend] =
+    useState<EmotionalTrendResponse | null>(null);
+
+  const [emotionalTrendLoading, setEmotionalTrendLoading] =
+    useState(false);
 
   // ==========================================================
   // PERSONALIZED RECOMMENDATION STATE
@@ -241,6 +329,51 @@ function App() {
   }, [recommendationHistory]);
 
   // ==========================================================
+  // TASK 6 - LOAD EMOTIONAL TREND
+  // ==========================================================
+
+  async function loadEmotionalTrend(
+    userId: string = selectedUser
+  ) {
+    setEmotionalTrendLoading(true);
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/emotional-trend?user_id=${encodeURIComponent(
+          userId
+        )}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(
+          "Could not load emotional trend:",
+          data.detail
+        );
+
+        setEmotionalTrend(null);
+        return;
+      }
+
+      setEmotionalTrend(data);
+    } catch (error) {
+      console.error(
+        "Emotional trend error:",
+        error
+      );
+
+      setEmotionalTrend(null);
+    } finally {
+      setEmotionalTrendLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadEmotionalTrend(selectedUser);
+  }, [selectedUser]);
+
+  // ==========================================================
   // ANALYZE TEXT
   // ==========================================================
 
@@ -271,6 +404,7 @@ function App() {
 
           body: JSON.stringify({
             text: text,
+            user_id: selectedUser,
           }),
         }
       );
@@ -289,6 +423,8 @@ function App() {
       }
 
       setResult(data);
+
+      await loadEmotionalTrend(selectedUser);
 
       setMessage(
         "✓ Analysis completed successfully."
@@ -510,6 +646,12 @@ function App() {
       }
 
       await loadPreviousInteractionCount();
+
+      // ========================================================
+      // TASK 6 - REFRESH TREND AFTER RECOMMENDATION
+      // ========================================================
+
+      await loadEmotionalTrend(selectedUser);
 
       setMessage(
         "✓ Personalized recommendations generated successfully."
@@ -810,6 +952,25 @@ function App() {
       );
   }
 
+  function trendLabel(
+    trend?: string
+  ) {
+    if (!trend) {
+      return "Not available";
+    }
+
+    return trend
+      .replace(
+        /_/g,
+        " "
+      )
+      .replace(
+        /\b\w/g,
+        (letter) =>
+          letter.toUpperCase()
+      );
+  }
+
   // ==========================================================
   // HYBRID SCORE LABELS
   // ==========================================================
@@ -844,6 +1005,15 @@ function App() {
       key: "semantic_score" as const,
     },
   ];
+
+  const trendAnalysis =
+    emotionalTrend?.trend_analysis;
+
+  const emotionFrequency =
+    trendAnalysis?.emotion_frequency || {};
+
+  const polarityFrequency =
+    trendAnalysis?.polarity_frequency || {};
 
   // ==========================================================
   // UI
@@ -1576,6 +1746,484 @@ function App() {
 
               )}
 
+              {/* ==================================================
+                  TASK 6 - EMOTIONAL TREND & USER STATE TRACKING
+                  ================================================== */}
+
+              <section className="emotional-trend-card">
+
+                <div className="emotional-trend-header">
+
+                  <div>
+
+                    <p className="small-label">
+                      EMOTIONAL HISTORY
+                    </p>
+
+                    <h4>
+                      Emotional Trend &amp; User State
+                    </h4>
+
+                    <p>
+                      Historical emotional patterns are
+                      analyzed to understand changes in
+                      your emotional state over time.
+                    </p>
+
+                  </div>
+
+                  <div className="trend-icon">
+                    📈
+                  </div>
+
+                </div>
+
+                {emotionalTrendLoading ? (
+
+                  <div className="trend-loading">
+                    Loading emotional history...
+                  </div>
+
+                ) : !trendAnalysis ||
+                  !trendAnalysis.records_analyzed ? (
+
+                  <div className="trend-empty">
+
+                    <h5>
+                      Building emotional history
+                    </h5>
+
+                    <p>
+                      More analyzed feedback is needed
+                      before a meaningful emotional trend
+                      can be identified.
+                    </p>
+
+                  </div>
+
+                ) : (
+
+                  <>
+
+                    <div className="trend-summary-grid">
+
+                      <div className="trend-summary-item">
+
+                        <span>
+                          Current State
+                        </span>
+
+                        <strong>
+                          {(
+                            trendAnalysis
+                              .recent_state
+                              ?.emotion ||
+                            trendAnalysis
+                              .latest_emotion ||
+                            "Unknown"
+                          ).toUpperCase()}
+                        </strong>
+
+                        <small>
+                          {(
+                            trendAnalysis
+                              .recent_state
+                              ?.polarity ||
+                            trendAnalysis
+                              .latest_polarity ||
+                            "Unknown"
+                          ).toUpperCase()}
+                        </small>
+
+                      </div>
+
+                      <div className="trend-summary-item">
+
+                        <span>
+                          Historical Dominant Emotion
+                        </span>
+
+                        <strong>
+                          {(
+                            trendAnalysis
+                              .dominant_emotion ||
+                            "Unknown"
+                          ).toUpperCase()}
+                        </strong>
+
+                        <small>
+                          Across{" "}
+                          {trendAnalysis.records_analyzed}{" "}
+                          records
+                        </small>
+
+                      </div>
+
+                      <div className="trend-summary-item">
+
+                        <span>
+                          Emotional Trend
+                        </span>
+
+                        <strong className="trend-value">
+                          {trendLabel(
+                            trendAnalysis.trend
+                          )}
+                        </strong>
+
+                        <small>
+                          {trendAnalysis.message ||
+                            "Trend analysis available"}
+                        </small>
+
+                      </div>
+
+                      <div className="trend-summary-item">
+
+                        <span>
+                          Average Intensity
+                        </span>
+
+                        <strong>
+                          {percentage(
+                            trendAnalysis
+                              .average_intensity
+                          )}
+                        </strong>
+
+                        <small>
+                          Change:{" "}
+                          {trendAnalysis.intensity_change !==
+                          undefined
+                            ? `${
+                                trendAnalysis.intensity_change >=
+                                0
+                                  ? "+"
+                                  : ""
+                              }${percentage(
+                                trendAnalysis
+                                  .intensity_change
+                              )}`
+                            : "Not available"}
+                        </small>
+
+                      </div>
+
+                    </div>
+
+                    <div className="trend-detail-grid">
+
+                      <div className="trend-detail-card">
+
+                        <div className="trend-detail-heading">
+
+                          <span>
+                            Emotion Frequency
+                          </span>
+
+                        </div>
+
+                        <div className="trend-frequency-list">
+
+                          {Object.entries(
+                            emotionFrequency
+                          ).length > 0 ? (
+
+                            Object.entries(
+                              emotionFrequency
+                            )
+                              .sort(
+                                (
+                                  [, a],
+                                  [, b]
+                                ) => b - a
+                              )
+                              .map(
+                                (
+                                  [
+                                    emotion,
+                                    count,
+                                  ]
+                                ) => (
+
+                                  <div
+                                    className="trend-frequency-row"
+                                    key={emotion}
+                                  >
+
+                                    <span>
+                                      {emotion}
+                                    </span>
+
+                                    <strong>
+                                      {count}
+                                    </strong>
+
+                                  </div>
+
+                                )
+                              )
+
+                          ) : (
+
+                            <span>
+                              No emotion history available.
+                            </span>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+                      <div className="trend-detail-card">
+
+                        <div className="trend-detail-heading">
+
+                          <span>
+                            Positive / Negative Trend
+                          </span>
+
+                        </div>
+
+                        <div className="polarity-trend-list">
+
+                          <div className="polarity-trend-row">
+
+                            <span>
+                              Positive records
+                            </span>
+
+                            <strong>
+                              {trendAnalysis
+                                .positive_records ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="polarity-trend-row">
+
+                            <span>
+                              Negative records
+                            </span>
+
+                            <strong>
+                              {trendAnalysis
+                                .negative_records ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="polarity-trend-row">
+
+                            <span>
+                              Neutral records
+                            </span>
+
+                            <strong>
+                              {trendAnalysis
+                                .neutral_records ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                          <div className="polarity-trend-row">
+
+                            <span>
+                              Direction
+                            </span>
+
+                            <strong>
+                              {trendLabel(
+                                trendAnalysis
+                                  .positive_negative_trend
+                                  ?.direction
+                              )}
+                            </strong>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div className="trend-pattern-section">
+
+                      <div>
+
+                        <p className="small-label">
+                          REPEATED EMOTIONAL PATTERNS
+                        </p>
+
+                        <div className="trend-pattern-tags">
+
+                          {trendAnalysis
+                            .repeated_emotions &&
+                          trendAnalysis
+                            .repeated_emotions
+                            .length > 0 ? (
+
+                            trendAnalysis
+                              .repeated_emotions
+                              .map(
+                                (
+                                  emotion,
+                                  index
+                                ) => (
+
+                                  <span
+                                    className="trend-pattern-tag"
+                                    key={`${emotion}-${index}`}
+                                  >
+                                    {emotion}
+                                  </span>
+
+                                )
+                              )
+
+                          ) : (
+
+                            <span className="no-trend-pattern">
+                              No repeated emotional pattern detected
+                            </span>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div className="trend-intensity-section">
+
+                      <div className="trend-intensity-header">
+
+                        <span>
+                          Intensity History
+                        </span>
+
+                        <strong>
+                          {trendAnalysis
+                            .intensity_over_time
+                            ?.length || 0}{" "}
+                          observations
+                        </strong>
+
+                      </div>
+
+                      <div className="trend-intensity-bars">
+
+                        {(
+                          trendAnalysis
+                            .intensity_over_time ||
+                          []
+                        ).map(
+                          (
+                            intensity,
+                            index
+                          ) => (
+
+                            <div
+                              className="trend-intensity-bar-wrapper"
+                              key={index}
+                              title={`Record ${
+                                index + 1
+                              }: ${percentage(
+                                intensity
+                              )}`}
+                            >
+
+                              <div
+                                className="trend-intensity-bar-fill"
+                                style={{
+                                  height: `${Math.min(
+                                    100,
+                                    Math.max(
+                                      5,
+                                      intensity *
+                                        100
+                                    )
+                                  )}%`,
+                                }}
+                              />
+
+                            </div>
+
+                          )
+                        )}
+
+                      </div>
+
+                    </div>
+
+                    <div className="trend-current-state">
+
+                      <div className="trend-current-icon">
+                        💡
+                      </div>
+
+                      <div>
+
+                        <p className="small-label">
+                          CURRENT EMOTIONAL STATE
+                        </p>
+
+                        <h5>
+
+                          {(
+                            trendAnalysis
+                              .recent_state
+                              ?.emotion ||
+                            trendAnalysis
+                              .latest_emotion ||
+                            "Unknown"
+                          ).toUpperCase()}
+
+                        </h5>
+
+                        <p>
+
+                          Intensity:{" "}
+                          {percentage(
+                            trendAnalysis
+                              .recent_state
+                              ?.intensity
+                          )}
+                          {" • "}
+                          Polarity:{" "}
+                          {(
+                            trendAnalysis
+                              .recent_state
+                              ?.polarity ||
+                            "Unknown"
+                          ).toUpperCase()}
+                          {" • "}
+                          Severity:{" "}
+                          {(
+                            trendAnalysis
+                              .recent_state
+                              ?.severity ||
+                            "Unknown"
+                          ).toUpperCase()}
+
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </>
+
+                )}
+
+              </section>
+
               <section className="recommendation-card">
 
                 <div className="recommendation-header">
@@ -2225,6 +2873,88 @@ function App() {
 
                   <div className="recommendation-results">
 
+                    {/* TASK 6 - TREND INFLUENCE SUMMARY */}
+
+                    {recommendations.trend_influence && (
+
+                      <div className="recommendation-trend-summary">
+
+                        <div>
+
+                          <p className="small-label">
+                            EMOTIONAL HISTORY INFLUENCE
+                          </p>
+
+                          <h5>
+                            Historical patterns influenced this ranking
+                          </h5>
+
+                          <p>
+
+                            The recommendation engine used previous
+                            emotional patterns and recent emotional
+                            trends when adjusting recommendation scores.
+
+                          </p>
+
+                        </div>
+
+                        <div className="recommendation-trend-stats">
+
+                          <div>
+
+                            <span>
+                              Trend
+                            </span>
+
+                            <strong>
+                              {trendLabel(
+                                recommendations
+                                  .trend_influence
+                                  .trend
+                              )}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Dominant emotion
+                            </span>
+
+                            <strong>
+                              {(
+                                recommendations
+                                  .trend_influence
+                                  .dominant_emotion ||
+                                "Unknown"
+                              ).toUpperCase()}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Records
+                            </span>
+
+                            <strong>
+                              {recommendations
+                                .trend_influence
+                                .records_analyzed ??
+                                0}
+                            </strong>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    )}
+
                     {/* HYBRID ENGINE SUMMARY */}
 
                     <div className="hybrid-summary">
@@ -2581,6 +3311,72 @@ function App() {
 
                         </div>
 
+                        {/* TASK 6 HISTORY SCORES */}
+
+                        <div className="trend-score-breakdown">
+
+                          <div>
+
+                            <span>
+                              Historical emotion match
+                            </span>
+
+                            <strong>
+                              {percentage(
+                                recommendations
+                                  .top_recommendation
+                                  .historical_emotion_score
+                              )}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Historical trend match
+                            </span>
+
+                            <strong>
+                              {percentage(
+                                recommendations
+                                  .top_recommendation
+                                  .historical_trend_score
+                              )}
+                            </strong>
+
+                          </div>
+
+                          <div>
+
+                            <span>
+                              Trend adjustment
+                            </span>
+
+                            <strong>
+                              {recommendations
+                                .top_recommendation
+                                .trend_adjustment !==
+                              undefined
+                                ? `${
+                                    recommendations
+                                      .top_recommendation
+                                      .trend_adjustment >=
+                                    0
+                                      ? "+"
+                                      : ""
+                                  }${percentage(
+                                    recommendations
+                                      .top_recommendation
+                                      .trend_adjustment
+                                  )}`
+                                : "0.00%"}
+                            </strong>
+
+                          </div>
+
+                        </div>
+
                         <div className="top-ranking-score-grid">
 
                           <div>
@@ -2811,6 +3607,67 @@ function App() {
                                 </div>
 
                               )}
+
+                              {/* TASK 6 HISTORY INFLUENCE */}
+
+                              <div className="trend-score-breakdown">
+
+                                <div>
+
+                                  <span>
+                                    Historical emotion
+                                  </span>
+
+                                  <strong>
+                                    {percentage(
+                                      recommendation
+                                        .historical_emotion_score
+                                    )}
+                                  </strong>
+
+                                </div>
+
+                                <div>
+
+                                  <span>
+                                    Historical trend
+                                  </span>
+
+                                  <strong>
+                                    {percentage(
+                                      recommendation
+                                        .historical_trend_score
+                                    )}
+                                  </strong>
+
+                                </div>
+
+                                <div>
+
+                                  <span>
+                                    Trend adjustment
+                                  </span>
+
+                                  <strong>
+                                    {recommendation
+                                      .trend_adjustment !==
+                                    undefined
+                                      ? `${
+                                          recommendation
+                                            .trend_adjustment >=
+                                          0
+                                            ? "+"
+                                            : ""
+                                        }${percentage(
+                                          recommendation
+                                            .trend_adjustment
+                                        )}`
+                                      : "0.00%"}
+                                  </strong>
+
+                                </div>
+
+                              </div>
 
                               {/* M3-T4 FINAL RANKING SCORE */}
 
