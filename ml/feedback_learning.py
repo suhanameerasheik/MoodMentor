@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 
 # ============================================================
@@ -16,9 +16,23 @@ DATABASE_PATH = (
     / "moodmentor_history.db"
 )
 
+DEFAULT_USER_ID = "default_user"
+
 
 # ============================================================
-# INITIALIZE FEEDBACK TABLE
+# DATABASE CONNECTION
+# ============================================================
+
+def get_connection():
+    connection = sqlite3.connect(
+        DATABASE_PATH
+    )
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+# ============================================================
+# INITIALIZE FEEDBACK DATABASE
 # ============================================================
 
 def initialize_feedback_database():
@@ -44,14 +58,12 @@ def initialize_feedback_database():
             dominant_emotion TEXT,
             intensity REAL,
             polarity TEXT,
-            user_id TEXT
+            user_id TEXT,
+            rating REAL,
+            interaction_type TEXT
         )
         """
     )
-
-    # --------------------------------------------------------
-    # Add user_id to an existing database created earlier
-    # --------------------------------------------------------
 
     cursor.execute(
         "PRAGMA table_info(recommendation_feedback)"
@@ -63,11 +75,26 @@ def initialize_feedback_database():
     ]
 
     if "user_id" not in columns:
-
         cursor.execute(
             """
             ALTER TABLE recommendation_feedback
             ADD COLUMN user_id TEXT
+            """
+        )
+
+    if "rating" not in columns:
+        cursor.execute(
+            """
+            ALTER TABLE recommendation_feedback
+            ADD COLUMN rating REAL
+            """
+        )
+
+    if "interaction_type" not in columns:
+        cursor.execute(
+            """
+            ALTER TABLE recommendation_feedback
+            ADD COLUMN interaction_type TEXT
             """
         )
 
@@ -76,14 +103,38 @@ def initialize_feedback_database():
 
 
 # ============================================================
-# SAVE FEEDBACK
+# NORMALIZE USER ID
+# ============================================================
+
+def normalize_user_id(
+    user_id: Optional[str]
+) -> str:
+
+    if user_id is None:
+        return DEFAULT_USER_ID
+
+    user_id = str(
+        user_id
+    ).strip()
+
+    return (
+        user_id
+        if user_id
+        else DEFAULT_USER_ID
+    )
+
+
+# ============================================================
+# SAVE FEEDBACK / INTERACTION
 # ============================================================
 
 def save_recommendation_feedback(
     recommendation_id: str,
     feedback: str,
     emotional_state: Dict[str, Any],
-    user_id: str = "default_user"
+    user_id: str = DEFAULT_USER_ID,
+    rating: Optional[float] = None,
+    interaction_type: Optional[str] = None
 ) -> int:
 
     initialize_feedback_database()
@@ -92,21 +143,39 @@ def save_recommendation_feedback(
         feedback
     ).lower().strip()
 
-    if feedback not in {
+    allowed_feedback = {
         "helpful",
         "not_helpful"
-    }:
+    }
+
+    if feedback not in allowed_feedback:
         raise ValueError(
             "Feedback must be 'helpful' or 'not_helpful'"
         )
 
-    user_id = str(
+    user_id = normalize_user_id(
         user_id
-    ).strip()
+    )
 
-    if not user_id:
+    if rating is not None:
+        try:
+            rating = float(rating)
+        except (TypeError, ValueError):
+            raise ValueError(
+                "Rating must be a number between 1 and 5"
+            )
 
-        user_id = "default_user"
+        if rating < 1 or rating > 5:
+            raise ValueError(
+                "Rating must be between 1 and 5"
+            )
+
+    if interaction_type:
+        interaction_type = (
+            str(interaction_type)
+            .lower()
+            .strip()
+        )
 
     connection = sqlite3.connect(
         DATABASE_PATH
@@ -123,9 +192,11 @@ def save_recommendation_feedback(
             dominant_emotion,
             intensity,
             polarity,
-            user_id
+            user_id,
+            rating,
+            interaction_type
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             datetime.now().isoformat(),
@@ -145,7 +216,9 @@ def save_recommendation_feedback(
                 "polarity",
                 "neutral"
             ),
-            user_id
+            user_id,
+            rating,
+            interaction_type
         )
     )
 
@@ -158,10 +231,66 @@ def save_recommendation_feedback(
 
 
 # ============================================================
+# SAVE RECOMMENDATION INTERACTION
+# ============================================================
+
+def save_recommendation_interaction(
+    recommendation_id: str,
+    interaction_type: str,
+    user_id: str = DEFAULT_USER_ID,
+    emotional_state: Optional[Dict[str, Any]] = None,
+    rating: Optional[float] = None
+) -> int:
+
+    interaction_type = (
+        str(interaction_type)
+        .lower()
+        .strip()
+    )
+
+    allowed_interactions = {
+        "viewed",
+        "accepted",
+        "rejected",
+        "rating",
+        "preference_changed"
+    }
+
+    if interaction_type not in allowed_interactions:
+        raise ValueError(
+            "Interaction type must be "
+            "'viewed', 'accepted', 'rejected', "
+            "'rating', or 'preference_changed'"
+        )
+
+    if emotional_state is None:
+        emotional_state = {}
+
+    feedback = (
+        "helpful"
+        if interaction_type == "accepted"
+        else "not_helpful"
+        if interaction_type == "rejected"
+        else "helpful"
+    )
+
+    return save_recommendation_feedback(
+        recommendation_id=recommendation_id,
+        feedback=feedback,
+        emotional_state=emotional_state,
+        user_id=user_id,
+        rating=rating,
+        interaction_type=interaction_type
+    )
+
+
+# ============================================================
 # GET FEEDBACK STATISTICS
 # ============================================================
 
-def get_feedback_statistics() -> Dict[str, Any]:
+def get_feedback_statistics(
+    user_id: Optional[str] = None
+) -> Dict[str, Any]:
 
     initialize_feedback_database()
 
@@ -171,29 +300,65 @@ def get_feedback_statistics() -> Dict[str, Any]:
 
     cursor = connection.cursor()
 
-    cursor.execute(
-        """
-        SELECT
-            recommendation_id,
-            COUNT(*) AS total_feedback,
-            SUM(
-                CASE
-                    WHEN feedback = 'helpful'
-                    THEN 1
-                    ELSE 0
-                END
-            ) AS helpful_count,
-            SUM(
-                CASE
-                    WHEN feedback = 'not_helpful'
-                    THEN 1
-                    ELSE 0
-                END
-            ) AS not_helpful_count
-        FROM recommendation_feedback
-        GROUP BY recommendation_id
-        """
-    )
+    if user_id:
+
+        user_id = normalize_user_id(
+            user_id
+        )
+
+        cursor.execute(
+            """
+            SELECT
+                recommendation_id,
+                COUNT(*) AS total_feedback,
+                SUM(
+                    CASE
+                        WHEN feedback = 'helpful'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS helpful_count,
+                SUM(
+                    CASE
+                        WHEN feedback = 'not_helpful'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS not_helpful_count,
+                AVG(rating) AS average_rating
+            FROM recommendation_feedback
+            WHERE user_id = ?
+            GROUP BY recommendation_id
+            """,
+            (user_id,)
+        )
+
+    else:
+
+        cursor.execute(
+            """
+            SELECT
+                recommendation_id,
+                COUNT(*) AS total_feedback,
+                SUM(
+                    CASE
+                        WHEN feedback = 'helpful'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS helpful_count,
+                SUM(
+                    CASE
+                        WHEN feedback = 'not_helpful'
+                        THEN 1
+                        ELSE 0
+                    END
+                ) AS not_helpful_count,
+                AVG(rating) AS average_rating
+            FROM recommendation_feedback
+            GROUP BY recommendation_id
+            """
+        )
 
     rows = cursor.fetchall()
 
@@ -207,6 +372,7 @@ def get_feedback_statistics() -> Dict[str, Any]:
         total = row[1] or 0
         helpful = row[2] or 0
         not_helpful = row[3] or 0
+        average_rating = row[4]
 
         helpful_rate = (
             helpful / total
@@ -221,6 +387,14 @@ def get_feedback_statistics() -> Dict[str, Any]:
             "helpful_rate": round(
                 helpful_rate,
                 4
+            ),
+            "average_rating": (
+                round(
+                    float(average_rating),
+                    2
+                )
+                if average_rating is not None
+                else None
             )
         }
 
@@ -237,11 +411,11 @@ def get_user_interactions(
 
     initialize_feedback_database()
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
+    user_id = normalize_user_id(
+        user_id
     )
 
-    connection.row_factory = sqlite3.Row
+    connection = get_connection()
 
     cursor = connection.cursor()
 
@@ -255,14 +429,14 @@ def get_user_interactions(
             dominant_emotion,
             intensity,
             polarity,
-            user_id
+            user_id,
+            rating,
+            interaction_type
         FROM recommendation_feedback
         WHERE user_id = ?
         ORDER BY id DESC
         """,
-        (
-            user_id,
-        )
+        (user_id,)
     )
 
     rows = cursor.fetchall()
@@ -283,11 +457,7 @@ def get_all_user_interactions() -> List[Dict[str, Any]]:
 
     initialize_feedback_database()
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
-    )
-
-    connection.row_factory = sqlite3.Row
+    connection = get_connection()
 
     cursor = connection.cursor()
 
@@ -301,7 +471,9 @@ def get_all_user_interactions() -> List[Dict[str, Any]]:
             dominant_emotion,
             intensity,
             polarity,
-            user_id
+            user_id,
+            rating,
+            interaction_type
         FROM recommendation_feedback
         WHERE user_id IS NOT NULL
         AND user_id != ''
@@ -324,11 +496,14 @@ def get_all_user_interactions() -> List[Dict[str, Any]]:
 # ============================================================
 
 def get_feedback_score(
-    recommendation_id: str
+    recommendation_id: str,
+    user_id: Optional[str] = None
 ) -> float:
 
     statistics = (
-        get_feedback_statistics()
+        get_feedback_statistics(
+            user_id=user_id
+        )
     )
 
     recommendation_stats = (
@@ -346,19 +521,38 @@ def get_feedback_score(
         ]
     )
 
-    # Positive feedback increases score.
+    average_rating = (
+        recommendation_stats[
+            "average_rating"
+        ]
+    )
+
+    score = 0.0
+
     if helpful_rate >= 0.70:
-        return 0.15
+        score += 0.15
 
-    # Mostly positive feedback.
-    if helpful_rate >= 0.50:
-        return 0.05
+    elif helpful_rate >= 0.50:
+        score += 0.05
 
-    # Mostly negative feedback.
-    if helpful_rate < 0.30:
-        return -0.15
+    elif helpful_rate < 0.30:
+        score -= 0.15
 
-    return 0.0
+    if average_rating is not None:
+
+        if average_rating >= 4.0:
+            score += 0.05
+
+        elif average_rating <= 2.0:
+            score -= 0.05
+
+    return max(
+        -0.20,
+        min(
+            0.20,
+            score
+        )
+    )
 
 
 # ============================================================
@@ -366,8 +560,13 @@ def get_feedback_score(
 # ============================================================
 
 def apply_feedback_learning(
-    recommendations: List[Dict[str, Any]]
+    recommendations: List[Dict[str, Any]],
+    user_id: str = DEFAULT_USER_ID
 ) -> List[Dict[str, Any]]:
+
+    user_id = normalize_user_id(
+        user_id
+    )
 
     for recommendation in recommendations:
 
@@ -377,7 +576,8 @@ def apply_feedback_learning(
 
         feedback_score = (
             get_feedback_score(
-                recommendation_id
+                recommendation_id,
+                user_id=user_id
             )
         )
 
@@ -409,6 +609,12 @@ def apply_feedback_learning(
         ] = round(
             learned_score,
             4
+        )
+
+        recommendation[
+            "feedback_learning_applied"
+        ] = (
+            feedback_score != 0.0
         )
 
     recommendations.sort(

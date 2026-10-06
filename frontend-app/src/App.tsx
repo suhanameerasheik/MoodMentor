@@ -128,6 +128,7 @@ type RecommendationResult = {
   };
 
   historical_emotional_trend?: EmotionalTrendResponse;
+
   trend_influence?: {
     enabled?: boolean;
     records_analyzed?: number;
@@ -249,6 +250,19 @@ function App() {
 
   const [recommendationLoading, setRecommendationLoading] =
     useState(false);
+
+  // ==========================================================
+  // TASK 7 - RECOMMENDATION FEEDBACK LEARNING
+  // ==========================================================
+
+  const [feedbackRatings, setFeedbackRatings] =
+    useState<Record<string, number>>({});
+
+  const [feedbackStatus, setFeedbackStatus] =
+    useState<Record<string, string>>({});
+
+  const [feedbackLoading, setFeedbackLoading] =
+    useState<Record<string, boolean>>({});
 
   // ==========================================================
   // HISTORY PANEL STATE
@@ -521,7 +535,174 @@ function App() {
   }
 
   // ==========================================================
-  // PERSONALIZED RECOMMENDATIONS
+  // TASK 7 - SAVE RECOMMENDATION FEEDBACK
+  // ==========================================================
+
+  async function submitRecommendationFeedback(
+    recommendation: Recommendation,
+    feedback: "helpful" | "not_helpful",
+    interactionType:
+      | "viewed"
+      | "accepted"
+      | "rejected"
+      | "rating"
+      | "preference_changed",
+    ratingOverride?: number
+  ) {
+    const recommendationId =
+      recommendation.id;
+
+    if (!recommendationId) {
+      setMessage(
+        "Recommendation ID is missing. Feedback cannot be saved."
+      );
+
+      return;
+    }
+
+    const rating =
+      ratingOverride !== undefined
+        ? ratingOverride
+        : feedbackRatings[
+            recommendationId
+          ];
+
+    setFeedbackLoading(
+      (previous) => ({
+        ...previous,
+        [recommendationId]: true,
+      })
+    );
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/recommendation-feedback",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            user_id: selectedUser,
+
+            recommendation_id:
+              recommendationId,
+
+            feedback: feedback,
+
+            rating:
+              rating !== undefined
+                ? rating
+                : null,
+
+            interaction_type:
+              interactionType,
+
+            emotional_state: {
+              dominant_emotion:
+                result?.emotional_state
+                  ?.dominant_emotion ||
+                result?.emotional_state
+                  ?.primary_emotion ||
+                result?.emotion?.emotion ||
+                "unknown",
+
+              intensity:
+                result?.emotional_state
+                  ?.intensity ??
+                result?.emotional_state
+                  ?.emotional_intensity ??
+                0,
+
+              polarity:
+                result?.emotional_state
+                  ?.polarity ||
+                result?.sentiment
+                  ?.sentiment ||
+                "neutral",
+            },
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        setMessage(
+          data.detail ||
+            "Could not save recommendation feedback."
+        );
+
+        return;
+      }
+
+      let statusText = "";
+
+      if (
+        interactionType ===
+        "rating"
+      ) {
+        statusText =
+          `Rated ${rating}/5`;
+      } else if (
+        interactionType ===
+        "accepted"
+      ) {
+        statusText =
+          "Accepted";
+      } else if (
+        interactionType ===
+        "rejected"
+      ) {
+        statusText =
+          "Rejected";
+      } else if (
+        interactionType ===
+        "viewed"
+      ) {
+        statusText =
+          "Viewed";
+      } else {
+        statusText =
+          "Preference updated";
+      }
+
+      setFeedbackStatus(
+        (previous) => ({
+          ...previous,
+          [recommendationId]:
+            statusText,
+        })
+      );
+
+      setMessage(
+        "✓ Recommendation feedback saved. Future rankings will learn from this interaction."
+      );
+    } catch (error) {
+      console.error(
+        "Recommendation feedback error:",
+        error
+      );
+
+      setMessage(
+        "Could not connect to the feedback service."
+      );
+    } finally {
+      setFeedbackLoading(
+        (previous) => ({
+          ...previous,
+          [recommendationId]: false,
+        })
+      );
+    }
+  }
+
+  // ==========================================================
+  // TASK 7 - PERSONALIZED RECOMMENDATIONS
   // ==========================================================
 
   async function handleRecommendations() {
@@ -543,22 +724,29 @@ function App() {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
 
           body: JSON.stringify({
             text: text,
+
             preferences:
               selectedPreferences,
+
             recommendation_history:
               recommendationHistory,
+
             top_k: 5,
-            user_id: selectedUser,
+
+            user_id:
+              selectedUser,
           }),
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
         setMessage(
@@ -580,7 +768,8 @@ function App() {
           ?.recommendations || [];
 
       if (
-        returnedRecommendations.length > 0
+        returnedRecommendations.length >
+        0
       ) {
         setRecommendationHistoryData(
           (previous) => {
@@ -595,7 +784,10 @@ function App() {
             >();
 
             combined.forEach(
-              (item, index) => {
+              (
+                item,
+                index
+              ) => {
                 const key =
                   item.id ||
                   `${item.title || "recommendation"}-${index}`;
@@ -623,7 +815,9 @@ function App() {
           )
           .filter(
             (
-              id: string | undefined
+              id:
+                | string
+                | undefined
             ): id is string =>
               Boolean(id)
           );
@@ -647,11 +841,9 @@ function App() {
 
       await loadPreviousInteractionCount();
 
-      // ========================================================
-      // TASK 6 - REFRESH TREND AFTER RECOMMENDATION
-      // ========================================================
-
-      await loadEmotionalTrend(selectedUser);
+      await loadEmotionalTrend(
+        selectedUser
+      );
 
       setMessage(
         "✓ Personalized recommendations generated successfully."
@@ -672,12 +864,17 @@ function App() {
   }
 
   // ==========================================================
-  // PREFERENCE SELECTION
+  // TASK 7 - PREFERENCE SELECTION
   // ==========================================================
 
-  function togglePreference(
+  async function togglePreference(
     preference: string
   ) {
+    const wasSelected =
+      selectedPreferences.includes(
+        preference
+      );
+
     setSelectedPreferences(
       (previous) => {
         if (
@@ -696,6 +893,27 @@ function App() {
           preference,
         ];
       }
+    );
+
+    const topRecommendation =
+      recommendations?.top_recommendation;
+
+    if (
+      topRecommendation?.id
+    ) {
+      await submitRecommendationFeedback(
+        topRecommendation,
+        "helpful",
+        "preference_changed"
+      );
+    }
+
+    console.log(
+      `Preference ${
+        wasSelected
+          ? "removed"
+          : "added"
+      }: ${preference}`
     );
   }
 
@@ -881,6 +1099,46 @@ function App() {
   }
 
   // ==========================================================
+  // TASK 7 - RECORD RECOMMENDATIONS AS VIEWED
+  // ==========================================================
+
+  useEffect(() => {
+    const items =
+      recommendations?.recommendations ||
+      [];
+
+    if (
+      items.length === 0
+    ) {
+      return;
+    }
+
+    items.forEach(
+      (recommendation) => {
+        if (
+          !recommendation.id
+        ) {
+          return;
+        }
+
+        if (
+          feedbackStatus[
+            recommendation.id
+          ]
+        ) {
+          return;
+        }
+
+        submitRecommendationFeedback(
+          recommendation,
+          "helpful",
+          "viewed"
+        );
+      }
+    );
+  }, [recommendations]);
+
+  // ==========================================================
   // HELPER FUNCTIONS
   // ==========================================================
 
@@ -923,7 +1181,8 @@ function App() {
     }
 
     if (
-      typeof value === "boolean"
+      typeof value ===
+      "boolean"
     ) {
       return value
         ? "Yes"
@@ -989,7 +1248,8 @@ function App() {
       key: "preference_score" as const,
     },
     {
-      label: "Collaborative filtering",
+      label:
+        "Collaborative filtering",
       key: "collaborative_score" as const,
     },
     {
@@ -1001,7 +1261,8 @@ function App() {
       key: "historical_behavior_score" as const,
     },
     {
-      label: "Semantic similarity",
+      label:
+        "Semantic similarity",
       key: "semantic_score" as const,
     },
   ];
@@ -1010,10 +1271,12 @@ function App() {
     emotionalTrend?.trend_analysis;
 
   const emotionFrequency =
-    trendAnalysis?.emotion_frequency || {};
+    trendAnalysis?.emotion_frequency ||
+    {};
 
   const polarityFrequency =
-    trendAnalysis?.polarity_frequency || {};
+    trendAnalysis?.polarity_frequency ||
+    {};
 
   // ==========================================================
   // UI
@@ -3870,6 +4133,172 @@ function App() {
                                     : "0.00%"}
 
                                 </span>
+
+                              </div>
+
+                              {/* ==================================================
+                                  TASK 7 - RECOMMENDATION FEEDBACK
+                                  ================================================== */}
+
+                              <div className="feedback-section">
+
+                                <div className="feedback-header">
+
+                                  <div>
+
+                                    <p className="small-label">
+                                      RECOMMENDATION FEEDBACK
+                                    </p>
+
+                                    <span>
+                                      Help improve future recommendations
+                                    </span>
+
+                                  </div>
+
+                                  {recommendation.id &&
+                                    feedbackStatus[
+                                      recommendation.id
+                                    ] && (
+
+                                    <strong className="feedback-status">
+
+                                      ✓{" "}
+                                      {
+                                        feedbackStatus[
+                                          recommendation.id
+                                        ]
+                                      }
+
+                                    </strong>
+
+                                  )}
+
+                                </div>
+
+                                <div className="feedback-actions">
+
+                                  <button
+                                    type="button"
+                                    disabled={
+                                      feedbackLoading[
+                                        recommendation.id ||
+                                          ""
+                                      ]
+                                    }
+                                    onClick={() =>
+                                      submitRecommendationFeedback(
+                                        recommendation,
+                                        "helpful",
+                                        "accepted"
+                                      )
+                                    }
+                                  >
+                                    👍 Helpful / Accept
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    disabled={
+                                      feedbackLoading[
+                                        recommendation.id ||
+                                          ""
+                                      ]
+                                    }
+                                    onClick={() =>
+                                      submitRecommendationFeedback(
+                                        recommendation,
+                                        "not_helpful",
+                                        "rejected"
+                                      )
+                                    }
+                                  >
+                                    👎 Not Helpful / Reject
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    disabled={
+                                      feedbackLoading[
+                                        recommendation.id ||
+                                          ""
+                                      ]
+                                    }
+                                    onClick={() =>
+                                      submitRecommendationFeedback(
+                                        recommendation,
+                                        "helpful",
+                                        "viewed"
+                                      )
+                                    }
+                                  >
+                                    👁️ Viewed
+                                  </button>
+
+                                </div>
+
+                                <div className="rating-section">
+
+                                  <span>
+                                    Rate this recommendation:
+                                  </span>
+
+                                  <div className="rating-buttons">
+
+                                    {[1, 2, 3, 4, 5].map(
+                                      (rating) => (
+
+                                        <button
+                                          type="button"
+                                          key={rating}
+                                          className={
+                                            feedbackRatings[
+                                              recommendation
+                                                .id || ""
+                                            ] ===
+                                            rating
+                                              ? "rating-button selected"
+                                              : "rating-button"
+                                          }
+                                          disabled={
+                                            feedbackLoading[
+                                              recommendation
+                                                .id || ""
+                                            ]
+                                          }
+                                          onClick={() => {
+
+                                            if (
+                                              recommendation.id
+                                            ) {
+                                              setFeedbackRatings(
+                                                (
+                                                  previous
+                                                ) => ({
+                                                  ...previous,
+                                                  [recommendation.id!]:
+                                                    rating,
+                                                })
+                                              );
+                                            }
+
+                                            submitRecommendationFeedback(
+                                              recommendation,
+                                              "helpful",
+                                              "rating",
+                                              rating
+                                            );
+                                          }}
+                                        >
+                                          {rating}
+                                        </button>
+
+                                      )
+                                    )}
+
+                                  </div>
+
+                                </div>
 
                               </div>
 

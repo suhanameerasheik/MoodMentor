@@ -693,13 +693,9 @@ textarea:focus {
 }
 
 /* =========================================================
-   =========================================================
    TASK 6
    EMOTIONAL TREND & USER STATE TRACKING
-   =========================================================
    ========================================================= */
-
-/* Main Task 6 card */
 
 .emotional-trend-card {
   position: relative;
@@ -773,8 +769,6 @@ textarea:focus {
   box-shadow: 0 7px 18px rgba(79, 70, 229, 0.08);
 }
 
-/* Loading state */
-
 .trend-loading {
   margin-top: 22px;
   padding: 28px;
@@ -785,8 +779,6 @@ textarea:focus {
   border: 1px dashed #cfd5e5;
   font-size: 13px;
 }
-
-/* Empty state */
 
 .trend-empty {
   margin-top: 22px;
@@ -860,8 +852,6 @@ textarea:focus {
   font-size: 11px;
   line-height: 1.45;
 }
-
-/* Trend value */
 
 .trend-value {
   color: #16a34a !important;
@@ -939,11 +929,6 @@ textarea:focus {
   font-size: 13px;
 }
 
-/*
-   The count remains clear while the row gets
-   a polished progress-track appearance.
-*/
-
 .trend-frequency-row {
   position: relative;
 }
@@ -983,8 +968,6 @@ textarea:focus {
   color: #344054;
   font-size: 13px;
 }
-
-/* Color positive / negative rows based on order */
 
 .polarity-trend-row:nth-child(1) strong {
   color: #16a34a;
@@ -2079,6 +2062,219 @@ textarea:focus {
 }
 
 /* =========================================================
+   TASK 7
+   RECOMMENDATION FEEDBACK LEARNING
+   ========================================================= */
+
+.feedback-section {
+  position: relative;
+  margin-top: 17px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid #d9def5;
+  background:
+    linear-gradient(
+      135deg,
+      #f8f9ff 0%,
+      #ffffff 72%
+    );
+  box-shadow: 0 7px 20px rgba(79, 70, 229, 0.055);
+}
+
+.feedback-section::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 16px 0 0 16px;
+  background: #6366f1;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 13px;
+}
+
+.feedback-header > div:first-child {
+  min-width: 0;
+}
+
+.feedback-header .small-label {
+  color: #6366f1;
+}
+
+.feedback-header h6 {
+  margin-top: 3px;
+  color: #344054;
+  font-size: 14px;
+}
+
+.feedback-header span {
+  color: #667085;
+  font-size: 11px;
+}
+
+.feedback-status {
+  flex-shrink: 0;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #15803d !important;
+  border: 1px solid #bbf7d0;
+  font-size: 10px !important;
+  font-weight: 800;
+}
+
+.feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feedback-actions button,
+.rating-button {
+  border: 1px solid #d7dce7;
+  background: #ffffff;
+  color: #475467;
+  border-radius: 9px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.feedback-actions button:hover:not(:disabled),
+.rating-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #a5b4fc;
+  background: #f8f9ff;
+  color: #4f46e5;
+  box-shadow: 0 5px 12px rgba(79, 70, 229, 0.08);
+}
+
+.feedback-actions button:active:not(:disabled),
+.rating-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.feedback-actions button:disabled,
+.rating-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.feedback-actions button:first-child {
+  border-color: #bbf7d0;
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.feedback-actions button:first-child:hover:not(:disabled) {
+  border-color: #86efac;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.feedback-actions button:nth-child(2) {
+  border-color: #fecaca;
+  color: #b91c1c;
+  background: #fff7f7;
+}
+
+.feedback-actions button:nth-child(2):hover:not(:disabled) {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.feedback-actions button:nth-child(3) {
+  border-color: #dbe3f2;
+  color: #475467;
+  background: #f8fafc;
+}
+
+.feedback-actions button:nth-child(3):hover:not(:disabled) {
+  border-color: #c7d2fe;
+  color: #4f46e5;
+  background: #eef2ff;
+}
+
+/* Rating area */
+
+.rating-section {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid #e8eaf2;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-wrap: wrap;
+}
+
+.rating-section > span {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rating-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rating-button {
+  min-width: 34px;
+  height: 32px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.rating-button.selected {
+  border-color: #4f46e5;
+  background: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 5px 12px rgba(79, 70, 229, 0.18);
+}
+
+.rating-button.selected:hover:not(:disabled) {
+  border-color: #4338ca;
+  background: #4338ca;
+  color: #ffffff;
+}
+
+/* =========================================================
+   TASK 7 FEEDBACK LEARNING INDICATOR
+   ========================================================= */
+
+.feedback-learning-note {
+  margin-top: 12px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: #f5f7ff;
+  border: 1px solid #e1e5ff;
+  color: #667085;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.feedback-learning-note strong {
+  color: #4f46e5;
+}
+
+/* =========================================================
    WELLNESS RESULT
    ========================================================= */
 
@@ -2362,8 +2558,6 @@ footer span:first-child {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* TASK 6 */
-
   .trend-summary-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2384,6 +2578,16 @@ footer span:first-child {
 
   .personalization-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* TASK 7 */
+
+  .feedback-section {
+    padding: 16px;
+  }
+
+  .feedback-header {
+    align-items: flex-start;
   }
 }
 
@@ -2679,5 +2883,57 @@ footer span:first-child {
 
   .wellness-result {
     align-items: flex-start;
+  }
+
+  /* =======================================================
+     TASK 7 MOBILE
+     ======================================================= */
+
+  .feedback-section {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .feedback-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 11px;
+  }
+
+  .feedback-status {
+    align-self: flex-start;
+  }
+
+  .feedback-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .feedback-actions button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .rating-section {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rating-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .rating-button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .feedback-learning-note {
+    font-size: 9px;
   }
 }

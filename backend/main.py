@@ -66,6 +66,10 @@ def home():
     }
 
 
+# ============================================================
+# ANALYSIS
+# ============================================================
+
 def run_analysis(text):
 
     if not text or not text.strip():
@@ -120,6 +124,10 @@ def run_analysis(text):
     }
 
 
+# ============================================================
+# SAVE ANALYSIS HISTORY
+# ============================================================
+
 def save_analysis_history(
     analysis_result,
     user_id="default_user"
@@ -145,6 +153,10 @@ def save_analysis_history(
         user_id=user_id
     )
 
+
+# ============================================================
+# ANALYZE TEXT
+# ============================================================
 
 @app.post("/analyze")
 def analyze(data: dict):
@@ -191,6 +203,11 @@ def analyze(data: dict):
     }
 
 
+# ============================================================
+# PERSONALIZED RECOMMENDATIONS
+# TASK 3 + TASK 4 + TASK 5 + TASK 6 + TASK 7
+# ============================================================
+
 @app.post("/recommend")
 def recommend(data: dict):
 
@@ -215,7 +232,7 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------
-    # TASK 3D + TASK 6: User identity
+    # USER ID
     # --------------------------------------------------
 
     user_id = normalize_user_id(
@@ -226,6 +243,8 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------
+    # Validate preferences
+    # --------------------------------------------------
 
     if not isinstance(
         preferences,
@@ -233,11 +252,19 @@ def recommend(data: dict):
     ):
         preferences = []
 
+    # --------------------------------------------------
+    # Validate recommendation history
+    # --------------------------------------------------
+
     if not isinstance(
         recommendation_history,
         list
     ):
         recommendation_history = []
+
+    # --------------------------------------------------
+    # Validate top_k
+    # --------------------------------------------------
 
     try:
 
@@ -274,9 +301,6 @@ def recommend(data: dict):
     #
     # Read historical emotional state BEFORE saving
     # the current record.
-    #
-    # This prevents the current message from influencing
-    # its own historical trend.
     # --------------------------------------------------
 
     historical_emotional_context = (
@@ -312,10 +336,12 @@ def recommend(data: dict):
     # --------------------------------------------------
     # Generate recommendations
     #
-    # Existing hybrid + semantic + collaborative
-    # recommendation logic is preserved.
+    # Existing hybrid + semantic +
+    # collaborative recommendation logic
+    # is preserved.
     #
-    # Task 6 historical emotional context is added.
+    # Task 6 historical emotional context
+    # is passed into the recommendation engine.
     # --------------------------------------------------
 
     recommendation_result = (
@@ -339,14 +365,12 @@ def recommend(data: dict):
     )
 
     # --------------------------------------------------
-    # M3-T4 + M3-T6 + M3-T7
+    # TASK 6
     #
-    # Preserve the original hybrid score.
+    # Apply emotional trend adjustment
+    # before feedback learning.
     #
-    # Task 6 adds a small historical emotional trend
-    # adjustment BEFORE feedback learning.
-    #
-    # Feedback learning then calculates learned_score.
+    # Original hybrid score is preserved.
     # --------------------------------------------------
 
     for recommendation in recommendations:
@@ -382,7 +406,7 @@ def recommend(data: dict):
             4
         )
 
-        # Store Task 6 adjusted score.
+        # Preserve Task 6 adjusted score.
         recommendation[
             "trend_adjusted_score"
         ] = round(
@@ -390,8 +414,8 @@ def recommend(data: dict):
             4
         )
 
-        # This score becomes the input to
-        # feedback learning.
+        # This becomes the input to
+        # Task 7 feedback learning.
         recommendation[
             "score"
         ] = round(
@@ -399,22 +423,24 @@ def recommend(data: dict):
             4
         )
 
+    # --------------------------------------------------
+    # TASK 7
+    #
+    # Apply user-specific feedback learning.
+    #
+    # Feedback from one user must not affect
+    # another user's recommendations.
+    # --------------------------------------------------
+
     recommendations = (
         apply_feedback_learning(
-            recommendations
+            recommendations,
+            user_id=user_id
         )
     )
 
     # --------------------------------------------------
-    # Final ranking after feedback learning
-    #
-    # learned_score is now the final recommendation score.
-    #
-    # This preserves feedback learning while ensuring:
-    #
-    # rank 1 = highest final score
-    # rank 2 = second highest final score
-    # etc.
+    # FINAL RANKING AFTER FEEDBACK LEARNING
     # --------------------------------------------------
 
     for recommendation in recommendations:
@@ -437,8 +463,9 @@ def recommend(data: dict):
             4
         )
 
-        # Keep explanation's final score synchronized
-        # with the actual final recommendation score.
+        # Keep explanation's final score
+        # synchronized with actual score.
+
         if recommendation.get(
             "explanation"
         ):
@@ -458,6 +485,10 @@ def recommend(data: dict):
                 ],
                 4
             )
+
+    # --------------------------------------------------
+    # Final sorting
+    # --------------------------------------------------
 
     recommendations.sort(
         key=lambda item: (
@@ -485,6 +516,10 @@ def recommend(data: dict):
         reverse=True
     )
 
+    # --------------------------------------------------
+    # Reassign ranks
+    # --------------------------------------------------
+
     for index, recommendation in enumerate(
         recommendations,
         start=1
@@ -493,6 +528,10 @@ def recommend(data: dict):
         recommendation[
             "rank"
         ] = index
+
+    # --------------------------------------------------
+    # Update recommendation result
+    # --------------------------------------------------
 
     recommendation_result[
         "recommendations"
@@ -517,6 +556,10 @@ def recommend(data: dict):
         "method"
     ] = "hybrid_semantic_feedback"
 
+    # --------------------------------------------------
+    # Components
+    # --------------------------------------------------
+
     if "components" not in recommendation_result:
 
         recommendation_result[
@@ -539,9 +582,7 @@ def recommend(data: dict):
     # --------------------------------------------------
     # TASK 6
     #
-    # Return the historical trend summary without
-    # dumping the complete history into every
-    # recommendation response.
+    # Return historical trend summary.
     # --------------------------------------------------
 
     recommendation_result[
@@ -594,7 +635,7 @@ def recommend(data: dict):
     }
 
     # --------------------------------------------------
-    # Save actual recommendation interaction
+    # Save recommendation interaction history
     # --------------------------------------------------
 
     save_recommendation_interaction(
@@ -623,9 +664,9 @@ def recommend(data: dict):
     }
 
 
-# ------------------------------------------------------
-# Previous Recommendation Interactions API
-# ------------------------------------------------------
+# ============================================================
+# PREVIOUS RECOMMENDATION INTERACTIONS
+# ============================================================
 
 @app.get("/previous-interactions")
 def previous_interactions(
@@ -665,6 +706,11 @@ def previous_interactions(
     }
 
 
+# ============================================================
+# TASK 7
+# RECOMMENDATION FEEDBACK
+# ============================================================
+
 @app.post("/recommendation-feedback")
 def recommendation_feedback(
     data: dict
@@ -692,6 +738,31 @@ def recommendation_feedback(
         )
     )
 
+    # --------------------------------------------------
+    # Optional rating
+    # --------------------------------------------------
+
+    rating = data.get(
+        "rating",
+        None
+    )
+
+    # --------------------------------------------------
+    # Optional interaction type
+    #
+    # Supported:
+    # viewed
+    # accepted
+    # rejected
+    # rating
+    # preference_changed
+    # --------------------------------------------------
+
+    interaction_type = data.get(
+        "interaction_type",
+        None
+    )
+
     if not recommendation_id:
 
         raise HTTPException(
@@ -708,7 +779,10 @@ def recommendation_feedback(
                 feedback=feedback,
                 emotional_state=
                     emotional_state,
-                user_id=user_id
+                user_id=user_id,
+                rating=rating,
+                interaction_type=
+                    interaction_type
             )
         )
 
@@ -729,30 +803,52 @@ def recommendation_feedback(
             recommendation_id,
         "feedback":
             feedback,
+        "rating":
+            rating,
+        "interaction_type":
+            interaction_type,
         "user_id":
             user_id
     }
 
 
+# ============================================================
+# TASK 7
+# FEEDBACK STATISTICS
+# ============================================================
+
 @app.get("/recommendation-feedback")
-def recommendation_feedback_stats():
+def recommendation_feedback_stats(
+    user_id: str = None
+):
+
+    if user_id:
+
+        user_id = normalize_user_id(
+            user_id
+        )
 
     statistics = (
-        get_feedback_statistics()
+        get_feedback_statistics(
+            user_id=user_id
+        )
     )
 
     return {
         "status": "success",
         "message":
             "Recommendation feedback statistics retrieved successfully",
+        "user_id":
+            user_id,
         "statistics":
             statistics
     }
 
 
-# ------------------------------------------------------
-# Emotional Trend & User State Tracking
-# ------------------------------------------------------
+# ============================================================
+# TASK 6
+# EMOTIONAL TREND & USER STATE TRACKING
+# ============================================================
 
 @app.get("/emotional-trend")
 def emotional_trend(
@@ -793,9 +889,9 @@ def emotional_trend(
     }
 
 
-# ------------------------------------------------------
-# File Analysis
-# ------------------------------------------------------
+# ============================================================
+# FILE ANALYSIS
+# ============================================================
 
 @app.post("/analyze-file")
 async def analyze_file(
@@ -833,6 +929,10 @@ async def analyze_file(
             status_code=400,
             detail="The uploaded file must use UTF-8 text encoding"
         )
+
+    # --------------------------------------------------
+    # CSV
+    # --------------------------------------------------
 
     if filename.endswith(".csv"):
 
@@ -875,6 +975,7 @@ async def analyze_file(
                     )
 
         except HTTPException:
+
             raise
 
         except Exception:
@@ -888,6 +989,10 @@ async def analyze_file(
             lines
         )
 
+    # --------------------------------------------------
+    # Validate uploaded text
+    # --------------------------------------------------
+
     if not text.strip():
 
         raise HTTPException(
@@ -895,9 +1000,17 @@ async def analyze_file(
             detail="Uploaded file contains no valid text"
         )
 
+    # --------------------------------------------------
+    # Analyze
+    # --------------------------------------------------
+
     analysis_result = run_analysis(
         text
     )
+
+    # --------------------------------------------------
+    # Save user-specific history
+    # --------------------------------------------------
 
     record_id = save_analysis_history(
         analysis_result,
