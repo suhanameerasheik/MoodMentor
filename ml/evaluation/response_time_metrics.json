@@ -1,0 +1,52 @@
+{
+  "metric": "recommendation_response_time",
+  "test_cases": 10,
+  "average_seconds": 1.6098,
+  "minimum_seconds": 0.119,
+  "maximum_seconds": 14.7137,
+  "cold_start_seconds": 14.7137,
+  "warm_average_seconds": 0.1538,
+  "p95_seconds": 8.178,
+  "per_test_case": [
+    {
+      "test_id": "T01",
+      "response_time_seconds": 14.7137
+    },
+    {
+      "test_id": "T02",
+      "response_time_seconds": 0.1349
+    },
+    {
+      "test_id": "T03",
+      "response_time_seconds": 0.119
+    },
+    {
+      "test_id": "T04",
+      "response_time_seconds": 0.1397
+    },
+    {
+      "test_id": "T05",
+      "response_time_seconds": 0.1595
+    },
+    {
+      "test_id": "T06",
+      "response_time_seconds": 0.1598
+    },
+    {
+      "test_id": "T07",
+      "response_time_seconds": 0.1455
+    },
+    {
+      "test_id": "T08",
+      "response_time_seconds": 0.1878
+    },
+    {
+      "test_id": "T09",
+      "response_time_seconds": 0.148
+    },
+    {
+      "test_id": "T10",
+      "response_time_seconds": 0.1899
+    }
+  ]
+}
