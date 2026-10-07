@@ -1,0 +1,30 @@
+{
+  "precision_at_3": {
+    "baseline": 0.6333,
+    "advanced": 0.5667
+  },
+  "recall_at_3": {
+    "baseline": 0.6667,
+    "advanced": 0.6
+  },
+  "f1": {
+    "baseline": 0.6467,
+    "advanced": 0.58
+  },
+  "mrr": {
+    "baseline": 1.0,
+    "advanced": 0.9333
+  },
+  "ndcg_at_3": {
+    "baseline": 0.6755,
+    "advanced": 0.6995
+  },
+  "diversity": {
+    "baseline_unique_items": 9,
+    "advanced_unique_items": 12,
+    "advanced_catalog_coverage_percent": 100.0
+  },
+  "advanced_wins": 1,
+  "baseline_wins": 4,
+  "current_conclusion": "Advanced ML improves ranking quality and recommendation diversity, but does not yet outperform the baseline on all recommendation quality metrics. Poor-performing cases should be improved and retested in Task 9.10."
+}

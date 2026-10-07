@@ -1,0 +1,11 @@
+test_id,text,dominant_emotion,intensity,polarity,preferences,expected_recommendations
+T01,"I am extremely scared and stressed about my work deadline",fear,0.90,negative,"breathing;relaxation;stress","breathing_01;relax_01;social_01"
+T02,"I am angry and frustrated because my workload is too much",anger,0.85,negative,"walking;productivity;stress","walk_01;planning_01;focus_01"
+T03,"I feel sad and emotionally drained after a difficult day",sadness,0.70,negative,"journaling;relaxation;reflection","journaling_01;relax_01;music_01"
+T04,"I am feeling anxious and need something calming before my next meeting",fear,0.65,negative,"breathing;mindfulness;calm","breathing_01;mindfulness_01;music_01"
+T05,"I am overwhelmed by work and cannot concentrate",fear,0.80,negative,"focus;productivity;planning","focus_01;planning_01;breathing_01"
+T06,"I feel very angry and need to calm down",anger,0.90,negative,"breathing;relaxation;walking","breathing_01;relax_01;walk_01"
+T07,"I had a difficult day and want to write about what is bothering me",sadness,0.60,negative,"journaling;reflection;mental-health","journaling_01;music_01;mindfulness_01"
+T08,"I am happy because I completed an important task today",joy,0.85,positive,"gratitude;positive;motivation","celebrate_01;gratitude_01"
+T09,"I feel nervous and isolated and would like to talk to someone",fear,0.75,negative,"social-support;communication;support","social_01;breathing_01;mindfulness_01"
+T10,"My workload is stressful and I need to organize my tasks",fear,0.70,negative,"planning;workload;productivity","planning_01;focus_01;breathing_01"

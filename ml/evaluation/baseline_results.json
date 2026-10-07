@@ -1,0 +1,213 @@
+{
+  "method": "baseline_keyword_matching",
+  "test_cases": 10,
+  "k": 3,
+  "macro_precision_at_3": 0.6333,
+  "macro_recall_at_3": 0.6667,
+  "macro_f1": 0.6467,
+  "mean_mrr": 1.0,
+  "mean_ndcg_at_3": 0.6755,
+  "average_response_time_seconds": 3.9e-05,
+  "unique_recommendations_used": 9,
+  "per_test_case": [
+    {
+      "test_id": "T01",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0,
+      "f1": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_3": 1.0,
+      "response_time": 4e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T02",
+      "expected": [
+        "walk_01",
+        "planning_01",
+        "focus_01"
+      ],
+      "recommended": [
+        "walk_01",
+        "relax_01",
+        "breathing_01"
+      ],
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1": 0.3333,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.63,
+      "response_time": 4.7e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T03",
+      "expected": [
+        "journaling_01",
+        "relax_01",
+        "music_01"
+      ],
+      "recommended": [
+        "music_01",
+        "journaling_01",
+        "mindfulness_01"
+      ],
+      "precision_at_3": 0.6667,
+      "recall_at_3": 0.6667,
+      "f1": 0.6667,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.6075,
+      "response_time": 2.8e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T04",
+      "expected": [
+        "breathing_01",
+        "mindfulness_01",
+        "music_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1": 0.3333,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.63,
+      "response_time": 4.3e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T05",
+      "expected": [
+        "focus_01",
+        "planning_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1": 0.3333,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.21,
+      "response_time": 3.8e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T06",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "recommended": [
+        "walk_01",
+        "relax_01",
+        "breathing_01"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0,
+      "f1": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.79,
+      "response_time": 3.3e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T07",
+      "expected": [
+        "journaling_01",
+        "music_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "music_01",
+        "journaling_01",
+        "mindfulness_01"
+      ],
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0,
+      "f1": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.9225,
+      "response_time": 5.4e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T08",
+      "expected": [
+        "celebrate_01",
+        "gratitude_01"
+      ],
+      "recommended": [
+        "gratitude_01",
+        "celebrate_01",
+        "breathing_01"
+      ],
+      "precision_at_3": 0.6667,
+      "recall_at_3": 1.0,
+      "f1": 0.8,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.8597,
+      "response_time": 4.8e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T09",
+      "expected": [
+        "social_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "social_01",
+        "breathing_01",
+        "relax_01"
+      ],
+      "precision_at_3": 0.6667,
+      "recall_at_3": 0.6667,
+      "f1": 0.6667,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.895,
+      "response_time": 3.3e-05,
+      "unique_recommendations": 3
+    },
+    {
+      "test_id": "T10",
+      "expected": [
+        "planning_01",
+        "focus_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1": 0.3333,
+      "mrr": 1.0,
+      "ndcg_at_3": 0.21,
+      "response_time": 3e-05,
+      "unique_recommendations": 3
+    }
+  ]
+}
