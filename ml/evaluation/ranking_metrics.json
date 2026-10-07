@@ -1,0 +1,157 @@
+{
+  "k": 3,
+  "test_cases": 10,
+  "mean_reciprocal_rank": 0.9333,
+  "mean_ndcg_at_3": 0.6995,
+  "per_test_case": [
+    {
+      "test_id": "T01",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.895
+    },
+    {
+      "test_id": "T02",
+      "expected": [
+        "walk_01",
+        "planning_01",
+        "focus_01"
+      ],
+      "recommended": [
+        "walk_01",
+        "focus_01",
+        "planning_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.9725
+    },
+    {
+      "test_id": "T03",
+      "expected": [
+        "journaling_01",
+        "relax_01",
+        "music_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "relax_01",
+        "mindfulness_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.895
+    },
+    {
+      "test_id": "T04",
+      "expected": [
+        "breathing_01",
+        "mindfulness_01",
+        "music_01"
+      ],
+      "recommended": [
+        "music_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.8175
+    },
+    {
+      "test_id": "T05",
+      "expected": [
+        "focus_01",
+        "planning_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "mindfulness_01",
+        "walk_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.42
+    },
+    {
+      "test_id": "T06",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "recommended": [
+        "break_01",
+        "music_01",
+        "walk_01"
+      ],
+      "mrr": 0.3333,
+      "ndcg_at_3": 0.105
+    },
+    {
+      "test_id": "T07",
+      "expected": [
+        "journaling_01",
+        "music_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "gratitude_01",
+        "break_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.63
+    },
+    {
+      "test_id": "T08",
+      "expected": [
+        "celebrate_01",
+        "gratitude_01"
+      ],
+      "recommended": [
+        "celebrate_01",
+        "gratitude_01",
+        "planning_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 1.0
+    },
+    {
+      "test_id": "T09",
+      "expected": [
+        "social_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "social_01",
+        "break_01",
+        "music_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.63
+    },
+    {
+      "test_id": "T10",
+      "expected": [
+        "planning_01",
+        "focus_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "walk_01",
+        "break_01"
+      ],
+      "mrr": 1.0,
+      "ndcg_at_3": 0.63
+    }
+  ]
+}
