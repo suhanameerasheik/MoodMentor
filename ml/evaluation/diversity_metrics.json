@@ -1,0 +1,137 @@
+{
+  "metric": "recommendation_diversity",
+  "test_cases": 10,
+  "top_k": 3,
+  "catalog_size": 12,
+  "unique_recommendations_used": 12,
+  "catalog_coverage_percent": 100.0,
+  "average_unique_per_test": 3.0,
+  "average_top_k_diversity_percent": 100.0,
+  "unused_catalog_items": [],
+  "recommendations_used": [
+    "break_01",
+    "breathing_01",
+    "celebrate_01",
+    "focus_01",
+    "gratitude_01",
+    "journaling_01",
+    "mindfulness_01",
+    "music_01",
+    "planning_01",
+    "relax_01",
+    "social_01",
+    "walk_01"
+  ],
+  "per_test_case": [
+    {
+      "test_id": "T01",
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T02",
+      "recommended": [
+        "walk_01",
+        "focus_01",
+        "planning_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T03",
+      "recommended": [
+        "journaling_01",
+        "relax_01",
+        "mindfulness_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T04",
+      "recommended": [
+        "music_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T05",
+      "recommended": [
+        "planning_01",
+        "mindfulness_01",
+        "walk_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T06",
+      "recommended": [
+        "break_01",
+        "music_01",
+        "walk_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T07",
+      "recommended": [
+        "journaling_01",
+        "gratitude_01",
+        "break_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T08",
+      "recommended": [
+        "celebrate_01",
+        "gratitude_01",
+        "planning_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T09",
+      "recommended": [
+        "social_01",
+        "break_01",
+        "music_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    },
+    {
+      "test_id": "T10",
+      "recommended": [
+        "planning_01",
+        "walk_01",
+        "break_01"
+      ],
+      "unique_recommendations": 3,
+      "top_k": 3,
+      "diversity_ratio": 1.0
+    }
+  ]
+}
