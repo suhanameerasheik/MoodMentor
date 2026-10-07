@@ -1,0 +1,178 @@
+{
+  "k": 3,
+  "test_cases": 10,
+  "macro_precision_at_3": 0.5667,
+  "macro_recall_at_3": 0.6,
+  "macro_f1_score": 0.58,
+  "per_test_case": [
+    {
+      "test_id": "T01",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "relevant_count": 2,
+      "precision_at_3": 0.6667,
+      "recall_at_3": 0.6667,
+      "f1_score": 0.6667
+    },
+    {
+      "test_id": "T02",
+      "expected": [
+        "walk_01",
+        "planning_01",
+        "focus_01"
+      ],
+      "recommended": [
+        "walk_01",
+        "focus_01",
+        "planning_01"
+      ],
+      "relevant_count": 3,
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0,
+      "f1_score": 1.0
+    },
+    {
+      "test_id": "T03",
+      "expected": [
+        "journaling_01",
+        "relax_01",
+        "music_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "relax_01",
+        "mindfulness_01"
+      ],
+      "relevant_count": 2,
+      "precision_at_3": 0.6667,
+      "recall_at_3": 0.6667,
+      "f1_score": 0.6667
+    },
+    {
+      "test_id": "T04",
+      "expected": [
+        "breathing_01",
+        "mindfulness_01",
+        "music_01"
+      ],
+      "recommended": [
+        "music_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "relevant_count": 3,
+      "precision_at_3": 1.0,
+      "recall_at_3": 1.0,
+      "f1_score": 1.0
+    },
+    {
+      "test_id": "T05",
+      "expected": [
+        "focus_01",
+        "planning_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "mindfulness_01",
+        "walk_01"
+      ],
+      "relevant_count": 1,
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1_score": 0.3333
+    },
+    {
+      "test_id": "T06",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "recommended": [
+        "break_01",
+        "music_01",
+        "walk_01"
+      ],
+      "relevant_count": 1,
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1_score": 0.3333
+    },
+    {
+      "test_id": "T07",
+      "expected": [
+        "journaling_01",
+        "music_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "gratitude_01",
+        "break_01"
+      ],
+      "relevant_count": 1,
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1_score": 0.3333
+    },
+    {
+      "test_id": "T08",
+      "expected": [
+        "celebrate_01",
+        "gratitude_01"
+      ],
+      "recommended": [
+        "celebrate_01",
+        "gratitude_01",
+        "planning_01"
+      ],
+      "relevant_count": 2,
+      "precision_at_3": 0.6667,
+      "recall_at_3": 1.0,
+      "f1_score": 0.8
+    },
+    {
+      "test_id": "T09",
+      "expected": [
+        "social_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "social_01",
+        "break_01",
+        "music_01"
+      ],
+      "relevant_count": 1,
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1_score": 0.3333
+    },
+    {
+      "test_id": "T10",
+      "expected": [
+        "planning_01",
+        "focus_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "walk_01",
+        "break_01"
+      ],
+      "relevant_count": 1,
+      "precision_at_3": 0.3333,
+      "recall_at_3": 0.3333,
+      "f1_score": 0.3333
+    }
+  ]
+}
