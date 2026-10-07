@@ -243,6 +243,175 @@ def emotion_match(
 
 
 # ============================================================
+# PREFERENCE ALIASES
+#
+# Task 9.10:
+# Allows related user preference terms to match the
+# appropriate wellness content tags.
+# ============================================================
+
+PREFERENCE_ALIASES = {
+    "breathing": {
+        "breathing",
+        "stress",
+        "calm"
+    },
+
+    "stress": {
+        "stress",
+        "calm",
+        "relaxation",
+        "breathing"
+    },
+
+    "calm": {
+        "calm",
+        "relaxation",
+        "breathing",
+        "stress"
+    },
+
+    "relaxation": {
+        "relaxation",
+        "stress",
+        "calm",
+        "rest"
+    },
+
+    "mindfulness": {
+        "mindfulness",
+        "relaxation",
+        "focus"
+    },
+
+    "focus": {
+        "focus",
+        "productivity",
+        "work"
+    },
+
+    "productivity": {
+        "productivity",
+        "focus",
+        "work",
+        "planning",
+        "workload"
+    },
+
+    "work": {
+        "work",
+        "productivity",
+        "focus",
+        "planning",
+        "workload"
+    },
+
+    "planning": {
+        "planning",
+        "workload",
+        "productivity"
+    },
+
+    "workload": {
+        "workload",
+        "planning",
+        "productivity",
+        "focus"
+    },
+
+    "walking": {
+        "walking",
+        "exercise",
+        "stress"
+    },
+
+    "exercise": {
+        "exercise",
+        "walking",
+        "stress"
+    },
+
+    "social": {
+        "social-support",
+        "communication",
+        "support"
+    },
+
+    "social-support": {
+        "social-support",
+        "communication",
+        "support"
+    },
+
+    "communication": {
+        "communication",
+        "social-support",
+        "support"
+    },
+
+    "support": {
+        "support",
+        "social-support",
+        "communication"
+    },
+
+    "journaling": {
+        "journaling",
+        "reflection",
+        "mental-health"
+    },
+
+    "reflection": {
+        "reflection",
+        "journaling",
+        "mental-health"
+    },
+
+    "mental-health": {
+        "mental-health",
+        "journaling",
+        "reflection"
+    },
+
+    "music": {
+        "music",
+        "relaxation",
+        "calm"
+    },
+
+    "break": {
+        "break",
+        "rest",
+        "relaxation"
+    },
+
+    "rest": {
+        "rest",
+        "break",
+        "relaxation"
+    },
+
+    "gratitude": {
+        "gratitude",
+        "positive",
+        "reflection"
+    },
+
+    "positive": {
+        "positive",
+        "gratitude",
+        "motivation"
+    },
+
+    "motivation": {
+        "motivation",
+        "positive",
+        "joy"
+    }
+}
+
+
+# ============================================================
 # PREFERENCE MATCHING
 # ============================================================
 
@@ -254,24 +423,65 @@ def preference_match(
     if not preferences:
         return 0.0
 
-    user_preferences = {
-        str(preference).lower()
+    normalized_preferences = {
+        str(preference).lower().strip()
         for preference in preferences
+        if str(preference).strip()
     }
 
-    matching_tags = [
-        tag
+    normalized_tags = {
+        str(tag).lower().strip()
         for tag in content_tags
-        if tag.lower() in user_preferences
-    ]
+        if str(tag).strip()
+    }
 
-    if not matching_tags:
+    if not normalized_preferences or not normalized_tags:
         return 0.0
 
-    return min(
-        len(matching_tags)
-        / len(user_preferences),
-        1.0
+    preference_scores = []
+
+    for preference in normalized_preferences:
+
+        # ----------------------------------------------------
+        # Exact match = strongest signal
+        # ----------------------------------------------------
+
+        if preference in normalized_tags:
+            preference_scores.append(1.0)
+            continue
+
+        # ----------------------------------------------------
+        # Related/alias match = weaker signal
+        # ----------------------------------------------------
+
+        aliases = PREFERENCE_ALIASES.get(
+            preference,
+            {preference}
+        )
+
+        alias_matches = (
+            aliases
+            &
+            normalized_tags
+        )
+
+        if alias_matches:
+            preference_scores.append(0.40)
+
+        else:
+            preference_scores.append(0.0)
+
+    if not preference_scores:
+        return 0.0
+
+    return round(
+        min(
+            sum(preference_scores)
+            /
+            len(preference_scores),
+            1.0
+        ),
+        4
     )
 
 
@@ -299,7 +509,150 @@ def history_score(
 
     return -0.15
 
+# ============================================================
+# TASK 9.10 — USER INTENT MATCHING
+# ============================================================
 
+def calculate_intent_score(
+    text: str,
+    content: Dict[str, Any]
+) -> float:
+
+    if not text or not text.strip():
+        return 0.0
+
+    text_lower = text.lower()
+
+    tags = {
+        str(tag).lower().strip()
+        for tag in content.get("tags", [])
+    }
+
+    intent_score = 0.0
+
+    # Focus / concentration intent
+    if any(
+        phrase in text_lower
+        for phrase in [
+            "cannot concentrate",
+            "can't concentrate",
+            "cannot focus",
+            "can't focus",
+            "hard to concentrate",
+            "hard to focus"
+        ]
+    ):
+        if tags & {
+            "focus",
+            "productivity",
+            "work"
+        }:
+            intent_score = max(
+                intent_score,
+                1.0
+            )
+
+    # Planning / workload intent
+    if any(
+        phrase in text_lower
+        for phrase in [
+            "workload",
+            "organize my tasks",
+            "organize tasks",
+            "plan my tasks",
+            "too much work",
+            "work deadline"
+        ]
+    ):
+        if tags & {
+            "planning",
+            "workload",
+            "productivity"
+        }:
+            intent_score = max(
+                intent_score,
+                1.0
+            )
+
+        # Workload/task organization can also indicate
+        # a need for concentration and task focus.
+        if tags & {
+            "focus",
+            "work"
+        }:
+            intent_score = max(
+                intent_score,
+                0.6
+            )
+
+    # Journaling / reflection intent
+    if any(
+        phrase in text_lower
+        for phrase in [
+            "write about",
+            "write down",
+            "what is bothering me",
+            "my thoughts",
+            "want to write"
+        ]
+    ):
+        if tags & {
+            "journaling",
+            "reflection",
+            "mental-health"
+        }:
+            intent_score = max(
+                intent_score,
+                1.0
+            )
+
+    # Social support intent
+    if any(
+        phrase in text_lower
+        for phrase in [
+            "isolated",
+            "feel alone",
+            "talk to someone",
+            "talk to somebody",
+            "someone to talk"
+        ]
+    ):
+        if tags & {
+            "social-support",
+            "communication",
+            "support"
+        }:
+            intent_score = max(
+                intent_score,
+                1.0
+            )
+
+    # Calming intent
+    if any(
+        phrase in text_lower
+        for phrase in [
+            "calm down",
+            "need something calming",
+            "reduce stress",
+            "relax",
+            "breathing"
+        ]
+    ):
+        if tags & {
+            "breathing",
+            "relaxation",
+            "calm",
+            "stress"
+        }:
+            intent_score = max(
+                intent_score,
+                0.8
+            )
+
+    return round(
+        intent_score,
+        4
+    )
 # ============================================================
 # RULE-BASED SCORE
 # ============================================================
@@ -308,7 +661,8 @@ def calculate_rule_score(
     content: Dict[str, Any],
     dominant_emotion: str,
     intensity: float,
-    polarity: str
+    polarity: str,
+    text: str = ""
 ) -> float:
 
     score = 0.0
@@ -326,11 +680,26 @@ def calculate_rule_score(
     if content["polarity"] == polarity:
         score += 0.20
 
-    return round(
-        score,
-        4
+    # --------------------------------------------------------
+    # TASK 9.10 — INTENT-AWARE ADJUSTMENT
+    # --------------------------------------------------------
+
+    intent_score = calculate_intent_score(
+        text=text,
+        content=content
     )
 
+    score += (
+        intent_score * 0.80
+    )
+
+    return round(
+        min(
+            score,
+            1.0
+        ),
+        4
+    )
 
 # ============================================================
 # CONTENT-BASED EMOTION SCORE
@@ -507,8 +876,13 @@ def calculate_personalization_score(
 # ============================================================
 
 def calculate_semantic_scores(
-    text: str
+    text: str,
+    preferences: List[str] = None
 ) -> List[float]:
+
+    # preferences is intentionally retained in the function
+    # signature for backward compatibility.
+    # Semantic matching should use the actual user text only.
 
     if not text or not text.strip():
         return [
@@ -516,8 +890,10 @@ def calculate_semantic_scores(
             for _ in WELLNESS_CONTENT
         ]
 
+    semantic_query = text.strip()
+
     text_embedding = semantic_model.encode(
-        text,
+        semantic_query,
         convert_to_tensor=True
     )
 
@@ -526,17 +902,153 @@ def calculate_semantic_scores(
         WELLNESS_EMBEDDINGS
     )[0]
 
-    return [
-        round(
-            max(
-                0.0,
-                float(score)
-            ),
-            4
-        )
-        for score in similarities
-    ]
+    semantic_scores = []
 
+    for index, score in enumerate(similarities):
+
+        base_semantic_score = max(
+            0.0,
+            float(score)
+        )
+
+        context_adjustment = (
+            calculate_context_adjustment(
+                text=text,
+                content=WELLNESS_CONTENT[index]
+            )
+        )
+
+        final_semantic_score = min(
+            1.0,
+            base_semantic_score + context_adjustment
+        )
+
+        semantic_scores.append(
+            round(
+                final_semantic_score,
+                4
+            )
+        )
+
+    return semantic_scores
+
+
+def calculate_context_adjustment(
+    text: str,
+    content: Dict[str, Any]
+) -> float:
+
+    if not text or not text.strip():
+        return 0.0
+
+    text_lower = text.lower()
+
+    tags = {
+        str(tag).lower().strip()
+        for tag in content.get("tags", [])
+    }
+
+    adjustment = 0.0
+
+    productivity_words = {
+        "workload",
+        "work",
+        "deadline",
+        "tasks",
+        "task",
+        "concentrate",
+        "productivity",
+        "organize",
+        "planning"
+    }
+
+    if any(
+        word in text_lower
+        for word in productivity_words
+    ):
+        if tags & {
+            "planning",
+            "workload",
+            "productivity",
+            "focus"
+        }:
+            adjustment += 0.08
+
+    reflection_words = {
+        "write",
+        "writing",
+        "write about",
+        "thoughts",
+        "bothering me",
+        "reflection",
+        "reflect"
+    }
+
+    if any(
+        word in text_lower
+        for word in reflection_words
+    ):
+        if tags & {
+            "journaling",
+            "reflection",
+            "mental-health"
+        }:
+            adjustment += 0.10
+
+    social_words = {
+        "isolated",
+        "alone",
+        "talk to someone",
+        "talk to",
+        "someone",
+        "support",
+        "trusted"
+    }
+
+    if any(
+        word in text_lower
+        for word in social_words
+    ):
+        if tags & {
+            "social-support",
+            "communication",
+            "support"
+        }:
+            adjustment += 0.10
+
+    calming_words = {
+        "anxious",
+        "anxiety",
+        "nervous",
+        "scared",
+        "stressed",
+        "stress",
+        "angry",
+        "frustrated",
+        "calm",
+        "calming"
+    }
+
+    if any(
+        word in text_lower
+        for word in calming_words
+    ):
+        if tags & {
+            "breathing",
+            "mindfulness",
+            "relaxation",
+            "calm",
+            "stress"
+        }:
+            adjustment += 0.06
+
+    return round(
+        min(
+            adjustment,
+            0.20
+        ),
+        4
+    )
 
 # ============================================================
 # TASK 3C — COLLABORATIVE FILTERING
@@ -803,18 +1315,6 @@ def calculate_historical_emotion_score(
     historical_history: List[Dict[str, Any]]
 ) -> float:
 
-    """
-    Calculates how strongly the recommendation matches
-    the user's previous emotional patterns.
-
-    Recent emotional records receive higher weight than
-    older records.
-
-    Returns a value between 0.0 and 1.0.
-
-    0.5 represents neutral/no strong historical influence.
-    """
-
     if not historical_history:
         return 0.5
 
@@ -863,13 +1363,10 @@ def calculate_historical_emotion_score(
             )
         )
 
-        # More recent records receive more influence.
         recency_weight = (
             0.85 ** index
         )
 
-        # Stronger emotional records receive slightly
-        # more influence than weak emotional records.
         intensity_factor = (
             0.5
             +
@@ -922,15 +1419,6 @@ def calculate_historical_trend_score(
     historical_emotional_context: Dict[str, Any]
 ) -> float:
 
-    """
-    Combines historical emotional patterns and trend
-    information into one Task 6 score.
-
-    The existing hybrid score is NOT changed.
-
-    Returns a value between 0.0 and 1.0.
-    """
-
     if not historical_emotional_context:
         return 0.5
 
@@ -941,8 +1429,6 @@ def calculate_historical_trend_score(
         )
     )
 
-    # A single record is not enough to establish
-    # an emotional pattern.
     if len(history) < 2:
         return 0.5
 
@@ -981,17 +1467,10 @@ def calculate_historical_trend_score(
         )
     ).lower()
 
-    # Historical emotional pattern has the strongest
-    # influence.
     pattern_component = (
         historical_emotion_score * 0.60
     )
 
-    # Trend alignment provides an additional signal.
-    #
-    # For improving/worsening/stable trends, the current
-    # emotional pattern remains the main signal. Therefore
-    # the trend component is intentionally small.
     if trend == "worsening":
         trend_component = 0.65
 
@@ -1006,7 +1485,6 @@ def calculate_historical_trend_score(
 
     trend_component *= 0.25
 
-    # Latest polarity alignment.
     if (
         latest_polarity != "neutral"
         and latest_polarity == content_polarity
@@ -1048,16 +1526,6 @@ def calculate_historical_trend_score(
 def calculate_trend_adjustment(
     historical_trend_score: float
 ) -> float:
-
-    """
-    Converts the Task 6 trend score into a small
-    recommendation adjustment.
-
-    Maximum influence = +/- 0.05.
-
-    This intentionally keeps Task 6 from overpowering
-    the existing recommendation engine.
-    """
 
     try:
         historical_trend_score = float(
@@ -1103,7 +1571,8 @@ def calculate_hybrid_score(
     preferences: List[str],
     recommendation_history: List[str],
     semantic_score: float = 0.0,
-    collaborative_score: float = 0.0
+    collaborative_score: float = 0.0,
+    text: str = ""
 ) -> Dict[str, float]:
 
     emotion_scores = emotional_state.get(
@@ -1127,39 +1596,24 @@ def calculate_hybrid_score(
         "polarity",
         "neutral"
     )
-
-    # --------------------------------------------------------
-    # 1. Rule-based recommendation
-    # --------------------------------------------------------
-
+    
     rule_score = calculate_rule_score(
         content,
         dominant_emotion,
         intensity,
-        polarity
+        polarity,
+        text=text
     )
-
-    # --------------------------------------------------------
-    # 2. Content-based filtering
-    # --------------------------------------------------------
 
     content_score = calculate_content_score(
         content,
         emotion_scores
     )
 
-    # --------------------------------------------------------
-    # 3. User preference matching
-    # --------------------------------------------------------
-
     preference_score = preference_match(
         preferences,
         content["tags"]
     )
-
-    # --------------------------------------------------------
-    # 4. Historical user behavior
-    # --------------------------------------------------------
 
     historical_behavior_score = (
         calculate_historical_behavior_score(
@@ -1168,24 +1622,12 @@ def calculate_hybrid_score(
         )
     )
 
-    # --------------------------------------------------------
-    # 5. Emotion similarity
-    # --------------------------------------------------------
-
     emotion_similarity_score = (
         calculate_emotion_similarity_score(
             content,
             emotion_scores
         )
     )
-
-    # --------------------------------------------------------
-    # 6. Existing personalization score
-    #
-    # Kept for backward compatibility and explainability.
-    # It is NOT added separately to the final score because
-    # preference + history are already individual components.
-    # --------------------------------------------------------
 
     personalization_score = (
         calculate_personalization_score(
@@ -1194,10 +1636,6 @@ def calculate_hybrid_score(
             recommendation_history
         )
     )
-
-    # --------------------------------------------------------
-    # 7. Collaborative filtering
-    # --------------------------------------------------------
 
     collaborative_score = max(
         0.0,
@@ -1209,30 +1647,15 @@ def calculate_hybrid_score(
         )
     )
 
-    # No collaborative information means neutral influence.
-    # This prevents new users from being unfairly penalized.
     collaborative_component = (
         collaborative_score
         if collaborative_score > 0.0
         else 0.5
     )
 
-    # --------------------------------------------------------
-    # FINAL HYBRID WEIGHTS
-    #
-    # Rule-based             = 20%
-    # Content-based          = 15%
-    # Preferences            = 15%
-    # Collaborative         = 15%
-    # Emotion similarity     = 10%
-    # Historical behavior   = 10%
-    # Semantic similarity    = 15%
-    #
-    # Total                  = 100%
-    #
-    # IMPORTANT:
-    # Task 6 does NOT modify these weights.
-    # --------------------------------------------------------
+    # ========================================================
+    # EXISTING HYBRID WEIGHTS — UNCHANGED
+    # ========================================================
 
     hybrid_score = (
         (rule_score * 0.20)
@@ -1872,7 +2295,8 @@ def generate_hybrid_recommendations(
     )
 
     semantic_scores = calculate_semantic_scores(
-        text
+        text=text,
+        preferences=preferences
     )
 
     collaborative_scores = (
@@ -1900,16 +2324,10 @@ def generate_hybrid_recommendations(
                     collaborative_scores.get(
                         content["id"],
                         0.0
-                    )
+                    ),
+                    text=text
             )
         )
-
-        # ----------------------------------------------------
-        # TASK 6
-        # Historical emotional pattern influence.
-        #
-        # This does NOT modify the existing hybrid score.
-        # ----------------------------------------------------
 
         historical_emotion_score = (
             calculate_historical_emotion_score(
@@ -1972,11 +2390,9 @@ def generate_hybrid_recommendations(
                         "semantic_score"
                     ],
 
-                # Existing hybrid score is preserved.
                 "score":
                     score_details["hybrid_score"],
 
-                # Task 6 additions.
                 "base_score":
                     score_details["hybrid_score"],
 
@@ -2005,16 +2421,6 @@ def generate_hybrid_recommendations(
             }
         )
 
-    # --------------------------------------------------------
-    # IMPORTANT:
-    #
-    # Ranking inside this module continues to use the existing
-    # hybrid score. main.py will apply the Task 6 adjustment
-    # before feedback learning and final ranking.
-    #
-    # This preserves all previous ranking behavior.
-    # --------------------------------------------------------
-
     ranking_result = rank_recommendations(
         recommendations=scored_recommendations,
         top_k=top_k,
@@ -2031,7 +2437,6 @@ def generate_hybrid_recommendations(
 
     ranking_result.update(
         {
-            # Kept compatible with the existing API.
             "method": "hybrid_semantic_feedback",
 
             "components": [
@@ -2107,7 +2512,6 @@ def generate_hybrid_recommendations(
                         collaborative_scores
                     ),
 
-                # Task 6 information.
                 "emotional_history_records":
                     len(historical_history),
 

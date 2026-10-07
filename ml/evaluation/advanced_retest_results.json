@@ -1,0 +1,4813 @@
+{
+  "test_cases": 10,
+  "successful_tests": 10,
+  "average_response_time": 0.4139,
+  "results": [
+    {
+      "test_id": "T01",
+      "status": "success",
+      "text": "I am extremely scared and stressed about my work deadline",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "social_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "relevant": [
+        "breathing_01",
+        "relax_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 2.9866,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 358,
+        "user_id": "task9_retest_T01",
+        "analysis": {
+          "original_text": "I am extremely scared and stressed about my work deadline",
+          "preprocessed_text": "extremely scared stressed work deadline",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.707,
+            "positive": 0.0,
+            "negative": 0.662,
+            "neutral": 0.338
+          },
+          "emotion": {
+            "emotion": "fear",
+            "confidence": 0.9955
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [
+              "fear"
+            ],
+            "primary_emotion": "fear",
+            "emotion_scores": {
+              "joy": 0.0141,
+              "sadness": 0.0333,
+              "anger": 0.005,
+              "fear": 0.8317,
+              "surprise": 0.0059,
+              "disgust": 0.0066
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "fear",
+            "intensity": 0.8317,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "high",
+            "emotion_scores": {
+              "joy": 0.0141,
+              "sadness": 0.0333,
+              "anger": 0.005,
+              "fear": 0.8317,
+              "surprise": 0.0059,
+              "disgust": 0.0066
+            }
+          },
+          "wellness": {
+            "risk_level": "high",
+            "insight": "Employee feedback indicates a possible emotional wellness concern."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "breathing_01",
+              "title": "5-Minute Deep Breathing",
+              "type": "breathing",
+              "description": "A short breathing exercise to reduce immediate stress and tension.",
+              "tags": [
+                "breathing",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8317,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6033,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.3641,
+              "score": 0.7171,
+              "base_score": 0.6847,
+              "historical_emotion_score": 0.9159,
+              "historical_trend_score": 0.8245,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.7171,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8317,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6033,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9159,
+                  "historical_trend": 0.8245,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.3641,
+                  "final_score": 0.7171
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.7171,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "relax_01",
+              "title": "Guided Relaxation",
+              "type": "relaxation",
+              "description": "Follow a short guided relaxation exercise to release tension.",
+              "tags": [
+                "relaxation",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8317,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6033,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.2735,
+              "score": 0.7035,
+              "base_score": 0.6711,
+              "historical_emotion_score": 0.9159,
+              "historical_trend_score": 0.8245,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.7035,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8317,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6033,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9159,
+                  "historical_trend": 0.8245,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.2735,
+                  "final_score": 0.7035
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.7035,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "walk_01",
+              "title": "Take a Short Walk",
+              "type": "physical_activity",
+              "description": "Take a short walk away from your workspace to refresh your mind.",
+              "tags": [
+                "walking",
+                "exercise",
+                "stress"
+              ],
+              "rule_score": 0.88,
+              "content_score": 0.8317,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6033,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.424,
+              "score": 0.6721,
+              "base_score": 0.6397,
+              "historical_emotion_score": 0.9159,
+              "historical_trend_score": 0.8245,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.6721,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.88,
+                  "content_based": 0.8317,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6033,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9159,
+                  "historical_trend": 0.8245,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.424,
+                  "final_score": 0.6721
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6721,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "breathing_01",
+            "title": "5-Minute Deep Breathing",
+            "type": "breathing",
+            "description": "A short breathing exercise to reduce immediate stress and tension.",
+            "tags": [
+              "breathing",
+              "stress",
+              "calm"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.8317,
+            "preference_score": 0.8,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.6033,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.71,
+            "semantic_score": 0.3641,
+            "score": 0.7171,
+            "base_score": 0.6847,
+            "historical_emotion_score": 0.9159,
+            "historical_trend_score": 0.8245,
+            "trend_adjustment": 0.0324,
+            "trend_adjusted_score": 0.7171,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "strong emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current fear emotional state",
+                "Suitable for your high emotional intensity",
+                "Strong similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.8317,
+                "preference_matching": 0.8,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.6033,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.9159,
+                "historical_trend": 0.8245,
+                "trend_adjustment": 0.0324,
+                "personalization": 0.71,
+                "semantic_similarity": 0.3641,
+                "final_score": 0.7171
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.7171,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "breathing_01",
+            "relax_01",
+            "walk_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T01",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "fear",
+            "intensity": 0.8317,
+            "polarity": "negative",
+            "preferences": [
+              "breathing",
+              "relaxation",
+              "stress"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "fear",
+            "historical_repeated_emotions": [
+              "fear"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.8317,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:49.820334",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:05.737228",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:21.569467",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:05.689592",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.186248",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:57.670492",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:28.996454",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.035877",
+                "intensity": 0.8317,
+                "emotion": "fear"
+              }
+            ],
+            "emotion_frequency": {
+              "fear": 8
+            },
+            "dominant_emotion": "fear",
+            "repeated_emotions": [
+              "fear"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "fear",
+              "fear",
+              "fear",
+              "fear",
+              "fear"
+            ],
+            "latest_emotion": "fear",
+            "latest_polarity": "negative",
+            "latest_severity": "high",
+            "recent_state": {
+              "emotion": "fear",
+              "intensity": 0.8317,
+              "polarity": "negative",
+              "severity": "high"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "fear",
+            "repeated_emotions": [
+              "fear"
+            ],
+            "latest_emotion": "fear",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T02",
+      "status": "success",
+      "text": "I am angry and frustrated because my workload is too much",
+      "expected": [
+        "walk_01",
+        "planning_01",
+        "focus_01"
+      ],
+      "recommended": [
+        "walk_01",
+        "focus_01",
+        "planning_01"
+      ],
+      "relevant": [
+        "walk_01",
+        "focus_01",
+        "planning_01"
+      ],
+      "relevant_count": 3,
+      "response_time": 0.1232,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 359,
+        "user_id": "task9_retest_T02",
+        "analysis": {
+          "original_text": "I am angry and frustrated because my workload is too much",
+          "preprocessed_text": "angry frustrated workload much",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.7717,
+            "positive": 0.0,
+            "negative": 0.77,
+            "neutral": 0.23
+          },
+          "emotion": {
+            "emotion": "anger",
+            "confidence": 0.9917
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [
+              "anger"
+            ],
+            "primary_emotion": "anger",
+            "emotion_scores": {
+              "joy": 0.0035,
+              "sadness": 0.0144,
+              "anger": 0.8308,
+              "fear": 0.0028,
+              "surprise": 0.0022,
+              "disgust": 0.0108
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "anger",
+            "intensity": 0.8308,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "high",
+            "emotion_scores": {
+              "joy": 0.0035,
+              "sadness": 0.0144,
+              "anger": 0.8308,
+              "fear": 0.0028,
+              "surprise": 0.0022,
+              "disgust": 0.0108
+            }
+          },
+          "wellness": {
+            "risk_level": "medium",
+            "insight": "Employee feedback indicates possible workplace dissatisfaction or frustration."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "walk_01",
+              "title": "Take a Short Walk",
+              "type": "physical_activity",
+              "description": "Take a short walk away from your workspace to refresh your mind.",
+              "tags": [
+                "walking",
+                "exercise",
+                "stress"
+              ],
+              "rule_score": 0.88,
+              "content_score": 0.8308,
+              "preference_score": 0.6667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5892,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.6167,
+              "semantic_score": 0.5586,
+              "score": 0.7007,
+              "base_score": 0.6683,
+              "historical_emotion_score": 0.9154,
+              "historical_trend_score": 0.8242,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.7007,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.88,
+                  "content_based": 0.8308,
+                  "preference_matching": 0.6667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5892,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9154,
+                  "historical_trend": 0.8242,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.6167,
+                  "semantic_similarity": 0.5586,
+                  "final_score": 0.7007
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.7007,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "focus_01",
+              "title": "Focus Reset Exercise",
+              "type": "productivity",
+              "description": "Break your workload into one small achievable task at a time.",
+              "tags": [
+                "focus",
+                "productivity",
+                "work"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8308,
+              "preference_score": 0.3333,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.7093,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.3833,
+              "semantic_score": 0.6129,
+              "score": 0.6949,
+              "base_score": 0.6625,
+              "historical_emotion_score": 0.9154,
+              "historical_trend_score": 0.8242,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.6949,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "strong semantic similarity"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Strong semantic match with your current concern",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8308,
+                  "preference_matching": 0.3333,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.7093,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9154,
+                  "historical_trend": 0.8242,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.3833,
+                  "semantic_similarity": 0.6129,
+                  "final_score": 0.6949
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6949,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "planning_01",
+              "title": "Workload Planning Reset",
+              "type": "productivity",
+              "description": "List your tasks and prioritize the most important items first.",
+              "tags": [
+                "planning",
+                "workload",
+                "productivity"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8308,
+              "preference_score": 0.3333,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5892,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.3833,
+              "semantic_score": 0.5022,
+              "score": 0.6663,
+              "base_score": 0.6339,
+              "historical_emotion_score": 0.9154,
+              "historical_trend_score": 0.8242,
+              "trend_adjustment": 0.0324,
+              "trend_adjusted_score": 0.6663,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8308,
+                  "preference_matching": 0.3333,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5892,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9154,
+                  "historical_trend": 0.8242,
+                  "trend_adjustment": 0.0324,
+                  "personalization": 0.3833,
+                  "semantic_similarity": 0.5022,
+                  "final_score": 0.6663
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6663,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "walk_01",
+            "title": "Take a Short Walk",
+            "type": "physical_activity",
+            "description": "Take a short walk away from your workspace to refresh your mind.",
+            "tags": [
+              "walking",
+              "exercise",
+              "stress"
+            ],
+            "rule_score": 0.88,
+            "content_score": 0.8308,
+            "preference_score": 0.6667,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.5892,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.6167,
+            "semantic_score": 0.5586,
+            "score": 0.7007,
+            "base_score": 0.6683,
+            "historical_emotion_score": 0.9154,
+            "historical_trend_score": 0.8242,
+            "trend_adjustment": 0.0324,
+            "trend_adjusted_score": 0.7007,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "strong emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "moderate semantic similarity",
+              "good personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current anger emotional state",
+                "Suitable for your high emotional intensity",
+                "Strong similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Moderate semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 0.88,
+                "content_based": 0.8308,
+                "preference_matching": 0.6667,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.5892,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.9154,
+                "historical_trend": 0.8242,
+                "trend_adjustment": 0.0324,
+                "personalization": 0.6167,
+                "semantic_similarity": 0.5586,
+                "final_score": 0.7007
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.7007,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "walk_01",
+            "focus_01",
+            "planning_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T02",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "anger",
+            "intensity": 0.8308,
+            "polarity": "negative",
+            "preferences": [
+              "walking",
+              "productivity",
+              "stress"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "anger",
+            "historical_repeated_emotions": [
+              "anger"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.8308,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:49.975521",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:05.886268",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:21.776465",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:05.842423",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.355960",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:57.804313",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.122784",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.187311",
+                "intensity": 0.8308,
+                "emotion": "anger"
+              }
+            ],
+            "emotion_frequency": {
+              "anger": 8
+            },
+            "dominant_emotion": "anger",
+            "repeated_emotions": [
+              "anger"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "anger",
+              "anger",
+              "anger",
+              "anger",
+              "anger"
+            ],
+            "latest_emotion": "anger",
+            "latest_polarity": "negative",
+            "latest_severity": "high",
+            "recent_state": {
+              "emotion": "anger",
+              "intensity": 0.8308,
+              "polarity": "negative",
+              "severity": "high"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "anger",
+            "repeated_emotions": [
+              "anger"
+            ],
+            "latest_emotion": "anger",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T03",
+      "status": "success",
+      "text": "I feel sad and emotionally drained after a difficult day",
+      "expected": [
+        "journaling_01",
+        "relax_01",
+        "music_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "relax_01",
+        "mindfulness_01"
+      ],
+      "relevant": [
+        "journaling_01",
+        "relax_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.1416,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 360,
+        "user_id": "task9_retest_T03",
+        "analysis": {
+          "original_text": "I feel sad and emotionally drained after a difficult day",
+          "preprocessed_text": "feel sad emotionally drained difficult day",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.7964,
+            "positive": 0.0,
+            "negative": 0.73,
+            "neutral": 0.27
+          },
+          "emotion": {
+            "emotion": "sadness",
+            "confidence": 0.9909
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [
+              "sadness"
+            ],
+            "primary_emotion": "sadness",
+            "emotion_scores": {
+              "joy": 0.0067,
+              "sadness": 0.8966,
+              "anger": 0.006,
+              "fear": 0.0035,
+              "surprise": 0.0025,
+              "disgust": 0.0038
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.8966,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "high",
+            "emotion_scores": {
+              "joy": 0.0067,
+              "sadness": 0.8966,
+              "anger": 0.006,
+              "fear": 0.0035,
+              "surprise": 0.0025,
+              "disgust": 0.0038
+            }
+          },
+          "wellness": {
+            "risk_level": "high",
+            "insight": "Employee feedback indicates a possible emotional wellness concern."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "journaling_01",
+              "title": "Write Down Your Thoughts",
+              "type": "journaling",
+              "description": "Write down what is bothering you and identify the main source of stress.",
+              "tags": [
+                "journaling",
+                "reflection",
+                "mental-health"
+              ],
+              "rule_score": 0.88,
+              "content_score": 0.8966,
+              "preference_score": 0.6667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5834,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.6167,
+              "semantic_score": 0.3878,
+              "score": 0.6864,
+              "base_score": 0.652,
+              "historical_emotion_score": 0.9483,
+              "historical_trend_score": 0.844,
+              "trend_adjustment": 0.0344,
+              "trend_adjusted_score": 0.6864,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.88,
+                  "content_based": 0.8966,
+                  "preference_matching": 0.6667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5834,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9483,
+                  "historical_trend": 0.844,
+                  "trend_adjustment": 0.0344,
+                  "personalization": 0.6167,
+                  "semantic_similarity": 0.3878,
+                  "final_score": 0.6864
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6864,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "relax_01",
+              "title": "Guided Relaxation",
+              "type": "relaxation",
+              "description": "Follow a short guided relaxation exercise to release tension.",
+              "tags": [
+                "relaxation",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8966,
+              "preference_score": 0.3333,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5834,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.3833,
+              "semantic_score": 0.262,
+              "score": 0.6415,
+              "base_score": 0.6071,
+              "historical_emotion_score": 0.9483,
+              "historical_trend_score": 0.844,
+              "trend_adjustment": 0.0344,
+              "trend_adjusted_score": 0.6415,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8966,
+                  "preference_matching": 0.3333,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5834,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9483,
+                  "historical_trend": 0.844,
+                  "trend_adjustment": 0.0344,
+                  "personalization": 0.3833,
+                  "semantic_similarity": 0.262,
+                  "final_score": 0.6415
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6415,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "mindfulness_01",
+              "title": "Mindfulness Reset",
+              "type": "mindfulness",
+              "description": "A simple mindfulness activity to help regain emotional balance.",
+              "tags": [
+                "mindfulness",
+                "relaxation",
+                "focus"
+              ],
+              "rule_score": 0.88,
+              "content_score": 0.8966,
+              "preference_score": 0.3333,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5834,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.3833,
+              "semantic_score": 0.3456,
+              "score": 0.6301,
+              "base_score": 0.5957,
+              "historical_emotion_score": 0.9483,
+              "historical_trend_score": 0.844,
+              "trend_adjustment": 0.0344,
+              "trend_adjusted_score": 0.6301,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.88,
+                  "content_based": 0.8966,
+                  "preference_matching": 0.3333,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5834,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9483,
+                  "historical_trend": 0.844,
+                  "trend_adjustment": 0.0344,
+                  "personalization": 0.3833,
+                  "semantic_similarity": 0.3456,
+                  "final_score": 0.6301
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6301,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "journaling_01",
+            "title": "Write Down Your Thoughts",
+            "type": "journaling",
+            "description": "Write down what is bothering you and identify the main source of stress.",
+            "tags": [
+              "journaling",
+              "reflection",
+              "mental-health"
+            ],
+            "rule_score": 0.88,
+            "content_score": 0.8966,
+            "preference_score": 0.6667,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.5834,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.6167,
+            "semantic_score": 0.3878,
+            "score": 0.6864,
+            "base_score": 0.652,
+            "historical_emotion_score": 0.9483,
+            "historical_trend_score": 0.844,
+            "trend_adjustment": 0.0344,
+            "trend_adjusted_score": 0.6864,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "strong emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "good personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current sadness emotional state",
+                "Suitable for your high emotional intensity",
+                "Strong similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 0.88,
+                "content_based": 0.8966,
+                "preference_matching": 0.6667,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.5834,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.9483,
+                "historical_trend": 0.844,
+                "trend_adjustment": 0.0344,
+                "personalization": 0.6167,
+                "semantic_similarity": 0.3878,
+                "final_score": 0.6864
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6864,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "journaling_01",
+            "relax_01",
+            "mindfulness_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T03",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.8966,
+            "polarity": "negative",
+            "preferences": [
+              "journaling",
+              "relaxation",
+              "reflection"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "sadness",
+            "historical_repeated_emotions": [
+              "sadness"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.8966,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:50.140370",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:06.115273",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:21.909938",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.001145",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.524456",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:57.935109",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.226184",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.344284",
+                "intensity": 0.8966,
+                "emotion": "sadness"
+              }
+            ],
+            "emotion_frequency": {
+              "sadness": 8
+            },
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative",
+            "latest_severity": "high",
+            "recent_state": {
+              "emotion": "sadness",
+              "intensity": 0.8966,
+              "polarity": "negative",
+              "severity": "high"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T04",
+      "status": "success",
+      "text": "I am feeling anxious and need something calming before my next meeting",
+      "expected": [
+        "breathing_01",
+        "mindfulness_01",
+        "music_01"
+      ],
+      "recommended": [
+        "music_01",
+        "breathing_01",
+        "relax_01"
+      ],
+      "relevant": [
+        "music_01",
+        "breathing_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.138,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 361,
+        "user_id": "task9_retest_T04",
+        "analysis": {
+          "original_text": "I am feeling anxious and need something calming before my next meeting",
+          "preprocessed_text": "feeling anxious need something calming next meeting",
+          "sentiment": {
+            "sentiment": "positive",
+            "compound": 0.296,
+            "positive": 0.412,
+            "negative": 0.196,
+            "neutral": 0.392
+          },
+          "emotion": {
+            "emotion": "fear",
+            "confidence": 0.9946
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "sadness",
+            "emotion_scores": {
+              "joy": 0.0195,
+              "sadness": 0.0679,
+              "anger": 0.0026,
+              "fear": 0.0661,
+              "surprise": 0.0025,
+              "disgust": 0.0018
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.0679,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0195,
+              "sadness": 0.0679,
+              "anger": 0.0026,
+              "fear": 0.0661,
+              "surprise": 0.0025,
+              "disgust": 0.0018
+            }
+          },
+          "wellness": {
+            "risk_level": "low",
+            "insight": "Employee feedback indicates a generally positive workplace experience."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "music_01",
+              "title": "Listen to Calming Music",
+              "type": "music",
+              "description": "Listen to calming music to create a more relaxed environment.",
+              "tags": [
+                "music",
+                "relaxation",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.0679,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8145,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.6134,
+              "score": 0.6081,
+              "base_score": 0.5986,
+              "historical_emotion_score": 0.534,
+              "historical_trend_score": 0.5954,
+              "trend_adjustment": 0.0095,
+              "trend_adjusted_score": 0.6081,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "strong semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Strong semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.0679,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8145,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.534,
+                  "historical_trend": 0.5954,
+                  "trend_adjustment": 0.0095,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.6134,
+                  "final_score": 0.6081
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6081,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "breathing_01",
+              "title": "5-Minute Deep Breathing",
+              "type": "breathing",
+              "description": "A short breathing exercise to reduce immediate stress and tension.",
+              "tags": [
+                "breathing",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.0679,
+              "preference_score": 0.6667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8145,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.6167,
+              "semantic_score": 0.3997,
+              "score": 0.5861,
+              "base_score": 0.5766,
+              "historical_emotion_score": 0.534,
+              "historical_trend_score": 0.5954,
+              "trend_adjustment": 0.0095,
+              "trend_adjusted_score": 0.5861,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.0679,
+                  "preference_matching": 0.6667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8145,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.534,
+                  "historical_trend": 0.5954,
+                  "trend_adjustment": 0.0095,
+                  "personalization": 0.6167,
+                  "semantic_similarity": 0.3997,
+                  "final_score": 0.5861
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.5861,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "relax_01",
+              "title": "Guided Relaxation",
+              "type": "relaxation",
+              "description": "Follow a short guided relaxation exercise to release tension.",
+              "tags": [
+                "relaxation",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.0679,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8145,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.4591,
+              "score": 0.585,
+              "base_score": 0.5755,
+              "historical_emotion_score": 0.534,
+              "historical_trend_score": 0.5954,
+              "trend_adjustment": 0.0095,
+              "trend_adjusted_score": 0.585,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.0679,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8145,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.534,
+                  "historical_trend": 0.5954,
+                  "trend_adjustment": 0.0095,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.4591,
+                  "final_score": 0.585
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.585,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "music_01",
+            "title": "Listen to Calming Music",
+            "type": "music",
+            "description": "Listen to calming music to create a more relaxed environment.",
+            "tags": [
+              "music",
+              "relaxation",
+              "calm"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.0679,
+            "preference_score": 0.6,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.8145,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.57,
+            "semantic_score": 0.6134,
+            "score": 0.6081,
+            "base_score": 0.5986,
+            "historical_emotion_score": 0.534,
+            "historical_trend_score": 0.5954,
+            "trend_adjustment": 0.0095,
+            "trend_adjusted_score": 0.6081,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "strong semantic similarity",
+              "good personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current sadness emotional state",
+                "Suitable for your current low emotional intensity",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Strong semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.0679,
+                "preference_matching": 0.6,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.8145,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.534,
+                "historical_trend": 0.5954,
+                "trend_adjustment": 0.0095,
+                "personalization": 0.57,
+                "semantic_similarity": 0.6134,
+                "final_score": 0.6081
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6081,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "music_01",
+            "breathing_01",
+            "relax_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T04",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.0679,
+            "polarity": "negative",
+            "preferences": [
+              "breathing",
+              "mindfulness",
+              "calm"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "sadness",
+            "historical_repeated_emotions": [
+              "sadness"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.0679,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:50.315908",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:06.233616",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.062956",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.221164",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.661560",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.115079",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.348434",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.489305",
+                "intensity": 0.0679,
+                "emotion": "sadness"
+              }
+            ],
+            "emotion_frequency": {
+              "sadness": 8
+            },
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "sadness",
+              "intensity": 0.0679,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T05",
+      "status": "success",
+      "text": "I am overwhelmed by work and cannot concentrate",
+      "expected": [
+        "focus_01",
+        "planning_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "mindfulness_01",
+        "focus_01"
+      ],
+      "relevant": [
+        "planning_01",
+        "focus_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.1184,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 362,
+        "user_id": "task9_retest_T05",
+        "analysis": {
+          "original_text": "I am overwhelmed by work and cannot concentrate",
+          "preprocessed_text": "overwhelmed work not concentrate",
+          "sentiment": {
+            "sentiment": "positive",
+            "compound": 0.0516,
+            "positive": 0.286,
+            "negative": 0.0,
+            "neutral": 0.714
+          },
+          "emotion": {
+            "emotion": "surprise",
+            "confidence": 0.6816
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "sadness",
+            "emotion_scores": {
+              "joy": 0.0065,
+              "sadness": 0.1249,
+              "anger": 0.0094,
+              "fear": 0.0114,
+              "surprise": 0.0206,
+              "disgust": 0.0073
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.1249,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0065,
+              "sadness": 0.1249,
+              "anger": 0.0094,
+              "fear": 0.0114,
+              "surprise": 0.0206,
+              "disgust": 0.0073
+            }
+          },
+          "wellness": {
+            "risk_level": "low",
+            "insight": "Employee feedback indicates a generally positive workplace experience."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "planning_01",
+              "title": "Workload Planning Reset",
+              "type": "productivity",
+              "description": "List your tasks and prioritize the most important items first.",
+              "tags": [
+                "planning",
+                "workload",
+                "productivity"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1249,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6581,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.5323,
+              "score": 0.6206,
+              "base_score": 0.6094,
+              "historical_emotion_score": 0.5624,
+              "historical_trend_score": 0.6124,
+              "trend_adjustment": 0.0112,
+              "trend_adjusted_score": 0.6206,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1249,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6581,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5624,
+                  "historical_trend": 0.6124,
+                  "trend_adjustment": 0.0112,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.5323,
+                  "final_score": 0.6206
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6206,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "mindfulness_01",
+              "title": "Mindfulness Reset",
+              "type": "mindfulness",
+              "description": "A simple mindfulness activity to help regain emotional balance.",
+              "tags": [
+                "mindfulness",
+                "relaxation",
+                "focus"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1249,
+              "preference_score": 0.4667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6581,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.4767,
+              "semantic_score": 0.4373,
+              "score": 0.5563,
+              "base_score": 0.5451,
+              "historical_emotion_score": 0.5624,
+              "historical_trend_score": 0.6124,
+              "trend_adjustment": 0.0112,
+              "trend_adjusted_score": 0.5563,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1249,
+                  "preference_matching": 0.4667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6581,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5624,
+                  "historical_trend": 0.6124,
+                  "trend_adjustment": 0.0112,
+                  "personalization": 0.4767,
+                  "semantic_similarity": 0.4373,
+                  "final_score": 0.5563
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.5563,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "focus_01",
+              "title": "Focus Reset Exercise",
+              "type": "productivity",
+              "description": "Break your workload into one small achievable task at a time.",
+              "tags": [
+                "focus",
+                "productivity",
+                "work"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.0114,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.1151,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.7351,
+              "score": 0.546,
+              "base_score": 0.5685,
+              "historical_emotion_score": 0.0,
+              "historical_trend_score": 0.275,
+              "trend_adjustment": -0.0225,
+              "trend_adjusted_score": 0.546,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.0114,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.1151,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.0,
+                  "historical_trend": 0.275,
+                  "trend_adjustment": -0.0225,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.7351,
+                  "final_score": 0.546
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.546,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "planning_01",
+            "title": "Workload Planning Reset",
+            "type": "productivity",
+            "description": "List your tasks and prioritize the most important items first.",
+            "tags": [
+              "planning",
+              "workload",
+              "productivity"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.1249,
+            "preference_score": 0.8,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.6581,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.71,
+            "semantic_score": 0.5323,
+            "score": 0.6206,
+            "base_score": 0.6094,
+            "historical_emotion_score": 0.5624,
+            "historical_trend_score": 0.6124,
+            "trend_adjustment": 0.0112,
+            "trend_adjusted_score": 0.6206,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "aligned with the user's recent emotional trend",
+              "moderate semantic similarity",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current sadness emotional state",
+                "Suitable for your current low emotional intensity",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Takes your recent emotional trend into account",
+                "Moderate semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.1249,
+                "preference_matching": 0.8,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.6581,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.5624,
+                "historical_trend": 0.6124,
+                "trend_adjustment": 0.0112,
+                "personalization": 0.71,
+                "semantic_similarity": 0.5323,
+                "final_score": 0.6206
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6206,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "planning_01",
+            "mindfulness_01",
+            "focus_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T05",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.1249,
+            "polarity": "negative",
+            "preferences": [
+              "focus",
+              "productivity",
+              "planning"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "sadness",
+            "historical_repeated_emotions": [
+              "sadness"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.1249,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:50.488521",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:06.420571",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.222453",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.466929",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.774075",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.256008",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.458962",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.639529",
+                "intensity": 0.1249,
+                "emotion": "sadness"
+              }
+            ],
+            "emotion_frequency": {
+              "sadness": 8
+            },
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "sadness",
+              "intensity": 0.1249,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T06",
+      "status": "success",
+      "text": "I feel very angry and need to calm down",
+      "expected": [
+        "breathing_01",
+        "relax_01",
+        "walk_01"
+      ],
+      "recommended": [
+        "breathing_01",
+        "walk_01",
+        "music_01"
+      ],
+      "relevant": [
+        "breathing_01",
+        "walk_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.1275,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 363,
+        "user_id": "task9_retest_T06",
+        "analysis": {
+          "original_text": "I feel very angry and need to calm down",
+          "preprocessed_text": "feel angry need calm",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.25,
+            "positive": 0.303,
+            "negative": 0.434,
+            "neutral": 0.263
+          },
+          "emotion": {
+            "emotion": "anger",
+            "confidence": 0.9939
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "anger",
+            "emotion_scores": {
+              "joy": 0.0039,
+              "sadness": 0.0462,
+              "anger": 0.4399,
+              "fear": 0.019,
+              "surprise": 0.0011,
+              "disgust": 0.0132
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "anger",
+            "intensity": 0.4399,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0039,
+              "sadness": 0.0462,
+              "anger": 0.4399,
+              "fear": 0.019,
+              "surprise": 0.0011,
+              "disgust": 0.0132
+            }
+          },
+          "wellness": {
+            "risk_level": "medium",
+            "insight": "Employee feedback indicates possible workplace dissatisfaction or frustration."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "breathing_01",
+              "title": "5-Minute Deep Breathing",
+              "type": "breathing",
+              "description": "A short breathing exercise to reduce immediate stress and tension.",
+              "tags": [
+                "breathing",
+                "stress",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4399,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6584,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.4312,
+              "score": 0.6322,
+              "base_score": 0.6115,
+              "historical_emotion_score": 0.7199,
+              "historical_trend_score": 0.7069,
+              "trend_adjustment": 0.0207,
+              "trend_adjusted_score": 0.6322,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4399,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6584,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7199,
+                  "historical_trend": 0.7069,
+                  "trend_adjustment": 0.0207,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.4312,
+                  "final_score": 0.6322
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6322,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "walk_01",
+              "title": "Take a Short Walk",
+              "type": "physical_activity",
+              "description": "Take a short walk away from your workspace to refresh your mind.",
+              "tags": [
+                "walking",
+                "exercise",
+                "stress"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4399,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6584,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.4186,
+              "score": 0.6303,
+              "base_score": 0.6096,
+              "historical_emotion_score": 0.7199,
+              "historical_trend_score": 0.7069,
+              "trend_adjustment": 0.0207,
+              "trend_adjusted_score": 0.6303,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4399,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6584,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7199,
+                  "historical_trend": 0.7069,
+                  "trend_adjustment": 0.0207,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.4186,
+                  "final_score": 0.6303
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6303,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "music_01",
+              "title": "Listen to Calming Music",
+              "type": "music",
+              "description": "Listen to calming music to create a more relaxed environment.",
+              "tags": [
+                "music",
+                "relaxation",
+                "calm"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4399,
+              "preference_score": 0.4667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6584,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.4767,
+              "semantic_score": 0.4664,
+              "score": 0.6175,
+              "base_score": 0.5968,
+              "historical_emotion_score": 0.7199,
+              "historical_trend_score": 0.7069,
+              "trend_adjustment": 0.0207,
+              "trend_adjusted_score": 0.6175,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current anger emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4399,
+                  "preference_matching": 0.4667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6584,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7199,
+                  "historical_trend": 0.7069,
+                  "trend_adjustment": 0.0207,
+                  "personalization": 0.4767,
+                  "semantic_similarity": 0.4664,
+                  "final_score": 0.6175
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6175,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "breathing_01",
+            "title": "5-Minute Deep Breathing",
+            "type": "breathing",
+            "description": "A short breathing exercise to reduce immediate stress and tension.",
+            "tags": [
+              "breathing",
+              "stress",
+              "calm"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.4399,
+            "preference_score": 0.6,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.6584,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.57,
+            "semantic_score": 0.4312,
+            "score": 0.6322,
+            "base_score": 0.6115,
+            "historical_emotion_score": 0.7199,
+            "historical_trend_score": 0.7069,
+            "trend_adjustment": 0.0207,
+            "trend_adjusted_score": 0.6322,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "moderate emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "moderate semantic similarity",
+              "good personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current anger emotional state",
+                "Suitable for your current low emotional intensity",
+                "Moderate similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Moderate semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.4399,
+                "preference_matching": 0.6,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.6584,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.7199,
+                "historical_trend": 0.7069,
+                "trend_adjustment": 0.0207,
+                "personalization": 0.57,
+                "semantic_similarity": 0.4312,
+                "final_score": 0.6322
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6322,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "breathing_01",
+            "walk_01",
+            "music_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T06",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "anger",
+            "intensity": 0.4399,
+            "polarity": "negative",
+            "preferences": [
+              "breathing",
+              "relaxation",
+              "walking"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "anger",
+            "historical_repeated_emotions": [
+              "anger"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.4399,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:50.673181",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:06.614160",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.378588",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.674016",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:05.969409",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.384384",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.628087",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.766400",
+                "intensity": 0.4399,
+                "emotion": "anger"
+              }
+            ],
+            "emotion_frequency": {
+              "anger": 8
+            },
+            "dominant_emotion": "anger",
+            "repeated_emotions": [
+              "anger"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "anger",
+              "anger",
+              "anger",
+              "anger",
+              "anger"
+            ],
+            "latest_emotion": "anger",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "anger",
+              "intensity": 0.4399,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "anger",
+            "repeated_emotions": [
+              "anger"
+            ],
+            "latest_emotion": "anger",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T07",
+      "status": "success",
+      "text": "I had a difficult day and want to write about what is bothering me",
+      "expected": [
+        "journaling_01",
+        "music_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "journaling_01",
+        "gratitude_01",
+        "break_01"
+      ],
+      "relevant": [
+        "journaling_01"
+      ],
+      "relevant_count": 1,
+      "response_time": 0.1119,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 364,
+        "user_id": "task9_retest_T07",
+        "analysis": {
+          "original_text": "I had a difficult day and want to write about what is bothering me",
+          "preprocessed_text": "difficult day want write bothering",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.5859,
+            "positive": 0.155,
+            "negative": 0.607,
+            "neutral": 0.238
+          },
+          "emotion": {
+            "emotion": "sadness",
+            "confidence": 0.7629
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "sadness",
+            "emotion_scores": {
+              "joy": 0.0036,
+              "sadness": 0.4448,
+              "anger": 0.0052,
+              "fear": 0.0042,
+              "surprise": 0.0014,
+              "disgust": 0.0043
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.4448,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0036,
+              "sadness": 0.4448,
+              "anger": 0.0052,
+              "fear": 0.0042,
+              "surprise": 0.0014,
+              "disgust": 0.0043
+            }
+          },
+          "wellness": {
+            "risk_level": "high",
+            "insight": "Employee feedback indicates a possible emotional wellness concern."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "journaling_01",
+              "title": "Write Down Your Thoughts",
+              "type": "journaling",
+              "description": "Write down what is bothering you and identify the main source of stress.",
+              "tags": [
+                "journaling",
+                "reflection",
+                "mental-health"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4448,
+              "preference_score": 1.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5894,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.85,
+              "semantic_score": 0.6909,
+              "score": 0.7251,
+              "base_score": 0.7043,
+              "historical_emotion_score": 0.7224,
+              "historical_trend_score": 0.7084,
+              "trend_adjustment": 0.0208,
+              "trend_adjusted_score": 0.7251,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "strong semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Strong semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4448,
+                  "preference_matching": 1.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5894,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7224,
+                  "historical_trend": 0.7084,
+                  "trend_adjustment": 0.0208,
+                  "personalization": 0.85,
+                  "semantic_similarity": 0.6909,
+                  "final_score": 0.7251
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.7251,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "gratitude_01",
+              "title": "Gratitude Reflection",
+              "type": "reflection",
+              "description": "Spend a few minutes identifying things that went well today.",
+              "tags": [
+                "gratitude",
+                "positive",
+                "reflection"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4448,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.7127,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.4003,
+              "score": 0.6188,
+              "base_score": 0.613,
+              "historical_emotion_score": 0.7224,
+              "historical_trend_score": 0.5584,
+              "trend_adjustment": 0.0058,
+              "trend_adjusted_score": 0.6188,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "moderate semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4448,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.7127,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7224,
+                  "historical_trend": 0.5584,
+                  "trend_adjustment": 0.0058,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.4003,
+                  "final_score": 0.6188
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6188,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "break_01",
+              "title": "Take a Screen Break",
+              "type": "break",
+              "description": "Step away from the screen for a few minutes and reset.",
+              "tags": [
+                "break",
+                "rest",
+                "relaxation"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.4448,
+              "preference_score": 0.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.5894,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.15,
+              "semantic_score": 0.2256,
+              "score": 0.5053,
+              "base_score": 0.4845,
+              "historical_emotion_score": 0.7224,
+              "historical_trend_score": 0.7084,
+              "trend_adjustment": 0.0208,
+              "trend_adjusted_score": 0.5053,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "moderate emotion-score similarity",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Moderate similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.4448,
+                  "preference_matching": 0.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.5894,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.7224,
+                  "historical_trend": 0.7084,
+                  "trend_adjustment": 0.0208,
+                  "personalization": 0.15,
+                  "semantic_similarity": 0.2256,
+                  "final_score": 0.5053
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.5053,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "journaling_01",
+            "title": "Write Down Your Thoughts",
+            "type": "journaling",
+            "description": "Write down what is bothering you and identify the main source of stress.",
+            "tags": [
+              "journaling",
+              "reflection",
+              "mental-health"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.4448,
+            "preference_score": 1.0,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.5894,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.85,
+            "semantic_score": 0.6909,
+            "score": 0.7251,
+            "base_score": 0.7043,
+            "historical_emotion_score": 0.7224,
+            "historical_trend_score": 0.7084,
+            "trend_adjustment": 0.0208,
+            "trend_adjusted_score": 0.7251,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "moderate emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "strong semantic similarity",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current sadness emotional state",
+                "Suitable for your current low emotional intensity",
+                "Moderate similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Strong semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.4448,
+                "preference_matching": 1.0,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.5894,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.7224,
+                "historical_trend": 0.7084,
+                "trend_adjustment": 0.0208,
+                "personalization": 0.85,
+                "semantic_similarity": 0.6909,
+                "final_score": 0.7251
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.7251,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "journaling_01",
+            "gratitude_01",
+            "break_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T07",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.4448,
+            "polarity": "negative",
+            "preferences": [
+              "journaling",
+              "reflection",
+              "mental-health"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "sadness",
+            "historical_repeated_emotions": [
+              "sadness"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.4448,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:50.866501",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:06.900387",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.561537",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.831247",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:06.107364",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.564522",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.788162",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:29.894578",
+                "intensity": 0.4448,
+                "emotion": "sadness"
+              }
+            ],
+            "emotion_frequency": {
+              "sadness": 8
+            },
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "sadness",
+              "intensity": 0.4448,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T08",
+      "status": "success",
+      "text": "I am happy because I completed an important task today",
+      "expected": [
+        "celebrate_01",
+        "gratitude_01"
+      ],
+      "recommended": [
+        "celebrate_01",
+        "gratitude_01",
+        "planning_01"
+      ],
+      "relevant": [
+        "celebrate_01",
+        "gratitude_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.1329,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 365,
+        "user_id": "task9_retest_T08",
+        "analysis": {
+          "original_text": "I am happy because I completed an important task today",
+          "preprocessed_text": "happy completed important task today",
+          "sentiment": {
+            "sentiment": "positive",
+            "compound": 0.6705,
+            "positive": 0.647,
+            "negative": 0.0,
+            "neutral": 0.353
+          },
+          "emotion": {
+            "emotion": "joy",
+            "confidence": 0.9891
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [
+              "joy"
+            ],
+            "primary_emotion": "joy",
+            "emotion_scores": {
+              "joy": 0.8886,
+              "sadness": 0.0042,
+              "anger": 0.0028,
+              "fear": 0.001,
+              "surprise": 0.002,
+              "disgust": 0.0007
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "joy",
+            "intensity": 0.8886,
+            "polarity": "positive",
+            "mixed_emotion": false,
+            "severity": "high_positive",
+            "emotion_scores": {
+              "joy": 0.8886,
+              "sadness": 0.0042,
+              "anger": 0.0028,
+              "fear": 0.001,
+              "surprise": 0.002,
+              "disgust": 0.0007
+            }
+          },
+          "wellness": {
+            "risk_level": "low",
+            "insight": "Employee feedback indicates a generally positive workplace experience."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "celebrate_01",
+              "title": "Celebrate a Small Win",
+              "type": "positive_activity",
+              "description": "Recognize one achievement from your day and build on that positive feeling.",
+              "tags": [
+                "joy",
+                "motivation",
+                "positive"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.8886,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 1.0,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.5976,
+              "score": 0.8021,
+              "base_score": 0.7679,
+              "historical_emotion_score": 0.9443,
+              "historical_trend_score": 0.8416,
+              "trend_adjustment": 0.0342,
+              "trend_adjusted_score": 0.8021,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current joy emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current positive emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.8886,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 1.0,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9443,
+                  "historical_trend": 0.8416,
+                  "trend_adjustment": 0.0342,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.5976,
+                  "final_score": 0.8021
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.8021,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "gratitude_01",
+              "title": "Gratitude Reflection",
+              "type": "reflection",
+              "description": "Spend a few minutes identifying things that went well today.",
+              "tags": [
+                "gratitude",
+                "positive",
+                "reflection"
+              ],
+              "rule_score": 0.76,
+              "content_score": 0.8886,
+              "preference_score": 0.8,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.7104,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.71,
+              "semantic_score": 0.4884,
+              "score": 0.7088,
+              "base_score": 0.6746,
+              "historical_emotion_score": 0.9443,
+              "historical_trend_score": 0.8416,
+              "trend_adjustment": 0.0342,
+              "trend_adjusted_score": 0.7088,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-score similarity",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "matches repeated emotional patterns from the user's history",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current joy emotional state",
+                  "Suitable for your high emotional intensity",
+                  "Strong similarity with your detected emotions",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Matches emotional patterns repeatedly observed in your history",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current positive emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.76,
+                  "content_based": 0.8886,
+                  "preference_matching": 0.8,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.7104,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.9443,
+                  "historical_trend": 0.8416,
+                  "trend_adjustment": 0.0342,
+                  "personalization": 0.71,
+                  "semantic_similarity": 0.4884,
+                  "final_score": 0.7088
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.7088,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "planning_01",
+              "title": "Workload Planning Reset",
+              "type": "productivity",
+              "description": "List your tasks and prioritize the most important items first.",
+              "tags": [
+                "planning",
+                "workload",
+                "productivity"
+              ],
+              "rule_score": 0.3,
+              "content_score": 0.0042,
+              "preference_score": 0.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.0052,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.15,
+              "semantic_score": 0.4226,
+              "score": 0.212,
+              "base_score": 0.2495,
+              "historical_emotion_score": 0.0,
+              "historical_trend_score": 0.125,
+              "trend_adjustment": -0.0375,
+              "trend_adjusted_score": 0.212,
+              "rank": 3,
+              "ranking_reason": [
+                "moderate semantic similarity"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Moderate semantic match with your current concern",
+                  "Aligned with your current positive emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.3,
+                  "content_based": 0.0042,
+                  "preference_matching": 0.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.0052,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.0,
+                  "historical_trend": 0.125,
+                  "trend_adjustment": -0.0375,
+                  "personalization": 0.15,
+                  "semantic_similarity": 0.4226,
+                  "final_score": 0.212
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.212,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "celebrate_01",
+            "title": "Celebrate a Small Win",
+            "type": "positive_activity",
+            "description": "Recognize one achievement from your day and build on that positive feeling.",
+            "tags": [
+              "joy",
+              "motivation",
+              "positive"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.8886,
+            "preference_score": 0.8,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 1.0,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.71,
+            "semantic_score": 0.5976,
+            "score": 0.8021,
+            "base_score": 0.7679,
+            "historical_emotion_score": 0.9443,
+            "historical_trend_score": 0.8416,
+            "trend_adjustment": 0.0342,
+            "trend_adjusted_score": 0.8021,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "strong emotion-score similarity",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "matches repeated emotional patterns from the user's history",
+              "aligned with the user's recent emotional trend",
+              "moderate semantic similarity",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current joy emotional state",
+                "Suitable for your high emotional intensity",
+                "Strong similarity with your detected emotions",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Matches emotional patterns repeatedly observed in your history",
+                "Takes your recent emotional trend into account",
+                "Moderate semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current positive emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.8886,
+                "preference_matching": 0.8,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 1.0,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.9443,
+                "historical_trend": 0.8416,
+                "trend_adjustment": 0.0342,
+                "personalization": 0.71,
+                "semantic_similarity": 0.5976,
+                "final_score": 0.8021
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.8021,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "celebrate_01",
+            "gratitude_01",
+            "planning_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T08",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "joy",
+            "intensity": 0.8886,
+            "polarity": "positive",
+            "preferences": [
+              "gratitude",
+              "positive",
+              "motivation"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "joy",
+            "historical_repeated_emotions": [
+              "joy"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.8886,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:51.060831",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:07.169905",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.737684",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:06.970397",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:06.340608",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.718654",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:29.908934",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:30.028484",
+                "intensity": 0.8886,
+                "emotion": "joy"
+              }
+            ],
+            "emotion_frequency": {
+              "joy": 8
+            },
+            "dominant_emotion": "joy",
+            "repeated_emotions": [
+              "joy"
+            ],
+            "polarity_frequency": {
+              "positive": 8
+            },
+            "positive_records": 8,
+            "negative_records": 0,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 0.0,
+              "older_negative_ratio": 0.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "joy",
+              "joy",
+              "joy",
+              "joy",
+              "joy"
+            ],
+            "latest_emotion": "joy",
+            "latest_polarity": "positive",
+            "latest_severity": "high_positive",
+            "recent_state": {
+              "emotion": "joy",
+              "intensity": 0.8886,
+              "polarity": "positive",
+              "severity": "high_positive"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "joy",
+            "repeated_emotions": [
+              "joy"
+            ],
+            "latest_emotion": "joy",
+            "latest_polarity": "positive"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T09",
+      "status": "success",
+      "text": "I feel nervous and isolated and would like to talk to someone",
+      "expected": [
+        "social_01",
+        "breathing_01",
+        "mindfulness_01"
+      ],
+      "recommended": [
+        "social_01",
+        "break_01",
+        "music_01"
+      ],
+      "relevant": [
+        "social_01"
+      ],
+      "relevant_count": 1,
+      "response_time": 0.131,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 366,
+        "user_id": "task9_retest_T09",
+        "analysis": {
+          "original_text": "I feel nervous and isolated and would like to talk to someone",
+          "preprocessed_text": "feel nervous isolated would like talk someone",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.2263,
+            "positive": 0.229,
+            "negative": 0.404,
+            "neutral": 0.367
+          },
+          "emotion": {
+            "emotion": "fear",
+            "confidence": 0.9948
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "fear",
+            "emotion_scores": {
+              "joy": 0.0161,
+              "sadness": 0.0702,
+              "anger": 0.0043,
+              "fear": 0.1159,
+              "surprise": 0.0047,
+              "disgust": 0.0031
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "fear",
+            "intensity": 0.1159,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0161,
+              "sadness": 0.0702,
+              "anger": 0.0043,
+              "fear": 0.1159,
+              "surprise": 0.0047,
+              "disgust": 0.0031
+            }
+          },
+          "wellness": {
+            "risk_level": "high",
+            "insight": "Employee feedback indicates a possible emotional wellness concern."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "social_01",
+              "title": "Talk to Someone You Trust",
+              "type": "social_support",
+              "description": "Connect with a trusted colleague, friend, or support person.",
+              "tags": [
+                "social-support",
+                "communication",
+                "support"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1159,
+              "preference_score": 1.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8045,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.85,
+              "semantic_score": 0.5268,
+              "score": 0.6629,
+              "base_score": 0.6519,
+              "historical_emotion_score": 0.5579,
+              "historical_trend_score": 0.6097,
+              "trend_adjustment": 0.011,
+              "trend_adjusted_score": 0.6629,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend",
+                "moderate semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Moderate semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1159,
+                  "preference_matching": 1.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8045,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5579,
+                  "historical_trend": 0.6097,
+                  "trend_adjustment": 0.011,
+                  "personalization": 0.85,
+                  "semantic_similarity": 0.5268,
+                  "final_score": 0.6629
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6629,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "break_01",
+              "title": "Take a Screen Break",
+              "type": "break",
+              "description": "Step away from the screen for a few minutes and reset.",
+              "tags": [
+                "break",
+                "rest",
+                "relaxation"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1159,
+              "preference_score": 0.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8045,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.15,
+              "semantic_score": 0.2284,
+              "score": 0.4681,
+              "base_score": 0.4571,
+              "historical_emotion_score": 0.5579,
+              "historical_trend_score": 0.6097,
+              "trend_adjustment": 0.011,
+              "trend_adjusted_score": 0.4681,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1159,
+                  "preference_matching": 0.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8045,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5579,
+                  "historical_trend": 0.6097,
+                  "trend_adjustment": 0.011,
+                  "personalization": 0.15,
+                  "semantic_similarity": 0.2284,
+                  "final_score": 0.4681
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.4681,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "music_01",
+              "title": "Listen to Calming Music",
+              "type": "music",
+              "description": "Listen to calming music to create a more relaxed environment.",
+              "tags": [
+                "music",
+                "relaxation",
+                "calm"
+              ],
+              "rule_score": 0.85,
+              "content_score": 0.1159,
+              "preference_score": 0.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.8045,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.15,
+              "semantic_score": 0.3949,
+              "score": 0.4631,
+              "base_score": 0.4521,
+              "historical_emotion_score": 0.5579,
+              "historical_trend_score": 0.6097,
+              "trend_adjustment": 0.011,
+              "trend_adjusted_score": 0.4631,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current fear emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 0.85,
+                  "content_based": 0.1159,
+                  "preference_matching": 0.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.8045,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5579,
+                  "historical_trend": 0.6097,
+                  "trend_adjustment": 0.011,
+                  "personalization": 0.15,
+                  "semantic_similarity": 0.3949,
+                  "final_score": 0.4631
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.4631,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "social_01",
+            "title": "Talk to Someone You Trust",
+            "type": "social_support",
+            "description": "Connect with a trusted colleague, friend, or support person.",
+            "tags": [
+              "social-support",
+              "communication",
+              "support"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.1159,
+            "preference_score": 1.0,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.8045,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.85,
+            "semantic_score": 0.5268,
+            "score": 0.6629,
+            "base_score": 0.6519,
+            "historical_emotion_score": 0.5579,
+            "historical_trend_score": 0.6097,
+            "trend_adjustment": 0.011,
+            "trend_adjusted_score": 0.6629,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "aligned with the user's recent emotional trend",
+              "moderate semantic similarity",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current fear emotional state",
+                "Suitable for your current low emotional intensity",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Takes your recent emotional trend into account",
+                "Moderate semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.1159,
+                "preference_matching": 1.0,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.8045,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.5579,
+                "historical_trend": 0.6097,
+                "trend_adjustment": 0.011,
+                "personalization": 0.85,
+                "semantic_similarity": 0.5268,
+                "final_score": 0.6629
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6629,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "social_01",
+            "break_01",
+            "music_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T09",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "fear",
+            "intensity": 0.1159,
+            "polarity": "negative",
+            "preferences": [
+              "social-support",
+              "communication",
+              "support"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "fear",
+            "historical_repeated_emotions": [
+              "fear"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.1159,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:51.248655",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:07.339316",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.868439",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:07.085052",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:06.572572",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.838224",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:30.032203",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:30.196910",
+                "intensity": 0.1159,
+                "emotion": "fear"
+              }
+            ],
+            "emotion_frequency": {
+              "fear": 8
+            },
+            "dominant_emotion": "fear",
+            "repeated_emotions": [
+              "fear"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "fear",
+              "fear",
+              "fear",
+              "fear",
+              "fear"
+            ],
+            "latest_emotion": "fear",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "fear",
+              "intensity": 0.1159,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "fear",
+            "repeated_emotions": [
+              "fear"
+            ],
+            "latest_emotion": "fear",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    },
+    {
+      "test_id": "T10",
+      "status": "success",
+      "text": "My workload is stressful and I need to organize my tasks",
+      "expected": [
+        "planning_01",
+        "focus_01",
+        "breathing_01"
+      ],
+      "recommended": [
+        "planning_01",
+        "mindfulness_01",
+        "focus_01"
+      ],
+      "relevant": [
+        "planning_01",
+        "focus_01"
+      ],
+      "relevant_count": 2,
+      "response_time": 0.128,
+      "full_response": {
+        "status": "success",
+        "message": "Personalized recommendations generated successfully",
+        "history_record_id": 367,
+        "user_id": "task9_retest_T10",
+        "analysis": {
+          "original_text": "My workload is stressful and I need to organize my tasks",
+          "preprocessed_text": "workload stressful need organize task",
+          "sentiment": {
+            "sentiment": "negative",
+            "compound": -0.5106,
+            "positive": 0.0,
+            "negative": 0.452,
+            "neutral": 0.548
+          },
+          "emotion": {
+            "emotion": "fear",
+            "confidence": 0.5039
+          },
+          "multilabel_emotion": {
+            "detected_emotions": [],
+            "primary_emotion": "sadness",
+            "emotion_scores": {
+              "joy": 0.0159,
+              "sadness": 0.1699,
+              "anger": 0.0033,
+              "fear": 0.0234,
+              "surprise": 0.001,
+              "disgust": 0.0022
+            }
+          },
+          "emotional_state": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.1699,
+            "polarity": "negative",
+            "mixed_emotion": false,
+            "severity": "low",
+            "emotion_scores": {
+              "joy": 0.0159,
+              "sadness": 0.1699,
+              "anger": 0.0033,
+              "fear": 0.0234,
+              "surprise": 0.001,
+              "disgust": 0.0022
+            }
+          },
+          "wellness": {
+            "risk_level": "high",
+            "insight": "Employee feedback indicates a possible emotional wellness concern."
+          }
+        },
+        "recommendations": {
+          "recommendations": [
+            {
+              "id": "planning_01",
+              "title": "Workload Planning Reset",
+              "type": "productivity",
+              "description": "List your tasks and prioritize the most important items first.",
+              "tags": [
+                "planning",
+                "workload",
+                "productivity"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1699,
+              "preference_score": 1.0,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6588,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.85,
+              "semantic_score": 0.6622,
+              "score": 0.6783,
+              "base_score": 0.6657,
+              "historical_emotion_score": 0.5849,
+              "historical_trend_score": 0.6259,
+              "trend_adjustment": 0.0126,
+              "trend_adjusted_score": 0.6783,
+              "rank": 1,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend",
+                "strong semantic similarity",
+                "strong personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Strong semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1699,
+                  "preference_matching": 1.0,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6588,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5849,
+                  "historical_trend": 0.6259,
+                  "trend_adjustment": 0.0126,
+                  "personalization": 0.85,
+                  "semantic_similarity": 0.6622,
+                  "final_score": 0.6783
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.6783,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "mindfulness_01",
+              "title": "Mindfulness Reset",
+              "type": "mindfulness",
+              "description": "A simple mindfulness activity to help regain emotional balance.",
+              "tags": [
+                "mindfulness",
+                "relaxation",
+                "focus"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.1699,
+              "preference_score": 0.2667,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.6588,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.3367,
+              "semantic_score": 0.3592,
+              "score": 0.5228,
+              "base_score": 0.5102,
+              "historical_emotion_score": 0.5849,
+              "historical_trend_score": 0.6259,
+              "trend_adjustment": 0.0126,
+              "trend_adjusted_score": 0.5228,
+              "rank": 2,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "strong emotion-vector similarity",
+                "aligned with the user's recent emotional trend"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong similarity between your emotion profile and this wellness activity",
+                  "Takes your recent emotional trend into account",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.1699,
+                  "preference_matching": 0.2667,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.6588,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.5849,
+                  "historical_trend": 0.6259,
+                  "trend_adjustment": 0.0126,
+                  "personalization": 0.3367,
+                  "semantic_similarity": 0.3592,
+                  "final_score": 0.5228
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.5228,
+              "feedback_learning_applied": false
+            },
+            {
+              "id": "focus_01",
+              "title": "Focus Reset Exercise",
+              "type": "productivity",
+              "description": "Break your workload into one small achievable task at a time.",
+              "tags": [
+                "focus",
+                "productivity",
+                "work"
+              ],
+              "rule_score": 1.0,
+              "content_score": 0.0234,
+              "preference_score": 0.6,
+              "collaborative_score": 0.5,
+              "emotion_similarity_score": 0.1096,
+              "historical_behavior_score": 0.5,
+              "personalization_score": 0.57,
+              "semantic_score": 0.6189,
+              "score": 0.4998,
+              "base_score": 0.5223,
+              "historical_emotion_score": 0.0,
+              "historical_trend_score": 0.275,
+              "trend_adjustment": -0.0225,
+              "trend_adjusted_score": 0.4998,
+              "rank": 3,
+              "ranking_reason": [
+                "strong emotional and intensity match",
+                "matches user preferences",
+                "strong semantic similarity",
+                "good personalization match"
+              ],
+              "explanation": {
+                "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+                "reasons": [
+                  "Strong match for your current sadness emotional state",
+                  "Suitable for your current low emotional intensity",
+                  "Strong semantic match with your current concern",
+                  "Matches your preferred wellness activities",
+                  "Aligned with your current negative emotional state"
+                ],
+                "factors": {
+                  "emotional_match": 1.0,
+                  "content_based": 0.0234,
+                  "preference_matching": 0.6,
+                  "collaborative_filtering": 0.5,
+                  "emotion_similarity": 0.1096,
+                  "historical_behavior": 0.5,
+                  "historical_emotion_pattern": 0.0,
+                  "historical_trend": 0.275,
+                  "trend_adjustment": -0.0225,
+                  "personalization": 0.57,
+                  "semantic_similarity": 0.6189,
+                  "final_score": 0.4998
+                }
+              },
+              "feedback_score": 0.0,
+              "learned_score": 0.4998,
+              "feedback_learning_applied": false
+            }
+          ],
+          "count": 3,
+          "top_recommendation": {
+            "id": "planning_01",
+            "title": "Workload Planning Reset",
+            "type": "productivity",
+            "description": "List your tasks and prioritize the most important items first.",
+            "tags": [
+              "planning",
+              "workload",
+              "productivity"
+            ],
+            "rule_score": 1.0,
+            "content_score": 0.1699,
+            "preference_score": 1.0,
+            "collaborative_score": 0.5,
+            "emotion_similarity_score": 0.6588,
+            "historical_behavior_score": 0.5,
+            "personalization_score": 0.85,
+            "semantic_score": 0.6622,
+            "score": 0.6783,
+            "base_score": 0.6657,
+            "historical_emotion_score": 0.5849,
+            "historical_trend_score": 0.6259,
+            "trend_adjustment": 0.0126,
+            "trend_adjusted_score": 0.6783,
+            "rank": 1,
+            "ranking_reason": [
+              "strong emotional and intensity match",
+              "matches user preferences",
+              "strong emotion-vector similarity",
+              "aligned with the user's recent emotional trend",
+              "strong semantic similarity",
+              "strong personalization match"
+            ],
+            "explanation": {
+              "summary": "Recommended using multiple signals from your emotional state, preferences, behavior, and wellness content.",
+              "reasons": [
+                "Strong match for your current sadness emotional state",
+                "Suitable for your current low emotional intensity",
+                "Strong similarity between your emotion profile and this wellness activity",
+                "Takes your recent emotional trend into account",
+                "Strong semantic match with your current concern",
+                "Matches your preferred wellness activities",
+                "Aligned with your current negative emotional state"
+              ],
+              "factors": {
+                "emotional_match": 1.0,
+                "content_based": 0.1699,
+                "preference_matching": 1.0,
+                "collaborative_filtering": 0.5,
+                "emotion_similarity": 0.6588,
+                "historical_behavior": 0.5,
+                "historical_emotion_pattern": 0.5849,
+                "historical_trend": 0.6259,
+                "trend_adjustment": 0.0126,
+                "personalization": 0.85,
+                "semantic_similarity": 0.6622,
+                "final_score": 0.6783
+              }
+            },
+            "feedback_score": 0.0,
+            "learned_score": 0.6783,
+            "feedback_learning_applied": false
+          },
+          "ranking_order": [
+            "planning_01",
+            "mindfulness_01",
+            "focus_01"
+          ],
+          "duplicate_filtered": 0,
+          "low_relevance_filtered": 0,
+          "method": "hybrid_semantic_feedback",
+          "components": [
+            "rule_based",
+            "content_based",
+            "preference_matching",
+            "collaborative_filtering",
+            "emotion_similarity",
+            "historical_behavior",
+            "semantic_similarity",
+            "emotional_trend_tracking",
+            "historical_emotion_patterns",
+            "dynamic_ranking",
+            "duplicate_filtering",
+            "low_relevance_filtering",
+            "recommendation_explainability",
+            "feedback_learning"
+          ],
+          "hybrid_weights": {
+            "rule_based": 0.2,
+            "content_based": 0.15,
+            "preference_matching": 0.15,
+            "collaborative_filtering": 0.15,
+            "emotion_similarity": 0.1,
+            "historical_behavior": 0.1,
+            "semantic_similarity": 0.15
+          },
+          "user_id": "task9_retest_T10",
+          "collaborative_users_available": 4,
+          "personalization": {
+            "dominant_emotion": "sadness",
+            "intensity": 0.1699,
+            "polarity": "negative",
+            "preferences": [
+              "planning",
+              "workload",
+              "productivity"
+            ],
+            "history_used": 0,
+            "collaborative_history_used": false,
+            "emotional_history_records": 8,
+            "historical_emotion_tracking": true,
+            "historical_dominant_emotion": "sadness",
+            "historical_repeated_emotions": [
+              "sadness"
+            ],
+            "historical_trend": "stable"
+          },
+          "historical_emotional_trend": {
+            "trend": "stable",
+            "message": "Emotional intensity has remained relatively stable.",
+            "records_analyzed": 8,
+            "average_intensity": 0.1699,
+            "intensity_change": 0.0,
+            "intensity_over_time": [
+              {
+                "timestamp": "2026-10-07T13:19:51.409882",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:25:07.506872",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T13:58:22.966618",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:10:07.246421",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:12:06.691288",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T14:26:58.940735",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T18:09:30.192219",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              },
+              {
+                "timestamp": "2026-10-07T22:53:30.341893",
+                "intensity": 0.1699,
+                "emotion": "sadness"
+              }
+            ],
+            "emotion_frequency": {
+              "sadness": 8
+            },
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "polarity_frequency": {
+              "negative": 8
+            },
+            "positive_records": 0,
+            "negative_records": 8,
+            "neutral_records": 0,
+            "positive_negative_trend": {
+              "direction": "stable",
+              "recent_negative_ratio": 1.0,
+              "older_negative_ratio": 1.0,
+              "negative_ratio_change": 0.0
+            },
+            "recent_emotions": [
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness",
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative",
+            "latest_severity": "low",
+            "recent_state": {
+              "emotion": "sadness",
+              "intensity": 0.1699,
+              "polarity": "negative",
+              "severity": "low"
+            }
+          },
+          "trend_influence": {
+            "enabled": true,
+            "records_analyzed": 8,
+            "trend": "stable",
+            "dominant_emotion": "sadness",
+            "repeated_emotions": [
+              "sadness"
+            ],
+            "latest_emotion": "sadness",
+            "latest_polarity": "negative"
+          }
+        }
+      }
+    }
+  ]
+}
