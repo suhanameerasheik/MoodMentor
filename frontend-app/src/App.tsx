@@ -2380,49 +2380,184 @@ function App() {
 
                       </div>
 
-                      <div className="trend-intensity-bars">
+<div className="trend-intensity-section">
 
-                        {(
-                          trendAnalysis
-                            .intensity_over_time ||
-                          []
-                        ).map(
-                          (
-                            intensity,
-                            index
-                          ) => (
+  <div className="trend-intensity-header">
+    <span>Intensity History</span>
 
-                            <div
-                              className="trend-intensity-bar-wrapper"
-                              key={index}
-                              title={`Record ${
-                                index + 1
-                              }: ${percentage(
-                                intensity
-                              )}`}
-                            >
+    <strong>
+      {emotionalTrend?.history?.length || 0} observations
+    </strong>
+  </div>
 
-                              <div
-                                className="trend-intensity-bar-fill"
-                                style={{
-                                  height: `${Math.min(
-                                    100,
-                                    Math.max(
-                                      5,
-                                      intensity *
-                                        100
-                                    )
-                                  )}%`,
-                                }}
-                              />
+  <div
+    style={{
+      display: "flex",
+      alignItems: "flex-end",
+      gap: "16px",
+      width: "100%",
+      minHeight: "260px",
+      padding: "20px 15px 10px",
+      overflowX: "auto",
+      boxSizing: "border-box",
+      borderBottom: "1px solid #cbd5e1",
+    }}
+  >
 
-                            </div>
+    {(emotionalTrend?.history || []).map(
+      (record: any, index: number) => {
 
-                          )
-                        )}
+        /*
+         * Use the intensity stored for THIS exact
+         * emotional-history record.
+         */
 
-                      </div>
+        const rawIntensity = Number(
+          record.intensity ?? 0
+        );
 
+        /*
+         * Support both formats:
+         * 0.16 -> 16%
+         * 0.50 -> 50%
+         * 1.00 -> 100%
+         *
+         * Also supports:
+         * 16 -> 16%
+         * 50 -> 50%
+         * 100 -> 100%
+         */
+
+        const intensityPercentage =
+          rawIntensity <= 1
+            ? rawIntensity * 100
+            : rawIntensity;
+
+        const safeIntensity = Math.min(
+          100,
+          Math.max(0, intensityPercentage)
+        );
+
+        return (
+          <div
+            key={
+              record.id ??
+              `${record.created_at}-${index}`
+            }
+            style={{
+              minWidth: "55px",
+              height: "220px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "flex-end",
+            }}
+            title={
+              `Input ${index + 1}` +
+              ` | Emotion: ${record.emotion ?? "Unknown"}` +
+              ` | Intensity: ${Math.round(
+                safeIntensity
+              )}%`
+            }
+          >
+
+            {/* Intensity value */}
+            <strong
+              style={{
+                fontSize: "12px",
+                marginBottom: "6px",
+                color: "#111827",
+              }}
+            >
+              {Math.round(safeIntensity)}%
+            </strong>
+
+            {/* Bar container */}
+            <div
+              style={{
+                width: "32px",
+                height: "160px",
+                position: "relative",
+                background: "#e5e7eb",
+                borderRadius: "6px",
+                overflow: "hidden",
+                border: "1px solid #cbd5e1",
+                display: "flex",
+                alignItems: "flex-end",
+              }}
+            >
+
+              {/* ACTUAL intensity representation */}
+              <div
+                style={{
+                  width: "100%",
+                  height: `${safeIntensity}%`,
+                  background:
+                    safeIntensity >= 70
+                      ? "#ef4444"
+                      : safeIntensity >= 40
+                      ? "#f59e0b"
+                      : "#22c55e",
+                  borderRadius:
+                    "5px 5px 0 0",
+                  transition:
+                    "height 0.4s ease",
+                }}
+              />
+
+            </div>
+
+            {/* Input number */}
+            <span
+              style={{
+                marginTop: "7px",
+                fontSize: "11px",
+                fontWeight: 600,
+                color: "#475569",
+              }}
+            >
+              Input {index + 1}
+            </span>
+
+            {/* Emotion */}
+            <span
+              style={{
+                marginTop: "2px",
+                fontSize: "10px",
+                color: "#64748b",
+                maxWidth: "60px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {record.emotion ?? "Unknown"}
+            </span>
+
+          </div>
+        );
+      }
+    )}
+
+  </div>
+
+  {/* Scale */}
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      fontSize: "11px",
+      color: "#64748b",
+      marginTop: "6px",
+      padding: "0 15px",
+    }}
+  >
+    <span>Low</span>
+    <span>Moderate</span>
+    <span>High</span>
+  </div>
+
+</div>                     
                     </div>
 
                     <div className="trend-current-state">
