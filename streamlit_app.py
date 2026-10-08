@@ -113,6 +113,48 @@ def analyze_and_recommend(
         return None
 
 
+def save_recommendation_feedback(
+    recommendation_id,
+    feedback,
+    emotional_state,
+    user_id,
+    rating=None,
+    interaction_type=None,
+):
+    """Save recommendation feedback through the backend API."""
+
+    payload = {
+        "recommendation_id": recommendation_id,
+        "feedback": feedback,
+        "emotional_state": emotional_state,
+        "user_id": user_id,
+    }
+
+    if rating is not None:
+        payload["rating"] = rating
+
+    if interaction_type is not None:
+        payload["interaction_type"] = interaction_type
+
+    try:
+        response = requests.post(
+            f"{BACKEND_URL}/recommendation-feedback",
+            json=payload,
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+    except requests.RequestException as exc:
+        st.error(
+            f"Unable to save feedback: {exc}"
+        )
+
+        return None
+
+
 # ============================================================
 # HEADER
 # ============================================================
@@ -898,6 +940,11 @@ if "latest_result" in st.session_state:
                 [],
             )
 
+            recommendation_id = recommendation.get(
+                "id",
+                "",
+            )
+
             try:
                 score_value = float(score)
             except (
@@ -978,7 +1025,9 @@ if "latest_result" in st.session_state:
                         "**Why this recommendation?**"
                     )
 
-                    st.write(explanation)
+                    st.write(
+                        explanation
+                    )
 
 
                 # ------------------------------------------------
@@ -1002,6 +1051,166 @@ if "latest_result" in st.session_state:
                         st.write(
                             f"- {reason}"
                         )
+
+
+                # ------------------------------------------------
+                # RECOMMENDATION FEEDBACK
+                # ------------------------------------------------
+
+                st.divider()
+
+                st.write(
+                    "**Was this recommendation helpful?**"
+                )
+
+                feedback_col1, feedback_col2 = st.columns(2)
+
+                with feedback_col1:
+
+                    if st.button(
+                        "👍 Helpful",
+                        key=(
+                            f"helpful_"
+                            f"{recommendation_id}_"
+                            f"{index}"
+                        ),
+                    ):
+
+                        if not recommendation_id:
+
+                            st.error(
+                                "Recommendation ID is missing."
+                            )
+
+                        else:
+
+                            feedback_response = (
+                                save_recommendation_feedback(
+                                    recommendation_id=(
+                                        recommendation_id
+                                    ),
+                                    feedback="helpful",
+                                    emotional_state=(
+                                        result.get(
+                                            "analysis",
+                                            {},
+                                        ).get(
+                                            "emotional_state",
+                                            {},
+                                        )
+                                    ),
+                                    user_id=user_id,
+                                    interaction_type="accepted",
+                                )
+                            )
+
+                            if feedback_response:
+
+                                st.success(
+                                    "Thank you! Your feedback was saved."
+                                )
+
+
+                with feedback_col2:
+
+                    if st.button(
+                        "👎 Not Helpful",
+                        key=(
+                            f"not_helpful_"
+                            f"{recommendation_id}_"
+                            f"{index}"
+                        ),
+                    ):
+
+                        if not recommendation_id:
+
+                            st.error(
+                                "Recommendation ID is missing."
+                            )
+
+                        else:
+
+                            feedback_response = (
+                                save_recommendation_feedback(
+                                    recommendation_id=(
+                                        recommendation_id
+                                    ),
+                                    feedback="not_helpful",
+                                    emotional_state=(
+                                        result.get(
+                                            "analysis",
+                                            {},
+                                        ).get(
+                                            "emotional_state",
+                                            {},
+                                        )
+                                    ),
+                                    user_id=user_id,
+                                    interaction_type="rejected",
+                                )
+                            )
+
+                            if feedback_response:
+
+                                st.success(
+                                    "Thank you! Your feedback was saved."
+                                )
+
+
+                rating = st.select_slider(
+                    "Rate this recommendation",
+                    options=[1, 2, 3, 4, 5],
+                    value=3,
+                    key=(
+                        f"rating_"
+                        f"{recommendation_id}_"
+                        f"{index}"
+                    ),
+                )
+
+                if st.button(
+                    "Submit Rating",
+                    key=(
+                        f"submit_rating_"
+                        f"{recommendation_id}_"
+                        f"{index}"
+                    ),
+                ):
+
+                    if not recommendation_id:
+
+                        st.error(
+                            "Recommendation ID is missing."
+                        )
+
+                    else:
+
+                        rating_response = (
+                            save_recommendation_feedback(
+                                recommendation_id=(
+                                    recommendation_id
+                                ),
+                                feedback="helpful",
+                                emotional_state=(
+                                    result.get(
+                                        "analysis",
+                                        {},
+                                    ).get(
+                                        "emotional_state",
+                                        {},
+                                    )
+                                ),
+                                user_id=user_id,
+                                rating=rating,
+                                interaction_type="rating",
+                            )
+                        )
+
+                        if rating_response:
+
+                            st.success(
+                                "Your rating was saved."
+                            )
 
     else:
 
