@@ -74,3 +74,4 @@ websockets==17.1
 xxhash==4.0.1
 yarl==1.25.1
 streamlit==1.65.0
+reportlab==5.0.1

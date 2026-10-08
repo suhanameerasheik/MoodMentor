@@ -1,5 +1,24 @@
+import html
+import io
+
 import requests
 import streamlit as st
+
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle,
+)
+from reportlab.lib.units import inch
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+)
 
 
 # ============================================================
@@ -37,7 +56,10 @@ def get_previous_interactions(user_id):
         data = response.json()
 
         if isinstance(data, dict):
-            interactions = data.get("interactions", [])
+            interactions = data.get(
+                "interactions",
+                [],
+            )
 
             if isinstance(interactions, list):
                 return interactions
@@ -156,6 +178,1140 @@ def save_recommendation_feedback(
 
 
 # ============================================================
+# PDF HELPER FUNCTIONS
+# ============================================================
+
+def pdf_paragraph(
+    value,
+    style,
+):
+    """
+    Convert a value into a ReportLab Paragraph.
+
+    Paragraph is used instead of a plain string so that
+    long text wraps correctly inside PDF table cells.
+    """
+
+    if value is None:
+        value = ""
+
+    safe_value = html.escape(
+        str(value)
+    )
+
+    return Paragraph(
+        safe_value,
+        style,
+    )
+
+
+def format_pdf_date(timestamp):
+    """
+    Format an ISO timestamp so it does not collide with
+    neighboring PDF table columns.
+
+    Example:
+    2026-10-08T23:59:13.687325
+
+    becomes:
+
+    2026-10-08
+    23:59:13
+    """
+
+    if timestamp is None:
+        return "Unknown"
+
+    value = str(timestamp).strip()
+
+    if "T" in value:
+        date_part, time_part = value.split(
+            "T",
+            1,
+        )
+
+        if "." in time_part:
+            time_part = time_part.split(
+                ".",
+                1,
+            )[0]
+
+        return (
+            f"{html.escape(date_part)}"
+            f"<br/>"
+            f"{html.escape(time_part)}"
+        )
+
+    return html.escape(value)
+
+
+# ============================================================
+# PDF REPORT GENERATION
+# ============================================================
+
+def create_pdf_report(
+    user_id,
+    result,
+    trend_result,
+    history,
+):
+    """Create a PDF wellness report from dashboard data."""
+
+    buffer = io.BytesIO()
+
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=letter,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40,
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        "ReportTitle",
+        parent=styles["Title"],
+        alignment=TA_CENTER,
+        spaceAfter=18,
+    )
+
+    heading_style = ParagraphStyle(
+        "ReportHeading",
+        parent=styles["Heading2"],
+        spaceBefore=12,
+        spaceAfter=8,
+    )
+
+    body_style = ParagraphStyle(
+        "ReportBody",
+        parent=styles["BodyText"],
+        fontSize=9,
+        leading=12,
+        spaceAfter=6,
+    )
+
+    table_header_style = ParagraphStyle(
+        "TableHeader",
+        parent=styles["BodyText"],
+        fontName="Helvetica-Bold",
+        fontSize=8,
+        leading=10,
+    )
+
+    table_cell_style = ParagraphStyle(
+        "TableCell",
+        parent=styles["BodyText"],
+        fontSize=8,
+        leading=10,
+    )
+
+    date_cell_style = ParagraphStyle(
+        "DateCell",
+        parent=styles["BodyText"],
+        fontSize=7.5,
+        leading=9,
+    )
+
+    story = []
+
+    # ========================================================
+    # REPORT TITLE
+    # ========================================================
+
+    story.append(
+        Paragraph(
+            "MoodMentor Wellness Report",
+            title_style,
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>User ID:</b> "
+            f"{html.escape(str(user_id))}",
+            body_style,
+        )
+    )
+
+    story.append(
+        Spacer(
+            1,
+            10,
+        )
+    )
+
+    # ========================================================
+    # CURRENT EMOTIONAL ANALYSIS
+    # ========================================================
+
+    analysis = {}
+
+    if isinstance(result, dict):
+        analysis = result.get(
+            "analysis",
+            {},
+        )
+
+    if not isinstance(analysis, dict):
+        analysis = {}
+
+    emotional_state = analysis.get(
+        "emotional_state",
+        {},
+    )
+
+    if not isinstance(emotional_state, dict):
+        emotional_state = {}
+
+    sentiment = analysis.get(
+        "sentiment",
+        {},
+    )
+
+    if not isinstance(sentiment, dict):
+        sentiment = {}
+
+    emotion = analysis.get(
+        "emotion",
+        {},
+    )
+
+    if not isinstance(emotion, dict):
+        emotion = {}
+
+    wellness = analysis.get(
+        "wellness",
+        {},
+    )
+
+    if not isinstance(wellness, dict):
+        wellness = {}
+
+    story.append(
+        Paragraph(
+            "Emotional Analysis",
+            heading_style,
+        )
+    )
+
+    try:
+        intensity_value = float(
+            emotional_state.get(
+                "intensity",
+                0,
+            )
+        )
+    except (
+        TypeError,
+        ValueError,
+    ):
+        intensity_value = 0.0
+
+    try:
+        confidence_value = float(
+            emotion.get(
+                "confidence",
+                0,
+            )
+        )
+    except (
+        TypeError,
+        ValueError,
+    ):
+        confidence_value = 0.0
+
+    analysis_data = [
+        [
+            pdf_paragraph(
+                "Metric",
+                table_header_style,
+            ),
+            pdf_paragraph(
+                "Value",
+                table_header_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Dominant Emotion",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    emotional_state.get(
+                        "dominant_emotion",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Intensity",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                f"{intensity_value:.2f}",
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Polarity",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    emotional_state.get(
+                        "polarity",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Severity",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    emotional_state.get(
+                        "severity",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Risk Level",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    wellness.get(
+                        "risk_level",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Model Emotion",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    emotion.get(
+                        "emotion",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Model Confidence",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                f"{confidence_value:.2%}",
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Sentiment",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    sentiment.get(
+                        "sentiment",
+                        "N/A",
+                    )
+                ).title(),
+                table_cell_style,
+            ),
+        ],
+        [
+            pdf_paragraph(
+                "Sentiment Compound",
+                table_cell_style,
+            ),
+            pdf_paragraph(
+                str(
+                    sentiment.get(
+                        "compound",
+                        0,
+                    )
+                ),
+                table_cell_style,
+            ),
+        ],
+    ]
+
+    analysis_table = Table(
+        analysis_data,
+        colWidths=[
+            2.3 * inch,
+            3.7 * inch,
+        ],
+        repeatRows=1,
+    )
+
+    analysis_table.setStyle(
+        TableStyle(
+            [
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.lightgrey,
+                ),
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.grey,
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "TOP",
+                ),
+                (
+                    "PADDING",
+                    (0, 0),
+                    (-1, -1),
+                    6,
+                ),
+            ]
+        )
+    )
+
+    story.append(
+        analysis_table
+    )
+
+    # ========================================================
+    # EMOTIONAL SCORES
+    # ========================================================
+
+    emotion_scores = emotional_state.get(
+        "emotion_scores",
+        {},
+    )
+
+    if (
+        isinstance(
+            emotion_scores,
+            dict,
+        )
+        and emotion_scores
+    ):
+
+        story.append(
+            Paragraph(
+                "Emotional Scores",
+                heading_style,
+            )
+        )
+
+        score_data = [
+            [
+                pdf_paragraph(
+                    "Emotion",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Score",
+                    table_header_style,
+                ),
+            ]
+        ]
+
+        for emotion_name, score in emotion_scores.items():
+
+            try:
+                score_value = float(score)
+            except (
+                TypeError,
+                ValueError,
+            ):
+                continue
+
+            score_data.append(
+                [
+                    pdf_paragraph(
+                        str(
+                            emotion_name
+                        ).title(),
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        f"{score_value:.4f}",
+                        table_cell_style,
+                    ),
+                ]
+            )
+
+        if len(score_data) > 1:
+
+            score_table = Table(
+                score_data,
+                colWidths=[
+                    2.3 * inch,
+                    1.5 * inch,
+                ],
+                repeatRows=1,
+            )
+
+            score_table.setStyle(
+                TableStyle(
+                    [
+                        (
+                            "BACKGROUND",
+                            (0, 0),
+                            (-1, 0),
+                            colors.lightgrey,
+                        ),
+                        (
+                            "GRID",
+                            (0, 0),
+                            (-1, -1),
+                            0.5,
+                            colors.grey,
+                        ),
+                        (
+                            "PADDING",
+                            (0, 0),
+                            (-1, -1),
+                            6,
+                        ),
+                    ]
+                )
+            )
+
+            story.append(
+                score_table
+            )
+
+    # ========================================================
+    # WELLNESS INSIGHT
+    # ========================================================
+
+    story.append(
+        Paragraph(
+            "Wellness Insight",
+            heading_style,
+        )
+    )
+
+    insight = wellness.get(
+        "insight",
+        "No wellness insight available.",
+    )
+
+    story.append(
+        Paragraph(
+            html.escape(
+                str(insight)
+            ),
+            body_style,
+        )
+    )
+
+    # ========================================================
+    # EMOTIONAL TREND
+    # ========================================================
+
+    if isinstance(
+        trend_result,
+        dict,
+    ):
+
+        trend_analysis = trend_result.get(
+            "trend_analysis",
+            {},
+        )
+
+        if not isinstance(
+            trend_analysis,
+            dict,
+        ):
+            trend_analysis = {}
+
+        story.append(
+            Paragraph(
+                "Emotional Trend",
+                heading_style,
+            )
+        )
+
+        try:
+            average_intensity = float(
+                trend_analysis.get(
+                    "average_intensity",
+                    0,
+                )
+            )
+        except (
+            TypeError,
+            ValueError,
+        ):
+            average_intensity = 0.0
+
+        try:
+            intensity_change = float(
+                trend_analysis.get(
+                    "intensity_change",
+                    0,
+                )
+            )
+        except (
+            TypeError,
+            ValueError,
+        ):
+            intensity_change = 0.0
+
+        trend_data = [
+            [
+                pdf_paragraph(
+                    "Metric",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Value",
+                    table_header_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Overall Trend",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    str(
+                        trend_analysis.get(
+                            "trend",
+                            "N/A",
+                        )
+                    ).title(),
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Records Analyzed",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    str(
+                        trend_analysis.get(
+                            "records_analyzed",
+                            0,
+                        )
+                    ),
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Average Intensity",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    f"{average_intensity:.2f}",
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Intensity Change",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    f"{intensity_change:+.3f}",
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Latest Emotion",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    str(
+                        trend_analysis.get(
+                            "latest_emotion",
+                            "N/A",
+                        )
+                    ).title(),
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Latest Polarity",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    str(
+                        trend_analysis.get(
+                            "latest_polarity",
+                            "N/A",
+                        )
+                    ).title(),
+                    table_cell_style,
+                ),
+            ],
+            [
+                pdf_paragraph(
+                    "Latest Severity",
+                    table_cell_style,
+                ),
+                pdf_paragraph(
+                    str(
+                        trend_analysis.get(
+                            "latest_severity",
+                            "N/A",
+                        )
+                    ).title(),
+                    table_cell_style,
+                ),
+            ],
+        ]
+
+        trend_table = Table(
+            trend_data,
+            colWidths=[
+                2.3 * inch,
+                3.7 * inch,
+            ],
+            repeatRows=1,
+        )
+
+        trend_table.setStyle(
+            TableStyle(
+                [
+                    (
+                        "BACKGROUND",
+                        (0, 0),
+                        (-1, 0),
+                        colors.lightgrey,
+                    ),
+                    (
+                        "GRID",
+                        (0, 0),
+                        (-1, -1),
+                        0.5,
+                        colors.grey,
+                    ),
+                    (
+                        "VALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "TOP",
+                    ),
+                    (
+                        "PADDING",
+                        (0, 0),
+                        (-1, -1),
+                        6,
+                    ),
+                ]
+            )
+        )
+
+        story.append(
+            trend_table
+        )
+
+        trend_message = trend_analysis.get(
+            "message",
+            "",
+        )
+
+        if trend_message:
+
+            story.append(
+                Paragraph(
+                    html.escape(
+                        str(trend_message)
+                    ),
+                    body_style,
+                )
+            )
+
+    # ========================================================
+    # PERSONALIZED RECOMMENDATIONS
+    # ========================================================
+
+    story.append(
+        Paragraph(
+            "Personalized Recommendations",
+            heading_style,
+        )
+    )
+
+    recommendation_result = {}
+
+    if isinstance(result, dict):
+
+        recommendation_result = result.get(
+            "recommendations",
+            {},
+        )
+
+    if isinstance(
+        recommendation_result,
+        dict,
+    ):
+
+        recommendations = (
+            recommendation_result.get(
+                "recommendations",
+                [],
+            )
+        )
+
+    elif isinstance(
+        recommendation_result,
+        list,
+    ):
+
+        recommendations = recommendation_result
+
+    else:
+
+        recommendations = []
+
+    if recommendations:
+
+        recommendation_data = [
+            [
+                pdf_paragraph(
+                    "Recommendation",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Type",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Score",
+                    table_header_style,
+                ),
+            ]
+        ]
+
+        for recommendation in recommendations[:10]:
+
+            if not isinstance(
+                recommendation,
+                dict,
+            ):
+                continue
+
+            recommendation_data.append(
+                [
+                    pdf_paragraph(
+                        recommendation.get(
+                            "title",
+                            "Unknown",
+                        ),
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        recommendation.get(
+                            "type",
+                            "General",
+                        ),
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        recommendation.get(
+                            "score",
+                            0,
+                        ),
+                        table_cell_style,
+                    ),
+                ]
+            )
+
+        if len(recommendation_data) > 1:
+
+            recommendation_table = Table(
+                recommendation_data,
+                colWidths=[
+                    3.2 * inch,
+                    1.3 * inch,
+                    0.9 * inch,
+                ],
+                repeatRows=1,
+            )
+
+            recommendation_table.setStyle(
+                TableStyle(
+                    [
+                        (
+                            "BACKGROUND",
+                            (0, 0),
+                            (-1, 0),
+                            colors.lightgrey,
+                        ),
+                        (
+                            "GRID",
+                            (0, 0),
+                            (-1, -1),
+                            0.5,
+                            colors.grey,
+                        ),
+                        (
+                            "VALIGN",
+                            (0, 0),
+                            (-1, -1),
+                            "TOP",
+                        ),
+                        (
+                            "PADDING",
+                            (0, 0),
+                            (-1, -1),
+                            6,
+                        ),
+                    ]
+                )
+            )
+
+            story.append(
+                recommendation_table
+            )
+
+    else:
+
+        story.append(
+            Paragraph(
+                "No recommendations were available.",
+                body_style,
+            )
+        )
+
+    # ========================================================
+    # PREVIOUS INTERACTION HISTORY
+    # ========================================================
+
+    story.append(
+        Paragraph(
+            "Previous Interaction History",
+            heading_style,
+        )
+    )
+
+    if (
+        isinstance(
+            history,
+            list,
+        )
+        and history
+    ):
+
+        history_data = [
+            [
+                pdf_paragraph(
+                    "Date",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Emotion",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Intensity",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Polarity",
+                    table_header_style,
+                ),
+                pdf_paragraph(
+                    "Severity",
+                    table_header_style,
+                ),
+            ]
+        ]
+
+        for record in history[:20]:
+
+            if not isinstance(
+                record,
+                dict,
+            ):
+                continue
+
+            record_emotional_state = record.get(
+                "emotional_state",
+                {},
+            )
+
+            if not isinstance(
+                record_emotional_state,
+                dict,
+            ):
+                record_emotional_state = {}
+
+            intensity = record_emotional_state.get(
+                "intensity",
+                0,
+            )
+
+            try:
+                intensity_value = float(
+                    intensity
+                )
+            except (
+                TypeError,
+                ValueError,
+            ):
+                intensity_value = 0.0
+
+            date_value = format_pdf_date(
+                record.get(
+                    "created_at",
+                    "Unknown",
+                )
+            )
+
+            history_data.append(
+                [
+                    Paragraph(
+                        date_value,
+                        date_cell_style,
+                    ),
+                    pdf_paragraph(
+                        str(
+                            record_emotional_state.get(
+                                "dominant_emotion",
+                                "N/A",
+                            )
+                        ).title(),
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        f"{intensity_value:.2f}",
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        str(
+                            record_emotional_state.get(
+                                "polarity",
+                                "N/A",
+                            )
+                        ).title(),
+                        table_cell_style,
+                    ),
+                    pdf_paragraph(
+                        str(
+                            record_emotional_state.get(
+                                "severity",
+                                "N/A",
+                            )
+                        ).title(),
+                        table_cell_style,
+                    ),
+                ]
+            )
+
+        if len(history_data) > 1:
+
+            history_table = Table(
+                history_data,
+                colWidths=[
+                    1.65 * inch,
+                    1.20 * inch,
+                    0.85 * inch,
+                    1.00 * inch,
+                    1.20 * inch,
+                ],
+                repeatRows=1,
+            )
+
+            history_table.setStyle(
+                TableStyle(
+                    [
+                        (
+                            "BACKGROUND",
+                            (0, 0),
+                            (-1, 0),
+                            colors.lightgrey,
+                        ),
+                        (
+                            "FONTNAME",
+                            (0, 0),
+                            (-1, 0),
+                            "Helvetica-Bold",
+                        ),
+                        (
+                            "GRID",
+                            (0, 0),
+                            (-1, -1),
+                            0.5,
+                            colors.grey,
+                        ),
+                        (
+                            "VALIGN",
+                            (0, 0),
+                            (-1, -1),
+                            "TOP",
+                        ),
+                        (
+                            "PADDING",
+                            (0, 0),
+                            (-1, -1),
+                            5,
+                        ),
+                    ]
+                )
+            )
+
+            story.append(
+                history_table
+            )
+
+    else:
+
+        story.append(
+            Paragraph(
+                "No previous interaction history available.",
+                body_style,
+            )
+        )
+
+    # ========================================================
+    # BUILD PDF
+    # ========================================================
+
+    document.build(
+        story
+    )
+
+    buffer.seek(0)
+
+    return buffer.getvalue()
+
+
+# ============================================================
 # HEADER
 # ============================================================
 
@@ -261,19 +1417,13 @@ if analyze_button:
 
             if result.get("status") == "success":
 
-                # ------------------------------------------------
-                # Store latest result
-                # ------------------------------------------------
+                st.session_state[
+                    "latest_result"
+                ] = result
 
-                st.session_state["latest_result"] = result
-
-                st.session_state["latest_user_id"] = (
-                    selected_user_id
-                )
-
-                # ------------------------------------------------
-                # Refresh interaction history immediately
-                # ------------------------------------------------
+                st.session_state[
+                    "latest_user_id"
+                ] = selected_user_id
 
                 history = get_previous_interactions(
                     selected_user_id
@@ -309,7 +1459,9 @@ if analyze_button:
 
 if "latest_result" in st.session_state:
 
-    result = st.session_state["latest_result"]
+    result = st.session_state[
+        "latest_result"
+    ]
 
     st.divider()
 
@@ -340,7 +1492,6 @@ if "latest_result" in st.session_state:
         {},
     )
 
-
     # ========================================================
     # MAIN METRICS
     # ========================================================
@@ -361,9 +1512,22 @@ if "latest_result" in st.session_state:
 
     with col2:
 
+        try:
+            display_intensity = float(
+                emotional_state.get(
+                    "intensity",
+                    0,
+                )
+            )
+        except (
+            TypeError,
+            ValueError,
+        ):
+            display_intensity = 0.0
+
         st.metric(
             "Intensity",
-            f"{float(emotional_state.get('intensity', 0)):.2f}",
+            f"{display_intensity:.2f}",
         )
 
     with col3:
@@ -402,7 +1566,6 @@ if "latest_result" in st.session_state:
             ).title(),
         )
 
-
     # ========================================================
     # EMOTION MODEL INFORMATION
     # ========================================================
@@ -423,9 +1586,22 @@ if "latest_result" in st.session_state:
             ).title(),
         )
 
+        try:
+            display_confidence = float(
+                emotion.get(
+                    "confidence",
+                    0,
+                )
+            )
+        except (
+            TypeError,
+            ValueError,
+        ):
+            display_confidence = 0.0
+
         st.write(
             "**Model confidence:**",
-            f"{float(emotion.get('confidence', 0)):.2%}",
+            f"{display_confidence:.2%}",
         )
 
     with emotion_col2:
@@ -447,7 +1623,6 @@ if "latest_result" in st.session_state:
                 0,
             ),
         )
-
 
     # ========================================================
     # EMOTIONAL SCORES
@@ -493,7 +1668,6 @@ if "latest_result" in st.session_state:
             "No emotional score data available."
         )
 
-
     # ========================================================
     # WELLNESS INSIGHT
     # ========================================================
@@ -505,8 +1679,9 @@ if "latest_result" in st.session_state:
         "No wellness insight available.",
     )
 
-    st.info(insight)
-
+    st.info(
+        insight
+    )
 
     # ========================================================
     # EMOTIONAL TREND
@@ -542,11 +1717,6 @@ if "latest_result" in st.session_state:
         ):
             trend_analysis = {}
 
-
-        # ----------------------------------------------------
-        # TREND SUMMARY
-        # ----------------------------------------------------
-
         trend_col1, trend_col2, trend_col3, trend_col4 = st.columns(4)
 
         with trend_col1:
@@ -573,18 +1743,43 @@ if "latest_result" in st.session_state:
 
         with trend_col3:
 
+            try:
+                average_intensity = float(
+                    trend_analysis.get(
+                        "average_intensity",
+                        0,
+                    )
+                )
+            except (
+                TypeError,
+                ValueError,
+            ):
+                average_intensity = 0.0
+
             st.metric(
                 "Average Intensity",
-                f"{float(trend_analysis.get('average_intensity', 0)):.2f}",
+                f"{average_intensity:.2f}",
             )
 
         with trend_col4:
 
+            try:
+                intensity_change = float(
+                    trend_analysis.get(
+                        "intensity_change",
+                        0,
+                    )
+                )
+            except (
+                TypeError,
+                ValueError,
+            ):
+                intensity_change = 0.0
+
             st.metric(
                 "Intensity Change",
-                f"{float(trend_analysis.get('intensity_change', 0)):+.3f}",
+                f"{intensity_change:+.3f}",
             )
-
 
         trend_message = trend_analysis.get(
             "message",
@@ -596,7 +1791,6 @@ if "latest_result" in st.session_state:
             st.info(
                 trend_message
             )
-
 
         # ----------------------------------------------------
         # EMOTIONAL INTENSITY OVER TIME
@@ -657,7 +1851,6 @@ if "latest_result" in st.session_state:
                         TypeError,
                         ValueError,
                     ):
-
                         continue
 
             if trend_chart_data:
@@ -679,7 +1872,6 @@ if "latest_result" in st.session_state:
             st.info(
                 "No emotional intensity trend data available."
             )
-
 
         # ----------------------------------------------------
         # EMOTION AND SENTIMENT SUMMARY
@@ -733,7 +1925,6 @@ if "latest_result" in st.session_state:
                     "No emotion frequency data available."
                 )
 
-
         with trend_col2:
 
             st.subheader(
@@ -780,7 +1971,6 @@ if "latest_result" in st.session_state:
                     "No sentiment distribution data available."
                 )
 
-
         # ----------------------------------------------------
         # RECENT EMOTIONAL STATE
         # ----------------------------------------------------
@@ -815,9 +2005,22 @@ if "latest_result" in st.session_state:
 
             with state_col2:
 
+                try:
+                    latest_intensity = float(
+                        recent_state.get(
+                            "intensity",
+                            0,
+                        )
+                    )
+                except (
+                    TypeError,
+                    ValueError,
+                ):
+                    latest_intensity = 0.0
+
                 st.metric(
                     "Latest Intensity",
-                    f"{float(recent_state.get('intensity', 0)):.2f}",
+                    f"{latest_intensity:.2f}",
                 )
 
             with state_col3:
@@ -844,18 +2047,11 @@ if "latest_result" in st.session_state:
                     ).title(),
                 )
 
-        else:
-
-            st.info(
-                "Recent emotional state is not available."
-            )
-
     else:
 
         st.info(
             "Emotional trend data is not available."
         )
-
 
     # ========================================================
     # RECOMMENDATIONS
@@ -863,7 +2059,9 @@ if "latest_result" in st.session_state:
 
     st.divider()
 
-    st.header("Personalized Recommendations")
+    st.header(
+        "Personalized Recommendations"
+    )
 
     recommendation_result = result.get(
         "recommendations",
@@ -875,9 +2073,11 @@ if "latest_result" in st.session_state:
         dict,
     ):
 
-        recommendations = recommendation_result.get(
-            "recommendations",
-            [],
+        recommendations = (
+            recommendation_result.get(
+                "recommendations",
+                [],
+            )
         )
 
     elif isinstance(
@@ -890,7 +2090,6 @@ if "latest_result" in st.session_state:
     else:
 
         recommendations = []
-
 
     if recommendations:
 
@@ -972,11 +2171,11 @@ if "latest_result" in st.session_state:
                         f"**Score:** {score_value:.3f}"
                     )
 
-
                 if description:
 
-                    st.write(description)
-
+                    st.write(
+                        description
+                    )
 
                 # ------------------------------------------------
                 # Recommendation explanation
@@ -1003,10 +2202,15 @@ if "latest_result" in st.session_state:
                             "**Why this recommendation?**"
                         )
 
-                        st.write(summary)
+                        st.write(
+                            summary
+                        )
 
                     if (
-                        isinstance(reasons, list)
+                        isinstance(
+                            reasons,
+                            list,
+                        )
                         and reasons
                     ):
 
@@ -1029,7 +2233,6 @@ if "latest_result" in st.session_state:
                         explanation
                     )
 
-
                 # ------------------------------------------------
                 # Ranking reasons
                 # ------------------------------------------------
@@ -1051,7 +2254,6 @@ if "latest_result" in st.session_state:
                         st.write(
                             f"- {reason}"
                         )
-
 
                 # ------------------------------------------------
                 # RECOMMENDATION FEEDBACK
@@ -1110,7 +2312,6 @@ if "latest_result" in st.session_state:
                                     "Thank you! Your feedback was saved."
                                 )
 
-
                 with feedback_col2:
 
                     if st.button(
@@ -1156,10 +2357,15 @@ if "latest_result" in st.session_state:
                                     "Thank you! Your feedback was saved."
                                 )
 
-
                 rating = st.select_slider(
                     "Rate this recommendation",
-                    options=[1, 2, 3, 4, 5],
+                    options=[
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                    ],
                     value=3,
                     key=(
                         f"rating_"
@@ -1225,7 +2431,9 @@ if "latest_result" in st.session_state:
 
 st.divider()
 
-st.header("Previous Interaction History")
+st.header(
+    "Previous Interaction History"
+)
 
 
 # ============================================================
@@ -1330,7 +2538,10 @@ history = st.session_state.get(
 # ============================================================
 
 if (
-    isinstance(history, list)
+    isinstance(
+        history,
+        list,
+    )
     and history
 ):
 
@@ -1345,67 +2556,82 @@ if (
 
     for record in history:
 
-        if not isinstance(record, dict):
+        if not isinstance(
+            record,
+            dict,
+        ):
             continue
 
-        emotional_state = record.get(
+        record_emotional_state = record.get(
             "emotional_state",
             {},
         )
 
         if not isinstance(
-            emotional_state,
+            record_emotional_state,
             dict,
         ):
-            emotional_state = {}
+            record_emotional_state = {}
 
-        dominant_emotion = emotional_state.get(
+        dominant_emotion = record_emotional_state.get(
             "dominant_emotion"
         )
 
-        polarity = emotional_state.get(
+        polarity = record_emotional_state.get(
             "polarity"
         )
 
-        severity = emotional_state.get(
+        severity = record_emotional_state.get(
             "severity"
         )
 
         if dominant_emotion:
+
             emotions.add(
-                str(dominant_emotion).lower()
+                str(
+                    dominant_emotion
+                ).lower()
             )
 
         if polarity:
+
             polarities.add(
-                str(polarity).lower()
+                str(
+                    polarity
+                ).lower()
             )
 
         if severity:
+
             severities.add(
-                str(severity).lower()
+                str(
+                    severity
+                ).lower()
             )
 
-        recommendations = record.get(
+        record_recommendations = record.get(
             "recommendations",
             [],
         )
 
         if isinstance(
-            recommendations,
+            record_recommendations,
             dict,
         ):
-            recommendations = recommendations.get(
-                "recommendations",
-                [],
+
+            record_recommendations = (
+                record_recommendations.get(
+                    "recommendations",
+                    [],
+                )
             )
 
         if isinstance(
-            recommendations,
+            record_recommendations,
             list,
         ):
 
-            for recommendation in recommendations:
+            for recommendation in record_recommendations:
 
                 if not isinstance(
                     recommendation,
@@ -1418,12 +2644,12 @@ if (
                 )
 
                 if recommendation_type:
+
                     recommendation_types.add(
                         str(
                             recommendation_type
                         ).lower()
                     )
-
 
     # --------------------------------------------------------
     # SEARCH AND FILTER CONTROLS
@@ -1507,7 +2733,6 @@ if (
             ],
         )
 
-
     # --------------------------------------------------------
     # APPLY FILTERS
     # --------------------------------------------------------
@@ -1524,33 +2749,33 @@ if (
         ):
             continue
 
-        emotional_state = record.get(
+        record_emotional_state = record.get(
             "emotional_state",
             {},
         )
 
         if not isinstance(
-            emotional_state,
+            record_emotional_state,
             dict,
         ):
-            emotional_state = {}
+            record_emotional_state = {}
 
         dominant_emotion = str(
-            emotional_state.get(
+            record_emotional_state.get(
                 "dominant_emotion",
                 "",
             )
         ).lower()
 
         polarity = str(
-            emotional_state.get(
+            record_emotional_state.get(
                 "polarity",
                 "",
             )
         ).lower()
 
         severity = str(
-            emotional_state.get(
+            record_emotional_state.get(
                 "severity",
                 "",
             )
@@ -1563,39 +2788,34 @@ if (
             )
         ).lower()
 
-
-        # ----------------------------------------------------
-        # SEARCH MATCH
-        # ----------------------------------------------------
-
-        recommendations = record.get(
+        record_recommendations = record.get(
             "recommendations",
             [],
         )
 
         if isinstance(
-            recommendations,
+            record_recommendations,
             dict,
         ):
 
-            recommendations = recommendations.get(
-                "recommendations",
-                [],
+            record_recommendations = (
+                record_recommendations.get(
+                    "recommendations",
+                    [],
+                )
             )
 
         if not isinstance(
-            recommendations,
+            record_recommendations,
             list,
         ):
 
-            recommendations = []
-
+            record_recommendations = []
 
         recommendation_titles = []
-
         recommendation_types_for_record = []
 
-        for recommendation in recommendations:
+        for recommendation in record_recommendations:
 
             if not isinstance(
                 recommendation,
@@ -1618,15 +2838,16 @@ if (
             ).lower()
 
             if title:
+
                 recommendation_titles.append(
                     title
                 )
 
             if recommendation_type:
+
                 recommendation_types_for_record.append(
                     recommendation_type
                 )
-
 
         searchable_text = (
             record_text
@@ -1638,63 +2859,47 @@ if (
 
         if (
             search_query
-            and search_query not in searchable_text
+            and search_query
+            not in searchable_text
         ):
+
             continue
-
-
-        # ----------------------------------------------------
-        # EMOTION FILTER
-        # ----------------------------------------------------
 
         if (
             selected_emotion != "All"
             and dominant_emotion
             != selected_emotion.lower()
         ):
+
             continue
-
-
-        # ----------------------------------------------------
-        # POLARITY FILTER
-        # ----------------------------------------------------
 
         if (
             selected_polarity != "All"
             and polarity
             != selected_polarity.lower()
         ):
+
             continue
-
-
-        # ----------------------------------------------------
-        # SEVERITY FILTER
-        # ----------------------------------------------------
 
         if (
             selected_severity != "All"
             and severity
             != selected_severity.lower()
         ):
+
             continue
-
-
-        # ----------------------------------------------------
-        # RECOMMENDATION TYPE FILTER
-        # ----------------------------------------------------
 
         if (
             selected_type != "All"
             and selected_type.lower()
             not in recommendation_types_for_record
         ):
-            continue
 
+            continue
 
         filtered_history.append(
             record
         )
-
 
     # --------------------------------------------------------
     # SORT HISTORY
@@ -1709,14 +2914,12 @@ if (
             )
         )
 
-
     filtered_history.sort(
         key=history_sort_key,
         reverse=(
             sort_order == "Newest first"
         ),
     )
-
 
     # --------------------------------------------------------
     # FILTER SUMMARY
@@ -1726,7 +2929,6 @@ if (
         f"Showing {len(filtered_history)} "
         f"of {len(history)} interaction(s)."
     )
-
 
     # --------------------------------------------------------
     # DISPLAY FILTERED HISTORY
@@ -1746,27 +2948,30 @@ if (
                 "",
             )
 
-            emotional_state = record.get(
+            record_emotional_state = record.get(
                 "emotional_state",
                 {},
             )
 
             if not isinstance(
-                emotional_state,
+                record_emotional_state,
                 dict,
             ):
 
-                emotional_state = {}
+                record_emotional_state = {}
 
-
-            dominant_emotion = emotional_state.get(
-                "dominant_emotion",
-                "N/A",
+            dominant_emotion = (
+                record_emotional_state.get(
+                    "dominant_emotion",
+                    "N/A",
+                )
             )
 
-            intensity = emotional_state.get(
-                "intensity",
-                0,
+            intensity = (
+                record_emotional_state.get(
+                    "intensity",
+                    0,
+                )
             )
 
             try:
@@ -1781,7 +2986,6 @@ if (
             ):
 
                 intensity_value = 0.0
-
 
             with st.expander(
                 f"{created_at} — "
@@ -1805,18 +3009,13 @@ if (
 
                 st.write(
                     f"**Polarity:** "
-                    f"{str(emotional_state.get('polarity', 'N/A')).title()}"
+                    f"{str(record_emotional_state.get('polarity', 'N/A')).title()}"
                 )
 
                 st.write(
                     f"**Severity:** "
-                    f"{str(emotional_state.get('severity', 'N/A')).title()}"
+                    f"{str(record_emotional_state.get('severity', 'N/A')).title()}"
                 )
-
-
-                # ------------------------------------------------
-                # Previous recommendations
-                # ------------------------------------------------
 
                 previous_recommendations = record.get(
                     "recommendations",
@@ -1834,7 +3033,6 @@ if (
                             [],
                         )
                     )
-
 
                 if (
                     isinstance(
@@ -1855,14 +3053,18 @@ if (
                             dict,
                         ):
 
-                            recommendation_title = recommendation.get(
-                                "title",
-                                "Unknown",
+                            recommendation_title = (
+                                recommendation.get(
+                                    "title",
+                                    "Unknown",
+                                )
                             )
 
-                            recommendation_type = recommendation.get(
-                                "type",
-                                "",
+                            recommendation_type = (
+                                recommendation.get(
+                                    "type",
+                                    "",
+                                )
                             )
 
                             if recommendation_type:
@@ -1889,4 +3091,70 @@ else:
     st.info(
         "No previous interaction history found "
         f"for user `{history_user_id}`."
+    )
+
+
+# ============================================================
+# M4-T5 REPORT GENERATION AND EXPORT
+# ============================================================
+
+st.divider()
+
+st.header(
+    "Report Generation and Export"
+)
+
+latest_result = st.session_state.get(
+    "latest_result"
+)
+
+latest_user_id = st.session_state.get(
+    "latest_user_id",
+    user_id.strip(),
+)
+
+if latest_result is not None:
+
+    with st.spinner(
+        "Preparing wellness report..."
+    ):
+
+        latest_trend_result = get_emotional_trend(
+            latest_user_id
+        )
+
+    latest_history = st.session_state.get(
+        "interaction_history",
+        [],
+    )
+
+    try:
+
+        report_pdf = create_pdf_report(
+            user_id=latest_user_id,
+            result=latest_result,
+            trend_result=latest_trend_result,
+            history=latest_history,
+        )
+
+        st.download_button(
+            label="Download Wellness Report",
+            data=report_pdf,
+            file_name=(
+                "moodmentor_wellness_report.pdf"
+            ),
+            mime="application/pdf",
+        )
+
+    except Exception as exc:
+
+        st.error(
+            f"Unable to generate the wellness report: {exc}"
+        )
+
+else:
+
+    st.info(
+        "Analyze an employee check-in first "
+        "to generate a wellness report."
     )
