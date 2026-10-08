@@ -646,7 +646,8 @@ def recommend(data: dict):
         top_recommendation=
             recommendation_result[
                 "top_recommendation"
-            ]
+            ],
+        user_id=user_id
     )
 
     return {
@@ -670,7 +671,9 @@ def recommend(data: dict):
 
 @app.get("/previous-interactions")
 def previous_interactions(
-    limit: int = 20
+    limit: int = 20,
+    user_id: str = None
+
 ):
 
     try:
@@ -688,10 +691,15 @@ def previous_interactions(
         1,
         min(limit, 100)
     )
+    if user_id:
 
+        user_id = normalize_user_id(
+            user_id      
+    )
     interactions = (
         get_previous_interactions(
-            limit
+            limit,
+            user_id=user_id
         )
     )
 
@@ -704,7 +712,6 @@ def previous_interactions(
         "interactions":
             interactions
     }
-
 
 # ============================================================
 # TASK 7
