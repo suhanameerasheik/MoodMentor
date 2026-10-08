@@ -1326,7 +1326,7 @@ history = st.session_state.get(
 
 
 # ============================================================
-# DISPLAY HISTORY
+# DISPLAY HISTORY WITH SEARCH AND FILTERING
 # ============================================================
 
 if (
@@ -1334,27 +1334,19 @@ if (
     and history
 ):
 
-    st.write(
-        f"Showing {len(history)} previous interaction(s)."
-    )
+    # --------------------------------------------------------
+    # PREPARE FILTER OPTIONS
+    # --------------------------------------------------------
 
-    for record in history[:20]:
+    emotions = set()
+    polarities = set()
+    severities = set()
+    recommendation_types = set()
 
-        if not isinstance(
-            record,
-            dict,
-        ):
+    for record in history:
+
+        if not isinstance(record, dict):
             continue
-
-        created_at = record.get(
-            "created_at",
-            "Unknown time",
-        )
-
-        record_text = record.get(
-            "text",
-            "",
-        )
 
         emotional_state = record.get(
             "emotional_state",
@@ -1365,102 +1357,532 @@ if (
             emotional_state,
             dict,
         ):
-
             emotional_state = {}
 
         dominant_emotion = emotional_state.get(
-            "dominant_emotion",
-            "N/A",
+            "dominant_emotion"
         )
 
-        intensity = emotional_state.get(
-            "intensity",
-            0,
+        polarity = emotional_state.get(
+            "polarity"
         )
 
-        try:
-            intensity_value = float(intensity)
-        except (
-            TypeError,
-            ValueError,
+        severity = emotional_state.get(
+            "severity"
+        )
+
+        if dominant_emotion:
+            emotions.add(
+                str(dominant_emotion).lower()
+            )
+
+        if polarity:
+            polarities.add(
+                str(polarity).lower()
+            )
+
+        if severity:
+            severities.add(
+                str(severity).lower()
+            )
+
+        recommendations = record.get(
+            "recommendations",
+            [],
+        )
+
+        if isinstance(
+            recommendations,
+            dict,
         ):
-            intensity_value = 0.0
-
-        with st.expander(
-            f"{created_at} — "
-            f"{str(dominant_emotion).title()} "
-            f"(Intensity: {intensity_value:.2f})"
-        ):
-
-            st.write(
-                f"**Original text:** {record_text}"
-            )
-
-            st.write(
-                f"**Dominant emotion:** "
-                f"{str(dominant_emotion).title()}"
-            )
-
-            st.write(
-                f"**Intensity:** "
-                f"{intensity_value:.2f}"
-            )
-
-            st.write(
-                f"**Polarity:** "
-                f"{str(emotional_state.get('polarity', 'N/A')).title()}"
-            )
-
-            st.write(
-                f"**Severity:** "
-                f"{str(emotional_state.get('severity', 'N/A')).title()}"
-            )
-
-
-            # ------------------------------------------------
-            # Previous recommendations
-            # ------------------------------------------------
-
-            previous_recommendations = record.get(
+            recommendations = recommendations.get(
                 "recommendations",
                 [],
             )
 
-            if isinstance(
-                previous_recommendations,
+        if isinstance(
+            recommendations,
+            list,
+        ):
+
+            for recommendation in recommendations:
+
+                if not isinstance(
+                    recommendation,
+                    dict,
+                ):
+                    continue
+
+                recommendation_type = recommendation.get(
+                    "type"
+                )
+
+                if recommendation_type:
+                    recommendation_types.add(
+                        str(
+                            recommendation_type
+                        ).lower()
+                    )
+
+
+    # --------------------------------------------------------
+    # SEARCH AND FILTER CONTROLS
+    # --------------------------------------------------------
+
+    st.subheader(
+        "Search and Filter History"
+    )
+
+    search_text = st.text_input(
+        "Search history",
+        placeholder=(
+            "Search by employee text or recommendation title"
+        ),
+    )
+
+    filter_col1, filter_col2, filter_col3 = st.columns(3)
+
+    with filter_col1:
+
+        selected_emotion = st.selectbox(
+            "Emotion",
+            options=[
+                "All"
+            ]
+            + sorted(
+                emotion.title()
+                for emotion in emotions
+            ),
+        )
+
+    with filter_col2:
+
+        selected_polarity = st.selectbox(
+            "Polarity",
+            options=[
+                "All"
+            ]
+            + sorted(
+                polarity.title()
+                for polarity in polarities
+            ),
+        )
+
+    with filter_col3:
+
+        selected_severity = st.selectbox(
+            "Severity",
+            options=[
+                "All"
+            ]
+            + sorted(
+                severity.title()
+                for severity in severities
+            ),
+        )
+
+    filter_col4, filter_col5 = st.columns(2)
+
+    with filter_col4:
+
+        selected_type = st.selectbox(
+            "Recommendation Type",
+            options=[
+                "All"
+            ]
+            + sorted(
+                recommendation_type.title()
+                for recommendation_type
+                in recommendation_types
+            ),
+        )
+
+    with filter_col5:
+
+        sort_order = st.selectbox(
+            "Sort History",
+            options=[
+                "Newest first",
+                "Oldest first",
+            ],
+        )
+
+
+    # --------------------------------------------------------
+    # APPLY FILTERS
+    # --------------------------------------------------------
+
+    filtered_history = []
+
+    search_query = search_text.strip().lower()
+
+    for record in history:
+
+        if not isinstance(
+            record,
+            dict,
+        ):
+            continue
+
+        emotional_state = record.get(
+            "emotional_state",
+            {},
+        )
+
+        if not isinstance(
+            emotional_state,
+            dict,
+        ):
+            emotional_state = {}
+
+        dominant_emotion = str(
+            emotional_state.get(
+                "dominant_emotion",
+                "",
+            )
+        ).lower()
+
+        polarity = str(
+            emotional_state.get(
+                "polarity",
+                "",
+            )
+        ).lower()
+
+        severity = str(
+            emotional_state.get(
+                "severity",
+                "",
+            )
+        ).lower()
+
+        record_text = str(
+            record.get(
+                "text",
+                "",
+            )
+        ).lower()
+
+
+        # ----------------------------------------------------
+        # SEARCH MATCH
+        # ----------------------------------------------------
+
+        recommendations = record.get(
+            "recommendations",
+            [],
+        )
+
+        if isinstance(
+            recommendations,
+            dict,
+        ):
+
+            recommendations = recommendations.get(
+                "recommendations",
+                [],
+            )
+
+        if not isinstance(
+            recommendations,
+            list,
+        ):
+
+            recommendations = []
+
+
+        recommendation_titles = []
+
+        recommendation_types_for_record = []
+
+        for recommendation in recommendations:
+
+            if not isinstance(
+                recommendation,
+                dict,
+            ):
+                continue
+
+            title = str(
+                recommendation.get(
+                    "title",
+                    "",
+                )
+            ).lower()
+
+            recommendation_type = str(
+                recommendation.get(
+                    "type",
+                    "",
+                )
+            ).lower()
+
+            if title:
+                recommendation_titles.append(
+                    title
+                )
+
+            if recommendation_type:
+                recommendation_types_for_record.append(
+                    recommendation_type
+                )
+
+
+        searchable_text = (
+            record_text
+            + " "
+            + " ".join(
+                recommendation_titles
+            )
+        )
+
+        if (
+            search_query
+            and search_query not in searchable_text
+        ):
+            continue
+
+
+        # ----------------------------------------------------
+        # EMOTION FILTER
+        # ----------------------------------------------------
+
+        if (
+            selected_emotion != "All"
+            and dominant_emotion
+            != selected_emotion.lower()
+        ):
+            continue
+
+
+        # ----------------------------------------------------
+        # POLARITY FILTER
+        # ----------------------------------------------------
+
+        if (
+            selected_polarity != "All"
+            and polarity
+            != selected_polarity.lower()
+        ):
+            continue
+
+
+        # ----------------------------------------------------
+        # SEVERITY FILTER
+        # ----------------------------------------------------
+
+        if (
+            selected_severity != "All"
+            and severity
+            != selected_severity.lower()
+        ):
+            continue
+
+
+        # ----------------------------------------------------
+        # RECOMMENDATION TYPE FILTER
+        # ----------------------------------------------------
+
+        if (
+            selected_type != "All"
+            and selected_type.lower()
+            not in recommendation_types_for_record
+        ):
+            continue
+
+
+        filtered_history.append(
+            record
+        )
+
+
+    # --------------------------------------------------------
+    # SORT HISTORY
+    # --------------------------------------------------------
+
+    def history_sort_key(record):
+
+        return str(
+            record.get(
+                "created_at",
+                "",
+            )
+        )
+
+
+    filtered_history.sort(
+        key=history_sort_key,
+        reverse=(
+            sort_order == "Newest first"
+        ),
+    )
+
+
+    # --------------------------------------------------------
+    # FILTER SUMMARY
+    # --------------------------------------------------------
+
+    st.write(
+        f"Showing {len(filtered_history)} "
+        f"of {len(history)} interaction(s)."
+    )
+
+
+    # --------------------------------------------------------
+    # DISPLAY FILTERED HISTORY
+    # --------------------------------------------------------
+
+    if filtered_history:
+
+        for record in filtered_history[:20]:
+
+            created_at = record.get(
+                "created_at",
+                "Unknown time",
+            )
+
+            record_text = record.get(
+                "text",
+                "",
+            )
+
+            emotional_state = record.get(
+                "emotional_state",
+                {},
+            )
+
+            if not isinstance(
+                emotional_state,
                 dict,
             ):
 
-                previous_recommendations = (
-                    previous_recommendations.get(
-                        "recommendations",
-                        [],
-                    )
-                )
+                emotional_state = {}
 
 
-            if (
-                isinstance(
-                    previous_recommendations,
-                    list,
+            dominant_emotion = emotional_state.get(
+                "dominant_emotion",
+                "N/A",
+            )
+
+            intensity = emotional_state.get(
+                "intensity",
+                0,
+            )
+
+            try:
+
+                intensity_value = float(
+                    intensity
                 )
-                and previous_recommendations
+
+            except (
+                TypeError,
+                ValueError,
+            ):
+
+                intensity_value = 0.0
+
+
+            with st.expander(
+                f"{created_at} — "
+                f"{str(dominant_emotion).title()} "
+                f"(Intensity: {intensity_value:.2f})"
             ):
 
                 st.write(
-                    "**Recommendations from this interaction:**"
+                    f"**Original text:** {record_text}"
                 )
 
-                for recommendation in previous_recommendations[:5]:
+                st.write(
+                    f"**Dominant emotion:** "
+                    f"{str(dominant_emotion).title()}"
+                )
 
-                    if isinstance(
-                        recommendation,
-                        dict,
-                    ):
+                st.write(
+                    f"**Intensity:** "
+                    f"{intensity_value:.2f}"
+                )
 
-                        st.write(
-                            f"- {recommendation.get('title', 'Unknown')}"
+                st.write(
+                    f"**Polarity:** "
+                    f"{str(emotional_state.get('polarity', 'N/A')).title()}"
+                )
+
+                st.write(
+                    f"**Severity:** "
+                    f"{str(emotional_state.get('severity', 'N/A')).title()}"
+                )
+
+
+                # ------------------------------------------------
+                # Previous recommendations
+                # ------------------------------------------------
+
+                previous_recommendations = record.get(
+                    "recommendations",
+                    [],
+                )
+
+                if isinstance(
+                    previous_recommendations,
+                    dict,
+                ):
+
+                    previous_recommendations = (
+                        previous_recommendations.get(
+                            "recommendations",
+                            [],
                         )
+                    )
+
+
+                if (
+                    isinstance(
+                        previous_recommendations,
+                        list,
+                    )
+                    and previous_recommendations
+                ):
+
+                    st.write(
+                        "**Recommendations from this interaction:**"
+                    )
+
+                    for recommendation in previous_recommendations[:5]:
+
+                        if isinstance(
+                            recommendation,
+                            dict,
+                        ):
+
+                            recommendation_title = recommendation.get(
+                                "title",
+                                "Unknown",
+                            )
+
+                            recommendation_type = recommendation.get(
+                                "type",
+                                "",
+                            )
+
+                            if recommendation_type:
+
+                                st.write(
+                                    f"- {recommendation_title} "
+                                    f"({recommendation_type})"
+                                )
+
+                            else:
+
+                                st.write(
+                                    f"- {recommendation_title}"
+                                )
+
+    else:
+
+        st.info(
+            "No interactions match the selected search and filters."
+        )
 
 else:
 
