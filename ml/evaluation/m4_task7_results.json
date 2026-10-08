@@ -1,0 +1,130 @@
+{
+  "task": "M4-T7",
+  "description": "Model performance and stress testing",
+  "emotion_model": "j-hartmann/emotion-english-distilroberta-base",
+  "emotion_evaluation": {
+    "test_cases": 10,
+    "accuracy": 0.9,
+    "macro_precision": 0.8,
+    "macro_recall": 0.76,
+    "macro_f1": 0.7778,
+    "average_inference_time_seconds": 0.033824,
+    "minimum_inference_time_seconds": 0.019835,
+    "maximum_inference_time_seconds": 0.108609,
+    "p95_inference_time_seconds": 0.080402,
+    "per_test_case": [
+      {
+        "test_id": "T01",
+        "expected_emotion": "fear",
+        "predicted_emotion": "fear",
+        "confidence": 0.9955,
+        "inference_time_seconds": 0.108609,
+        "correct": true
+      },
+      {
+        "test_id": "T02",
+        "expected_emotion": "anger",
+        "predicted_emotion": "anger",
+        "confidence": 0.9917,
+        "inference_time_seconds": 0.045925,
+        "correct": true
+      },
+      {
+        "test_id": "T03",
+        "expected_emotion": "sadness",
+        "predicted_emotion": "sadness",
+        "confidence": 0.9909,
+        "inference_time_seconds": 0.031566,
+        "correct": true
+      },
+      {
+        "test_id": "T04",
+        "expected_emotion": "fear",
+        "predicted_emotion": "fear",
+        "confidence": 0.9946,
+        "inference_time_seconds": 0.022858,
+        "correct": true
+      },
+      {
+        "test_id": "T05",
+        "expected_emotion": "fear",
+        "predicted_emotion": "surprise",
+        "confidence": 0.6816,
+        "inference_time_seconds": 0.020801,
+        "correct": false
+      },
+      {
+        "test_id": "T06",
+        "expected_emotion": "anger",
+        "predicted_emotion": "anger",
+        "confidence": 0.9939,
+        "inference_time_seconds": 0.019835,
+        "correct": true
+      },
+      {
+        "test_id": "T07",
+        "expected_emotion": "sadness",
+        "predicted_emotion": "sadness",
+        "confidence": 0.7629,
+        "inference_time_seconds": 0.024107,
+        "correct": true
+      },
+      {
+        "test_id": "T08",
+        "expected_emotion": "joy",
+        "predicted_emotion": "joy",
+        "confidence": 0.9891,
+        "inference_time_seconds": 0.020994,
+        "correct": true
+      },
+      {
+        "test_id": "T09",
+        "expected_emotion": "fear",
+        "predicted_emotion": "fear",
+        "confidence": 0.9948,
+        "inference_time_seconds": 0.021858,
+        "correct": true
+      },
+      {
+        "test_id": "T10",
+        "expected_emotion": "fear",
+        "predicted_emotion": "fear",
+        "confidence": 0.5039,
+        "inference_time_seconds": 0.021686,
+        "correct": true
+      }
+    ]
+  },
+  "stress_testing": [
+    {
+      "request_count": 10,
+      "successful_requests": 10,
+      "failed_requests": 0,
+      "success_rate_percent": 100.0,
+      "average_response_time_seconds": 0.376037,
+      "minimum_response_time_seconds": 0.091052,
+      "maximum_response_time_seconds": 2.879397,
+      "p95_response_time_seconds": 1.633799
+    },
+    {
+      "request_count": 25,
+      "successful_requests": 25,
+      "failed_requests": 0,
+      "success_rate_percent": 100.0,
+      "average_response_time_seconds": 0.105102,
+      "minimum_response_time_seconds": 0.091138,
+      "maximum_response_time_seconds": 0.158405,
+      "p95_response_time_seconds": 0.142274
+    },
+    {
+      "request_count": 50,
+      "successful_requests": 50,
+      "failed_requests": 0,
+      "success_rate_percent": 100.0,
+      "average_response_time_seconds": 0.140206,
+      "minimum_response_time_seconds": 0.092377,
+      "maximum_response_time_seconds": 0.524894,
+      "p95_response_time_seconds": 0.186443
+    }
+  ]
+}
