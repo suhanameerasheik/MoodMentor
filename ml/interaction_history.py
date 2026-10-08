@@ -27,10 +27,15 @@ def initialize_database():
 
     cursor = connection.cursor()
 
+    # --------------------------------------------------
+    # Create table if it does not exist
+    # --------------------------------------------------
+
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS recommendation_interactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT DEFAULT 'default_user',
             text TEXT NOT NULL,
             preferences TEXT,
             emotional_state TEXT,
@@ -40,6 +45,36 @@ def initialize_database():
         )
         """
     )
+
+    # --------------------------------------------------
+    # Database migration
+    #
+    # Existing databases created before Task 10 may
+    # not have the user_id column.
+    # --------------------------------------------------
+
+    cursor.execute(
+        """
+        PRAGMA table_info(
+            recommendation_interactions
+        )
+        """
+    )
+
+    columns = [
+        row["name"]
+        for row in cursor.fetchall()
+    ]
+
+    if "user_id" not in columns:
+
+        cursor.execute(
+            """
+            ALTER TABLE recommendation_interactions
+            ADD COLUMN user_id TEXT
+            DEFAULT 'default_user'
+            """
+        )
 
     connection.commit()
 
@@ -51,7 +86,8 @@ def save_recommendation_interaction(
     preferences,
     emotional_state,
     recommendations,
-    top_recommendation
+    top_recommendation,
+    user_id="default_user"
 ):
 
     initialize_database()
@@ -63,6 +99,7 @@ def save_recommendation_interaction(
     cursor.execute(
         """
         INSERT INTO recommendation_interactions (
+            user_id,
             text,
             preferences,
             emotional_state,
@@ -70,9 +107,10 @@ def save_recommendation_interaction(
             top_recommendation,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
         (
+            user_id,
             text,
             json.dumps(
                 preferences,
@@ -104,7 +142,8 @@ def save_recommendation_interaction(
 
 
 def get_previous_interactions(
-    limit=20
+    limit=20,
+    user_id=None
 ):
 
     initialize_database()
@@ -113,22 +152,49 @@ def get_previous_interactions(
 
     cursor = connection.cursor()
 
-    cursor.execute(
-        """
-        SELECT
-            id,
-            text,
-            preferences,
-            emotional_state,
-            recommendations,
-            top_recommendation,
-            created_at
-        FROM recommendation_interactions
-        ORDER BY id DESC
-        LIMIT ?
-        """,
-        (limit,)
-    )
+    if user_id:
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                user_id,
+                text,
+                preferences,
+                emotional_state,
+                recommendations,
+                top_recommendation,
+                created_at
+            FROM recommendation_interactions
+            WHERE user_id = ?
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (
+                user_id,
+                limit
+            )
+        )
+
+    else:
+
+        cursor.execute(
+            """
+            SELECT
+                id,
+                user_id,
+                text,
+                preferences,
+                emotional_state,
+                recommendations,
+                top_recommendation,
+                created_at
+            FROM recommendation_interactions
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,)
+        )
 
     rows = cursor.fetchall()
 
@@ -141,6 +207,10 @@ def get_previous_interactions(
         interactions.append(
             {
                 "id": row["id"],
+                "user_id": (
+                    row["user_id"]
+                    or "default_user"
+                ),
                 "text": row["text"],
                 "preferences": json.loads(
                     row["preferences"]
