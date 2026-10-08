@@ -53,6 +53,31 @@ def get_previous_interactions(user_id):
         )
         return None
 
+
+def get_emotional_trend(user_id):
+    try:
+        response = requests.get(
+            f"{BACKEND_URL}/emotional-trend",
+            params={"user_id": user_id},
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        if isinstance(data, dict):
+            return data
+
+        return None
+
+    except requests.RequestException as exc:
+        st.error(
+            f"Unable to load emotional trend: {exc}"
+        )
+        return None
+
+
 def analyze_and_recommend(
     text,
     user_id,
@@ -70,7 +95,6 @@ def analyze_and_recommend(
     }
 
     try:
-
         response = requests.post(
             f"{BACKEND_URL}/recommend",
             json=payload,
@@ -82,7 +106,6 @@ def analyze_and_recommend(
         return response.json()
 
     except requests.RequestException as error:
-
         st.error(
             f"Could not connect to the backend: {error}"
         )
@@ -207,9 +230,7 @@ if analyze_button:
                 )
 
                 # ------------------------------------------------
-                # IMPORTANT:
-                # Refresh interaction history immediately after
-                # a successful recommendation.
+                # Refresh interaction history immediately
                 # ------------------------------------------------
 
                 history = get_previous_interactions(
@@ -221,6 +242,10 @@ if analyze_button:
                     st.session_state[
                         "interaction_history"
                     ] = history
+
+                    st.session_state[
+                        "interaction_history_user_id"
+                    ] = selected_user_id
 
                 st.success(
                     "Analysis and recommendations generated successfully."
@@ -247,10 +272,6 @@ if "latest_result" in st.session_state:
     st.divider()
 
     st.header("Emotional Analysis")
-
-    # --------------------------------------------------------
-    # /recommend returns analysis inside the "analysis" key.
-    # --------------------------------------------------------
 
     analysis = result.get(
         "analysis",
@@ -288,9 +309,11 @@ if "latest_result" in st.session_state:
 
         st.metric(
             "Dominant Emotion",
-            emotional_state.get(
-                "dominant_emotion",
-                "N/A",
+            str(
+                emotional_state.get(
+                    "dominant_emotion",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -305,9 +328,11 @@ if "latest_result" in st.session_state:
 
         st.metric(
             "Polarity",
-            emotional_state.get(
-                "polarity",
-                "N/A",
+            str(
+                emotional_state.get(
+                    "polarity",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -315,9 +340,11 @@ if "latest_result" in st.session_state:
 
         st.metric(
             "Severity",
-            emotional_state.get(
-                "severity",
-                "N/A",
+            str(
+                emotional_state.get(
+                    "severity",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -325,9 +352,11 @@ if "latest_result" in st.session_state:
 
         st.metric(
             "Risk Level",
-            wellness.get(
-                "risk_level",
-                "N/A",
+            str(
+                wellness.get(
+                    "risk_level",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -344,9 +373,11 @@ if "latest_result" in st.session_state:
 
         st.write(
             "**Primary model emotion:**",
-            emotion.get(
-                "emotion",
-                "N/A",
+            str(
+                emotion.get(
+                    "emotion",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -359,9 +390,11 @@ if "latest_result" in st.session_state:
 
         st.write(
             "**Sentiment:**",
-            sentiment.get(
-                "sentiment",
-                "N/A",
+            str(
+                sentiment.get(
+                    "sentiment",
+                    "N/A",
+                )
             ).title(),
         )
 
@@ -385,14 +418,19 @@ if "latest_result" in st.session_state:
         {},
     )
 
-    if isinstance(
-        emotion_scores,
-        dict,
-    ) and emotion_scores:
+    if (
+        isinstance(
+            emotion_scores,
+            dict,
+        )
+        and emotion_scores
+    ):
 
         chart_data = {
             "Emotion": [
-                emotion_name.title()
+                str(
+                    emotion_name
+                ).title()
                 for emotion_name in emotion_scores.keys()
             ],
             "Score": [
@@ -429,20 +467,361 @@ if "latest_result" in st.session_state:
 
 
     # ========================================================
+    # EMOTIONAL TREND
+    # ========================================================
+
+    st.divider()
+
+    st.header("Emotional Trend")
+
+    trend_user_id = st.session_state.get(
+        "latest_user_id",
+        user_id.strip(),
+    )
+
+    with st.spinner(
+        "Loading emotional trend..."
+    ):
+
+        trend_result = get_emotional_trend(
+            trend_user_id
+        )
+
+    if trend_result:
+
+        trend_analysis = trend_result.get(
+            "trend_analysis",
+            {},
+        )
+
+        if not isinstance(
+            trend_analysis,
+            dict,
+        ):
+            trend_analysis = {}
+
+
+        # ----------------------------------------------------
+        # TREND SUMMARY
+        # ----------------------------------------------------
+
+        trend_col1, trend_col2, trend_col3, trend_col4 = st.columns(4)
+
+        with trend_col1:
+
+            st.metric(
+                "Overall Trend",
+                str(
+                    trend_analysis.get(
+                        "trend",
+                        "N/A",
+                    )
+                ).title(),
+            )
+
+        with trend_col2:
+
+            st.metric(
+                "Records Analyzed",
+                trend_analysis.get(
+                    "records_analyzed",
+                    0,
+                ),
+            )
+
+        with trend_col3:
+
+            st.metric(
+                "Average Intensity",
+                f"{float(trend_analysis.get('average_intensity', 0)):.2f}",
+            )
+
+        with trend_col4:
+
+            st.metric(
+                "Intensity Change",
+                f"{float(trend_analysis.get('intensity_change', 0)):+.3f}",
+            )
+
+
+        trend_message = trend_analysis.get(
+            "message",
+            "",
+        )
+
+        if trend_message:
+
+            st.info(
+                trend_message
+            )
+
+
+        # ----------------------------------------------------
+        # EMOTIONAL INTENSITY OVER TIME
+        # ----------------------------------------------------
+
+        st.subheader(
+            "Emotional Intensity Over Time"
+        )
+
+        intensity_history = trend_analysis.get(
+            "intensity_over_time",
+            [],
+        )
+
+        if (
+            isinstance(
+                intensity_history,
+                list,
+            )
+            and intensity_history
+        ):
+
+            trend_chart_data = []
+
+            for item in intensity_history:
+
+                if not isinstance(
+                    item,
+                    dict,
+                ):
+                    continue
+
+                timestamp = item.get(
+                    "timestamp",
+                )
+
+                intensity = item.get(
+                    "intensity",
+                )
+
+                if (
+                    timestamp is not None
+                    and intensity is not None
+                ):
+
+                    try:
+
+                        trend_chart_data.append(
+                            {
+                                "Time": timestamp,
+                                "Intensity": float(
+                                    intensity
+                                ),
+                            }
+                        )
+
+                    except (
+                        TypeError,
+                        ValueError,
+                    ):
+
+                        continue
+
+            if trend_chart_data:
+
+                st.line_chart(
+                    trend_chart_data,
+                    x="Time",
+                    y="Intensity",
+                )
+
+            else:
+
+                st.info(
+                    "No emotional intensity trend data available."
+                )
+
+        else:
+
+            st.info(
+                "No emotional intensity trend data available."
+            )
+
+
+        # ----------------------------------------------------
+        # EMOTION AND SENTIMENT SUMMARY
+        # ----------------------------------------------------
+
+        trend_col1, trend_col2 = st.columns(2)
+
+        with trend_col1:
+
+            st.subheader(
+                "Emotion Frequency"
+            )
+
+            emotion_frequency = trend_analysis.get(
+                "emotion_frequency",
+                {},
+            )
+
+            if (
+                isinstance(
+                    emotion_frequency,
+                    dict,
+                )
+                and emotion_frequency
+            ):
+
+                emotion_frequency_data = {
+                    "Emotion": [
+                        str(
+                            emotion_name
+                        ).title()
+                        for emotion_name
+                        in emotion_frequency.keys()
+                    ],
+                    "Count": [
+                        int(count)
+                        for count
+                        in emotion_frequency.values()
+                    ],
+                }
+
+                st.bar_chart(
+                    emotion_frequency_data,
+                    x="Emotion",
+                    y="Count",
+                )
+
+            else:
+
+                st.info(
+                    "No emotion frequency data available."
+                )
+
+
+        with trend_col2:
+
+            st.subheader(
+                "Sentiment Distribution"
+            )
+
+            polarity_frequency = trend_analysis.get(
+                "polarity_frequency",
+                {},
+            )
+
+            if (
+                isinstance(
+                    polarity_frequency,
+                    dict,
+                )
+                and polarity_frequency
+            ):
+
+                sentiment_chart_data = {
+                    "Sentiment": [
+                        str(
+                            name
+                        ).title()
+                        for name
+                        in polarity_frequency.keys()
+                    ],
+                    "Count": [
+                        int(count)
+                        for count
+                        in polarity_frequency.values()
+                    ],
+                }
+
+                st.bar_chart(
+                    sentiment_chart_data,
+                    x="Sentiment",
+                    y="Count",
+                )
+
+            else:
+
+                st.info(
+                    "No sentiment distribution data available."
+                )
+
+
+        # ----------------------------------------------------
+        # RECENT EMOTIONAL STATE
+        # ----------------------------------------------------
+
+        st.subheader(
+            "Recent Emotional State"
+        )
+
+        recent_state = trend_analysis.get(
+            "recent_state",
+            {},
+        )
+
+        if isinstance(
+            recent_state,
+            dict,
+        ):
+
+            state_col1, state_col2, state_col3, state_col4 = st.columns(4)
+
+            with state_col1:
+
+                st.metric(
+                    "Latest Emotion",
+                    str(
+                        recent_state.get(
+                            "emotion",
+                            "N/A",
+                        )
+                    ).title(),
+                )
+
+            with state_col2:
+
+                st.metric(
+                    "Latest Intensity",
+                    f"{float(recent_state.get('intensity', 0)):.2f}",
+                )
+
+            with state_col3:
+
+                st.metric(
+                    "Latest Polarity",
+                    str(
+                        recent_state.get(
+                            "polarity",
+                            "N/A",
+                        )
+                    ).title(),
+                )
+
+            with state_col4:
+
+                st.metric(
+                    "Latest Severity",
+                    str(
+                        recent_state.get(
+                            "severity",
+                            "N/A",
+                        )
+                    ).title(),
+                )
+
+        else:
+
+            st.info(
+                "Recent emotional state is not available."
+            )
+
+    else:
+
+        st.info(
+            "Emotional trend data is not available."
+        )
+
+
+    # ========================================================
     # RECOMMENDATIONS
     # ========================================================
 
     st.divider()
 
     st.header("Personalized Recommendations")
-
-    # --------------------------------------------------------
-    # /recommend returns:
-    #
-    # "recommendations": {
-    #     "recommendations": [...]
-    # }
-    # --------------------------------------------------------
 
     recommendation_result = result.get(
         "recommendations",
@@ -478,7 +857,6 @@ if "latest_result" in st.session_state:
             start=1,
         ):
 
-            # Safety check
             if not isinstance(
                 recommendation,
                 dict,
@@ -520,6 +898,13 @@ if "latest_result" in st.session_state:
                 [],
             )
 
+            try:
+                score_value = float(score)
+            except (
+                TypeError,
+                ValueError,
+            ):
+                score_value = 0.0
 
             with st.expander(
                 f"{rank}. {title}",
@@ -537,7 +922,7 @@ if "latest_result" in st.session_state:
                 with col2:
 
                     st.write(
-                        f"**Score:** {float(score):.3f}"
+                        f"**Score:** {score_value:.3f}"
                     )
 
 
@@ -634,26 +1019,22 @@ st.divider()
 st.header("Previous Interaction History")
 
 
-# ------------------------------------------------------------
-# Determine which user history should be displayed
-# ------------------------------------------------------------
+# ============================================================
+# DETERMINE HISTORY USER
+# ============================================================
 
 history_user_id = user_id.strip()
-
-
-# ------------------------------------------------------------
-# Detect user ID changes
-# ------------------------------------------------------------
-# If the user changes from default_user to another user,
-# fetch that user's history instead of showing the old user's
-# cached history.
-# ------------------------------------------------------------
 
 cached_history_user = st.session_state.get(
     "interaction_history_user_id"
 )
 
 current_user_id = user_id.strip()
+
+
+# ============================================================
+# DETECT USER ID CHANGES
+# ============================================================
 
 if (
     cached_history_user is not None
@@ -672,9 +1053,9 @@ if (
     history_user_id = current_user_id
 
 
-# ------------------------------------------------------------
+# ============================================================
 # REFRESH HISTORY BUTTON
-# ------------------------------------------------------------
+# ============================================================
 
 if st.button(
     "Refresh History"
@@ -699,9 +1080,9 @@ if st.button(
         )
 
 
-# ------------------------------------------------------------
+# ============================================================
 # LOAD HISTORY IF NOT ALREADY LOADED
-# ------------------------------------------------------------
+# ============================================================
 
 if (
     "interaction_history" not in st.session_state
@@ -725,9 +1106,9 @@ if (
         ] = history_user_id
 
 
-# ------------------------------------------------------------
+# ============================================================
 # GET CACHED HISTORY
-# ------------------------------------------------------------
+# ============================================================
 
 history = st.session_state.get(
     "interaction_history",
@@ -735,9 +1116,9 @@ history = st.session_state.get(
 )
 
 
-# ------------------------------------------------------------
+# ============================================================
 # DISPLAY HISTORY
-# ------------------------------------------------------------
+# ============================================================
 
 if (
     isinstance(history, list)
@@ -788,10 +1169,18 @@ if (
             0,
         )
 
+        try:
+            intensity_value = float(intensity)
+        except (
+            TypeError,
+            ValueError,
+        ):
+            intensity_value = 0.0
+
         with st.expander(
             f"{created_at} — "
             f"{str(dominant_emotion).title()} "
-            f"(Intensity: {float(intensity):.2f})"
+            f"(Intensity: {intensity_value:.2f})"
         ):
 
             st.write(
@@ -805,7 +1194,7 @@ if (
 
             st.write(
                 f"**Intensity:** "
-                f"{float(intensity):.2f}"
+                f"{intensity_value:.2f}"
             )
 
             st.write(
