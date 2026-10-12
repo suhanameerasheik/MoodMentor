@@ -14,3 +14,10 @@ dist/
 *.log
 # Trained ML models
 ml/models/
+# Python packaging artifacts
+build/
+dist/
+*.egg-info/
+
+# Temporary packaging test environment
+packaging-test-venv/
