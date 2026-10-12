@@ -40,6 +40,64 @@ st.set_page_config(
 
 
 # ============================================================
+# M4-T8 AUTHENTICATION
+# ============================================================
+
+def auth_headers():
+    token = st.session_state.get("access_token")
+
+    if not token:
+        return {}
+
+    return {"Authorization": f"Bearer {token}"}
+
+
+if "access_token" not in st.session_state:
+    st.session_state["access_token"] = None
+
+if not st.session_state["access_token"]:
+    st.title("MoodMentor Login")
+    st.write("Sign in to access your wellness dashboard.")
+
+    with st.form("login_form"):
+        login_username = st.text_input("User ID")
+        login_password = st.text_input(
+            "Password",
+            type="password",
+        )
+        login_submitted = st.form_submit_button("Log in")
+
+    if login_submitted:
+        try:
+            response = requests.post(
+                f"{BACKEND_URL}/login",
+                json={
+                    "username": login_username.strip(),
+                    "password": login_password,
+                },
+                timeout=15,
+            )
+
+            if response.status_code == 200:
+                login_data = response.json()
+                st.session_state["access_token"] = (
+                    login_data["access_token"]
+                )
+                st.session_state["authenticated_user"] = (
+                    login_username.strip()
+                )
+                st.rerun()
+            else:
+                st.error("Login failed. Check your credentials.")
+
+        except requests.RequestException:
+            st.error(
+                "Cannot connect to the backend. "
+                "Make sure the API server is running."
+            )
+
+    st.stop()
+# ============================================================
 # HELPER FUNCTIONS
 # ============================================================
 
@@ -47,7 +105,7 @@ def get_previous_interactions(user_id):
     try:
         response = requests.get(
             f"{BACKEND_URL}/previous-interactions",
-            params={"user_id": user_id},
+            headers=auth_headers(),
             timeout=30,
         )
 
@@ -80,7 +138,7 @@ def get_emotional_trend(user_id):
     try:
         response = requests.get(
             f"{BACKEND_URL}/emotional-trend",
-            params={"user_id": user_id},
+            headers=auth_headers(),
             timeout=30,
         )
 
@@ -120,6 +178,7 @@ def analyze_and_recommend(
         response = requests.post(
             f"{BACKEND_URL}/recommend",
             json=payload,
+            headers=auth_headers(),
             timeout=120,
         )
 
@@ -162,6 +221,7 @@ def save_recommendation_feedback(
         response = requests.post(
             f"{BACKEND_URL}/recommendation-feedback",
             json=payload,
+            headers=auth_headers(),
             timeout=30,
         )
 
@@ -1335,10 +1395,8 @@ with st.sidebar:
 
     st.header("Dashboard Settings")
 
-    user_id = st.text_input(
-        "User ID",
-        value="default_user",
-    )
+    user_id = st.session_state["authenticated_user"]
+    st.caption(f"Signed in as: {user_id}")
 
     top_k = st.slider(
         "Number of recommendations",
@@ -1357,6 +1415,52 @@ with st.sidebar:
         for item in preferences_text.split(",")
         if item.strip()
     ]
+    st.divider()
+
+    if st.button("Log out"):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+
+        st.subheader("Privacy")
+
+    confirm_deletion = st.checkbox(
+        "I understand this permanently deletes my stored data."
+    )
+
+    if st.button(
+        "Delete my data",
+        disabled=not confirm_deletion,
+    ):
+        try:
+            response = requests.delete(
+                f"{BACKEND_URL}/user-data",
+                headers=auth_headers(),
+                timeout=30,
+            )
+
+            if response.status_code == 200:
+                for key in (
+                    "latest_result",
+                    "latest_user_id",
+                    "interaction_history",
+                    "interaction_history_user_id",
+                ):
+                    st.session_state.pop(key, None)
+
+                st.success("Your stored data was deleted.")
+                st.rerun()
+
+            elif response.status_code == 401:
+                st.error("Your session expired. Please log in again.")
+
+            else:
+                st.error(
+                    f"Data deletion failed: HTTP {response.status_code}"
+                )
+
+        except requests.RequestException:
+            st.error("Could not connect to the backend.")
 
 
 # ============================================================
