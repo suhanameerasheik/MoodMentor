@@ -2,7 +2,14 @@ import sys
 from pathlib import Path
 import csv
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import (
+    FastAPI,
+    UploadFile,
+    File,
+    HTTPException,
+    Header,
+    Depends,
+)
 from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(
@@ -11,9 +18,16 @@ sys.path.append(
     )
 )
 
+from backend.auth import (
+    authenticate_user,
+    create_access_token,
+    decode_access_token,
+)
+
 from ml.preprocessing import preprocess_text
 from ml.sentiment import analyze_sentiment
 from ml.emotion import analyze_emotion
+from ml.data_privacy import delete_user_data
 from ml.multilabel_emotion import (
     analyze_multilabel_emotion
 )
@@ -36,7 +50,6 @@ from ml.feedback_learning import (
     get_feedback_statistics,
     apply_feedback_learning
 )
-
 from ml.interaction_history import (
     save_recommendation_interaction,
     get_previous_interactions
@@ -44,7 +57,41 @@ from ml.interaction_history import (
 
 
 app = FastAPI()
+def get_current_user(
+    authorization: str | None = Header(default=None)
+):
+    """Validate the Bearer token and return the authenticated user."""
 
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    scheme, separator, token = authorization.partition(" ")
+
+    if (
+        not separator
+        or scheme.lower() != "bearer"
+        or not token.strip()
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authentication header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = decode_access_token(token.strip())
+
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired access token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return user
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,16 +114,108 @@ def home():
 
 
 # ============================================================
+# AUTHENTICATION
+# M4-T8 SECURITY AND DATA PRIVACY
+# ============================================================
+
+@app.post("/login")
+def login(data: dict):
+
+    username = data.get(
+        "username",
+        ""
+    )
+
+    password = data.get(
+        "password",
+        ""
+    )
+
+    if not isinstance(
+        username,
+        str
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail="Username must be a string"
+        )
+
+    if not isinstance(
+        password,
+        str
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be a string"
+        )
+
+    username = username.strip()
+
+    if not username:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Username is required"
+        )
+
+    if not password:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Password is required"
+        )
+
+    user = authenticate_user(
+        username,
+        password
+    )
+
+    if not user:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid username or password"
+        )
+
+    access_token = create_access_token(
+        user["user_id"]
+    )
+
+    return {
+        "status": "success",
+        "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_id": user["user_id"]
+    }
+
+
+# ============================================================
 # ANALYSIS
 # ============================================================
 
 def run_analysis(text):
 
-    if not text or not text.strip():
+    if not isinstance(text, str):
+        raise HTTPException(
+            status_code=400,
+            detail="Text must be a string"
+        )
 
+    text = text.strip()
+
+    if not text:
         raise HTTPException(
             status_code=400,
             detail="Text cannot be empty"
+        )
+
+    if len(text) > 10000:
+        raise HTTPException(
+            status_code=413,
+            detail="Text exceeds the 10000-character limit"
         )
 
     cleaned_text = preprocess_text(
@@ -159,19 +298,17 @@ def save_analysis_history(
 # ============================================================
 
 @app.post("/analyze")
-def analyze(data: dict):
+def analyze(
+    data: dict,
+    current_user: dict = Depends(get_current_user),
+):
 
     text = data.get(
         "text",
         ""
     )
 
-    user_id = normalize_user_id(
-        data.get(
-            "user_id",
-            "default_user"
-        )
-    )
+    user_id = current_user["user_id"]
 
     try:
 
@@ -181,10 +318,7 @@ def analyze(data: dict):
 
     except HTTPException:
 
-        return {
-            "status": "error",
-            "message": "Text cannot be empty"
-        }
+        raise
 
     record_id = save_analysis_history(
         analysis_result,
@@ -209,7 +343,10 @@ def analyze(data: dict):
 # ============================================================
 
 @app.post("/recommend")
-def recommend(data: dict):
+def recommend(
+    data: dict,
+    current_user: dict = Depends(get_current_user),
+):
 
     text = data.get(
         "text",
@@ -236,10 +373,7 @@ def recommend(data: dict):
     # --------------------------------------------------
 
     user_id = normalize_user_id(
-        data.get(
-            "user_id",
-            "default_user"
-        )
+        current_user["user_id"]
     )
 
     # --------------------------------------------------
@@ -298,9 +432,8 @@ def recommend(data: dict):
 
     # --------------------------------------------------
     # TASK 6
-    #
-    # Read historical emotional state BEFORE saving
-    # the current record.
+    # Read historical emotional state BEFORE
+    # saving the current record.
     # --------------------------------------------------
 
     historical_emotional_context = (
@@ -335,13 +468,6 @@ def recommend(data: dict):
 
     # --------------------------------------------------
     # Generate recommendations
-    #
-    # Existing hybrid + semantic +
-    # collaborative recommendation logic
-    # is preserved.
-    #
-    # Task 6 historical emotional context
-    # is passed into the recommendation engine.
     # --------------------------------------------------
 
     recommendation_result = (
@@ -366,11 +492,7 @@ def recommend(data: dict):
 
     # --------------------------------------------------
     # TASK 6
-    #
-    # Apply emotional trend adjustment
-    # before feedback learning.
-    #
-    # Original hybrid score is preserved.
+    # Apply emotional trend adjustment.
     # --------------------------------------------------
 
     for recommendation in recommendations:
@@ -398,7 +520,6 @@ def recommend(data: dict):
             )
         )
 
-        # Preserve original pure hybrid score.
         recommendation[
             "base_score"
         ] = round(
@@ -406,7 +527,6 @@ def recommend(data: dict):
             4
         )
 
-        # Preserve Task 6 adjusted score.
         recommendation[
             "trend_adjusted_score"
         ] = round(
@@ -414,8 +534,6 @@ def recommend(data: dict):
             4
         )
 
-        # This becomes the input to
-        # Task 7 feedback learning.
         recommendation[
             "score"
         ] = round(
@@ -425,11 +543,7 @@ def recommend(data: dict):
 
     # --------------------------------------------------
     # TASK 7
-    #
     # Apply user-specific feedback learning.
-    #
-    # Feedback from one user must not affect
-    # another user's recommendations.
     # --------------------------------------------------
 
     recommendations = (
@@ -462,9 +576,6 @@ def recommend(data: dict):
             ),
             4
         )
-
-        # Keep explanation's final score
-        # synchronized with actual score.
 
         if recommendation.get(
             "explanation"
@@ -581,7 +692,6 @@ def recommend(data: dict):
 
     # --------------------------------------------------
     # TASK 6
-    #
     # Return historical trend summary.
     # --------------------------------------------------
 
@@ -669,50 +779,32 @@ def recommend(data: dict):
 # PREVIOUS RECOMMENDATION INTERACTIONS
 # ============================================================
 
+
 @app.get("/previous-interactions")
 def previous_interactions(
     limit: int = 20,
-    user_id: str = None
-
+    current_user: dict = Depends(get_current_user),
 ):
-
     try:
-
         limit = int(limit)
-
-    except (
-        ValueError,
-        TypeError
-    ):
-
+    except (ValueError, TypeError):
         limit = 20
 
-    limit = max(
-        1,
-        min(limit, 100)
-    )
-    if user_id:
+    limit = max(1, min(limit, 100))
 
-        user_id = normalize_user_id(
-            user_id      
-    )
-    interactions = (
-        get_previous_interactions(
-            limit,
-            user_id=user_id
-        )
+    user_id = current_user["user_id"]
+
+    interactions = get_previous_interactions(
+        limit,
+        user_id=user_id,
     )
 
     return {
         "status": "success",
-        "message":
-            "Previous recommendation interactions retrieved successfully",
-        "count":
-            len(interactions),
-        "interactions":
-            interactions
+        "message": "Previous recommendation interactions retrieved successfully",
+        "count": len(interactions),
+        "interactions": interactions,
     }
-
 # ============================================================
 # TASK 7
 # RECOMMENDATION FEEDBACK
@@ -720,7 +812,8 @@ def previous_interactions(
 
 @app.post("/recommendation-feedback")
 def recommendation_feedback(
-    data: dict
+    data: dict,
+    current_user: dict = Depends(get_current_user),
 ):
 
     recommendation_id = data.get(
@@ -738,32 +831,12 @@ def recommendation_feedback(
         {}
     )
 
-    user_id = normalize_user_id(
-        data.get(
-            "user_id",
-            "default_user"
-        )
-    )
-
-    # --------------------------------------------------
-    # Optional rating
-    # --------------------------------------------------
+    user_id = current_user["user_id"]
 
     rating = data.get(
         "rating",
         None
     )
-
-    # --------------------------------------------------
-    # Optional interaction type
-    #
-    # Supported:
-    # viewed
-    # accepted
-    # rejected
-    # rating
-    # preference_changed
-    # --------------------------------------------------
 
     interaction_type = data.get(
         "interaction_type",
@@ -826,14 +899,12 @@ def recommendation_feedback(
 
 @app.get("/recommendation-feedback")
 def recommendation_feedback_stats(
-    user_id: str = None
+    current_user: dict = Depends(get_current_user)
 ):
 
     if user_id:
 
-        user_id = normalize_user_id(
-            user_id
-        )
+            user_id = current_user["user_id"]
 
     statistics = (
         get_feedback_statistics(
@@ -860,7 +931,7 @@ def recommendation_feedback_stats(
 @app.get("/emotional-trend")
 def emotional_trend(
     limit: int = 20,
-    user_id: str = "default_user"
+    current_user: dict = Depends(get_current_user),
 ):
 
     try:
@@ -879,9 +950,7 @@ def emotional_trend(
         min(limit, 100)
     )
 
-    user_id = normalize_user_id(
-        user_id
-    )
+    user_id = current_user["user_id"]
 
     trend_result = get_emotional_trend(
         limit=limit,
@@ -903,12 +972,17 @@ def emotional_trend(
 @app.post("/analyze-file")
 async def analyze_file(
     file: UploadFile = File(...),
-    user_id: str = "default_user"
+    current_user: dict = Depends(get_current_user),
 ):
 
-    user_id = normalize_user_id(
-        user_id
-    )
+    user_id = current_user["user_id"]
+
+    if not file.filename:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Filename is required"
+        )
 
     filename = file.filename.lower()
 
@@ -922,7 +996,14 @@ async def analyze_file(
             detail="Only .txt and .csv files are supported"
         )
 
-    content = await file.read()
+        MAX_UPLOAD_BYTES = 1 * 1024 * 1024  # 1 MB
+    content = await file.read(MAX_UPLOAD_BYTES + 1)
+
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="File exceeds the 1 MB upload limit"
+        )
 
     try:
 
@@ -1033,4 +1114,27 @@ async def analyze_file(
         "user_id":
             user_id,
         **analysis_result
+    }
+# ============================================================
+# M4-T8: USER DATA DELETION
+# ============================================================
+
+@app.delete("/user-data")
+def delete_my_user_data(
+    current_user: dict = Depends(get_current_user),
+):
+    user_id = current_user["user_id"]
+
+    try:
+        result = delete_user_data(user_id)
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to complete data deletion",
+        )
+
+    return {
+        "status": "success",
+        "message": "Your stored data has been deleted",
+        **result,
     }
