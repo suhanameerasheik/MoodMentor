@@ -21,3 +21,6 @@ dist/
 
 # Temporary packaging test environment
 packaging-test-venv/
+
+# Local databases and user interaction data
+*.db

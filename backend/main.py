@@ -897,29 +897,22 @@ def recommendation_feedback(
 # FEEDBACK STATISTICS
 # ============================================================
 
+
 @app.get("/recommendation-feedback")
 def recommendation_feedback_stats(
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
+    user_id = normalize_user_id(current_user["user_id"])
 
-    if user_id:
-
-            user_id = current_user["user_id"]
-
-    statistics = (
-        get_feedback_statistics(
-            user_id=user_id
-        )
+    statistics = get_feedback_statistics(
+        user_id=user_id
     )
 
     return {
         "status": "success",
-        "message":
-            "Recommendation feedback statistics retrieved successfully",
-        "user_id":
-            user_id,
-        "statistics":
-            statistics
+        "message": "Recommendation feedback statistics retrieved successfully",
+        "user_id": user_id,
+        "statistics": statistics,
     }
 
 
@@ -969,16 +962,17 @@ def emotional_trend(
 # FILE ANALYSIS
 # ============================================================
 
+
 @app.post("/analyze-file")
 async def analyze_file(
     file: UploadFile = File(...),
     current_user: dict = Depends(get_current_user),
 ):
-
     user_id = current_user["user_id"]
+    MAX_UPLOAD_BYTES = 1 * 1024 * 1024  # 1 MB
 
+    # Validate filename
     if not file.filename:
-
         raise HTTPException(
             status_code=400,
             detail="Filename is required"
@@ -986,17 +980,17 @@ async def analyze_file(
 
     filename = file.filename.lower()
 
+    # Allow only .txt and .csv files
     if not (
         filename.endswith(".txt")
         or filename.endswith(".csv")
     ):
-
         raise HTTPException(
             status_code=400,
             detail="Only .txt and .csv files are supported"
         )
 
-        MAX_UPLOAD_BYTES = 1 * 1024 * 1024  # 1 MB
+    # Read at most 1 MB plus one byte to detect oversized uploads
     content = await file.read(MAX_UPLOAD_BYTES + 1)
 
     if len(content) > MAX_UPLOAD_BYTES:
@@ -1005,101 +999,62 @@ async def analyze_file(
             detail="File exceeds the 1 MB upload limit"
         )
 
+    # Decode the file as UTF-8
     try:
-
-        text = content.decode(
-            "utf-8"
-        )
-
+        text = content.decode("utf-8")
     except UnicodeDecodeError:
-
         raise HTTPException(
             status_code=400,
             detail="The uploaded file must use UTF-8 text encoding"
         )
 
-    # --------------------------------------------------
-    # CSV
-    # --------------------------------------------------
-
+    # Process CSV files using the feedback column
     if filename.endswith(".csv"):
-
         lines = []
 
         try:
-
-            reader = csv.DictReader(
-                text.splitlines()
-            )
+            reader = csv.DictReader(text.splitlines())
 
             if not reader.fieldnames:
-
                 raise HTTPException(
                     status_code=400,
                     detail="CSV file must contain a header row"
                 )
 
             if "feedback" not in reader.fieldnames:
-
                 raise HTTPException(
                     status_code=400,
                     detail="CSV must contain a 'feedback' column"
                 )
 
             for row in reader:
+                feedback = row.get("feedback", "")
 
-                feedback = row.get(
-                    "feedback",
-                    ""
-                )
-
-                if (
-                    feedback
-                    and feedback.strip()
-                ):
-
-                    lines.append(
-                        feedback.strip()
-                    )
+                if feedback and feedback.strip():
+                    lines.append(feedback.strip())
 
         except HTTPException:
-
             raise
 
         except Exception:
-
             raise HTTPException(
                 status_code=400,
                 detail="Invalid CSV format"
             )
 
-        text = " ".join(
-            lines
-        )
+        text = " ".join(lines)
 
-    # --------------------------------------------------
-    # Validate uploaded text
-    # --------------------------------------------------
-
+    # Reject empty files or files without usable feedback
     if not text.strip():
-
         raise HTTPException(
             status_code=400,
             detail="Uploaded file contains no valid text"
         )
 
-    # --------------------------------------------------
-    # Analyze
-    # --------------------------------------------------
+    # Analyze the uploaded text
+    analysis_result = run_analysis(text)
 
-    analysis_result = run_analysis(
-        text
-    )
-
-    # --------------------------------------------------
-    # Save user-specific history
-    # --------------------------------------------------
-
+    # Save the analysis under the authenticated user's ID
     record_id = save_analysis_history(
         analysis_result,
         user_id
@@ -1107,12 +1062,9 @@ async def analyze_file(
 
     return {
         "status": "success",
-        "filename":
-            file.filename,
-        "history_record_id":
-            record_id,
-        "user_id":
-            user_id,
+        "filename": file.filename,
+        "history_record_id": record_id,
+        "user_id": user_id,
         **analysis_result
     }
 # ============================================================
